@@ -2,6 +2,13 @@
 
 AI 기반 의료 진단 플랫폼으로, 환자가 증상과 이미지를 업로드하면 GPT API가 진단 정보와 관련 의학 논문을 제공하고, 의사가 관리자 대시보드에서 환자 정보를 확인할 수 있습니다.
 
+## 🌐 배포
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/WEED-ChoGeonHee/medical-diagnosis-platform)
+
+- **GitHub Repository**: [medical-diagnosis-platform](https://github.com/WEED-ChoGeonHee/medical-diagnosis-platform)
+- **배포 가이드**: [DEPLOYMENT.md](DEPLOYMENT.md) 참조
+
 ## 📋 프로젝트 구조
 
 ```
