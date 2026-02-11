@@ -2,7 +2,7 @@ const mysql = require('mysql2/promise');
 
 const poolConfig = {
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -14,24 +14,32 @@ const poolConfig = {
 
 // Aiven SSL 설정 (클라우드 DB인 경우)
 if (process.env.DB_SSL === 'true') {
-  poolConfig.ssl = { rejectUnauthorized: false };
+  poolConfig.ssl = { 
+    rejectUnauthorized: false,
+    minVersion: 'TLSv1.2'
+  };
 }
+
+console.log('DB 연결 설정:', {
+  host: poolConfig.host,
+  port: poolConfig.port,
+  user: poolConfig.user,
+  database: poolConfig.database,
+  ssl: poolConfig.ssl ? 'enabled' : 'disabled'
+});
 
 const pool = mysql.createPool(poolConfig);
 
 // 테이블 생성
 const initDatabase = async () => {
   try {
-    // 데이터베이스 생성 (없으면)
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD
-    });
-    
-    await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-    await connection.end();
+    // 연결 테스트
+    const testConnection = await pool.getConnection();
+    console.log('✅ MySQL 연결 성공!');
+    testConnection.release();
+
+    // Aiven에서는 defaultdb가 이미 생성되어 있으므로 바로 테이블 생성
+    console.log('📊 테이블 생성 시작...');
 
     // 사용자 테이블
     await pool.query(`
