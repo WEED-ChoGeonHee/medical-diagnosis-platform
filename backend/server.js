@@ -42,7 +42,7 @@ const startServer = async () => {
         DB_PASSWORD: process.env.DB_PASSWORD ? '✅ set' : '❌ missing',
         DB_NAME: process.env.DB_NAME ? '✅ ' + process.env.DB_NAME : '❌ missing',
         DB_SSL: process.env.DB_SSL || 'not set',
-        JWT_SECRET: process.env.JWT_SECRET ? '✅ set' : '❌ missing',
+        JWT_SECRET: process.env.JWT_SECRET ? '✅ set (' + process.env.JWT_SECRET.substring(0, 8) + '...)' : '❌ missing',
         NODE_ENV: process.env.NODE_ENV || 'not set'
       };
 

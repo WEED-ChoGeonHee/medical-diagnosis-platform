@@ -52,11 +52,17 @@ router.post('/register',
         }
       });
     } catch (error) {
-      console.error('회원가입 에러 상세:', error.message, error.code, error.errno);
+      console.error('=== 회원가입 에러 상세 ===');
+      console.error('Message:', error.message);
+      console.error('Code:', error.code);
+      console.error('Stack:', error.stack);
+      console.error('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+      console.error('JWT_SECRET length:', process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 0);
       res.status(500).json({
         message: '회원가입 중 오류가 발생했습니다.',
         debug_error: error.message,
-        debug_code: error.code
+        debug_code: error.code,
+        debug_stack: error.stack
       });
     }
   }
