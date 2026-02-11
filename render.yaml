@@ -7,11 +7,9 @@ services:
     region: singapore
     plan: free
     buildCommand: |
-      npm --prefix patient-portal install
-      npm --prefix patient-portal run build
-      npm --prefix admin-dashboard install
-      npm --prefix admin-dashboard run build
-      npm --prefix backend install
+      cd patient-portal && PUBLIC_URL=/patient npm install && PUBLIC_URL=/patient npm run build && cd ..
+      cd admin-dashboard && PUBLIC_URL=/admin npm install && PUBLIC_URL=/admin npm run build && cd ..
+      cd backend && npm install && cd ..
     startCommand: npm --prefix backend start
     envVars:
       - key: NODE_ENV
