@@ -1,36 +1,36 @@
-# 🖼️ Cloudinary 이미지 스토리지 설정 가이드
+# ?���?Cloudinary ?��?지 ?�토리�? ?�정 가?�드
 
-## 문제: Render.com 파일 저장 불가
+## 문제: Render.com ?�일 ?�??불�?
 
-Render 무료 웹 서비스는 **Ephemeral Filesystem**을 사용하여:
-- ❌ 서버 재시작 시 업로드된 파일 모두 삭제
-- ❌ `uploads/` 폴더의 모든 이미지 손실
-- ❌ 영구 파일 저장 불가능
-
----
-
-## 해결책: Cloudinary (무료 클라우드 스토리지)
-
-### ✅ Cloudinary 장점
-- 💰 **완전 무료**: 25GB 스토리지, 25GB 월간 대역폭
-- 🚀 **CDN 제공**: 전 세계 빠른 이미지 로딩
-- 🎨 **자동 최적화**: 이미지 크기, 포맷 자동 변환
-- 🔒 **안전**: 클라우드 백업
-- 💳 **신용카드 불필요**
+Render 무료 ???�비?�는 **Ephemeral Filesystem**???�용?�여:
+- ???�버 ?�시?????�로?�된 ?�일 모두 ??��
+- ??`uploads/` ?�더??모든 ?��?지 ?�실
+- ???�구 ?�일 ?�??불�???
 
 ---
 
-## 1️⃣ Cloudinary 계정 생성 (1분)
+## ?�결�? Cloudinary (무료 ?�라?�드 ?�토리�?)
 
-1. https://cloudinary.com/users/register/free 접속
-2. 이메일로 가입 (Google 계정 가능)
-3. 이메일 인증
+### ??Cloudinary ?�점
+- ?�� **?�전 무료**: 25GB ?�토리�?, 25GB ?�간 ?�??��
+- ?? **CDN ?�공**: ???�계 빠른 ?��?지 로딩
+- ?�� **?�동 최적??*: ?��?지 ?�기, ?�맷 ?�동 변??
+- ?�� **?�전**: ?�라?�드 백업
+- ?�� **?�용카드 불필??*
 
 ---
 
-## 2️⃣ API 정보 복사
+## 1️⃣ Cloudinary 계정 ?�성 (1�?
 
-가입 후 Dashboard에서:
+1. https://cloudinary.com/users/register/free ?�속
+2. ?�메?�로 가??(Google 계정 가??
+3. ?�메???�증
+
+---
+
+## 2️⃣ API ?�보 복사
+
+가????Dashboard?�서:
 
 ```
 Cloud Name: your_cloud_name
@@ -38,37 +38,37 @@ API Key: 123456789012345
 API Secret: abc123def456ghi789jkl012mno
 ```
 
-**이 정보를 복사해 주세요!**
+**???�보�?복사??주세??**
 
 ---
 
-## 3️⃣ 설정 자동화
+## 3️⃣ ?�정 ?�동??
 
-API 정보를 알려주시면:
-1. npm 패키지 설치 (`cloudinary`, `multer-storage-cloudinary`)
-2. 업로드 설정 자동 변경
-3. .env 파일 업데이트
-4. Render.com 환경 변수 안내
+API ?�보�??�려주시�?
+1. npm ?�키지 ?�치 (`cloudinary`, `multer-storage-cloudinary`)
+2. ?�로???�정 ?�동 변�?
+3. .env ?�일 ?�데?�트
+4. Render.com ?�경 변???�내
 
 ---
 
-## 📋 필요한 정보
+## ?�� ?�요???�보
 
-Cloudinary Dashboard에서 복사:
+Cloudinary Dashboard?�서 복사:
 - `Cloud Name`: ?
 - `API Key`: ?
 - `API Secret`: ?
 
 ---
 
-## 🔄 기존 이미지 마이그레이션
+## ?�� 기존 ?��?지 마이그레?�션
 
-로컬 `uploads/` 폴더의 이미지를 Cloudinary로 자동 업로드도 가능!
+로컬 `uploads/` ?�더???��?지�?Cloudinary�??�동 ?�로?�도 가??
 
 ---
 
-## 💡 참고
+## ?�� 참고
 
-- 무료 티어 제한: 25GB/월 (개인 프로젝트 충분)
-- 이미지 URL 예시: `https://res.cloudinary.com/your_cloud/image/upload/v123/sample.jpg`
-- Render.com 재시작 시에도 이미지 유지됨!
+- 무료 ?�어 ?�한: 25GB/??(개인 ?�로?�트 충분)
+- ?��?지 URL ?�시: `https://res.cloudinary.com/your_cloud/image/upload/v123/sample.jpg`
+- Render.com ?�시???�에???��?지 ?��???

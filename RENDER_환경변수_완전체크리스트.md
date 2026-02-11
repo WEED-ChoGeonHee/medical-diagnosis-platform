@@ -1,0 +1,280 @@
+# ?�� Render ?�경 변???�전 체크리스??
+
+## ??�?12�??�경 변???�요
+
+### Render Dashboard ??Environment ??��???�인
+
+---
+
+## ?�� ?�경 변??목록 �?�?
+
+### 1️⃣ ?�동 ?�정 (건드리�? ?�아????
+
+```
+??NODE_ENV = production (render.yaml?�서 ?�동 ?�정)
+??PORT = 10000 (render.yaml?�서 ?�동 ?�정)
+??JWT_SECRET = (?�동 ?�성??
+```
+
+---
+
+### 2️⃣ ?�동 ?�력 ?�수 (Aiven MySQL)
+
+```
+Key: DB_HOST
+Value: geonhee-1017-itweed-cf64.e.aivencloud.com
+```
+
+```
+Key: DB_PORT
+Value: 26163
+```
+
+```
+Key: DB_USER
+Value: avnadmin
+```
+
+```
+Key: DB_PASSWORD
+Value: YOUR_AIVEN_PASSWORD
+```
+
+```
+Key: DB_NAME
+Value: defaultdb
+```
+
+```
+Key: DB_SSL
+Value: true
+```
+
+---
+
+### 3️⃣ ?�동 ?�력 ?�수 (Gemini API)
+
+```
+Key: GEMINI_API_KEY
+Value: YOUR_GEMINI_API_KEY
+```
+
+---
+
+### 4️⃣ ?�동 ?�력 ?�수 (Cloudinary)
+
+```
+Key: CLOUDINARY_CLOUD_NAME
+Value: YOUR_CLOUDINARY_CLOUD_NAME
+```
+
+```
+Key: CLOUDINARY_API_KEY
+Value: YOUR_CLOUDINARY_API_KEY
+```
+
+```
+Key: CLOUDINARY_API_SECRET
+Value: YOUR_CLOUDINARY_API_SECRET
+```
+
+---
+
+## ?�� Environment ??최종 ?�인 ?�항
+
+�?**12�?* ?�경 변?��? ?�어????
+
+### ?�동 ?�정 (3�?
+- [x] NODE_ENV
+- [x] PORT
+- [x] JWT_SECRET
+
+### Database (6�?
+- [ ] DB_HOST
+- [ ] DB_PORT
+- [ ] DB_USER
+- [ ] DB_PASSWORD
+- [ ] DB_NAME
+- [ ] DB_SSL
+
+### API (1�?
+- [ ] GEMINI_API_KEY
+
+### Cloud Storage (3�?
+- [ ] CLOUDINARY_CLOUD_NAME
+- [ ] CLOUDINARY_API_KEY
+- [ ] CLOUDINARY_API_SECRET
+
+---
+
+## ?�️ 중요 ?�인??
+
+### DB_PORT 주의!
+- ??**25060** (?�반?�인 MySQL ?�트 - ?�못??)
+- ??**26163** (Aiven MySQL ?�제 ?�트 - ?�바�?)
+
+### DB_NAME 주의!
+- ??**medical_diagnosis** (?�의 ?�름 - ?�못??)
+- ??**defaultdb** (Aiven 기본 DB ?�름 - ?�바�?)
+
+### DB_SSL ?�수!
+- ??**true** (Aiven?�?SSL ?�수)
+
+---
+
+## ?�� ?�력 방법
+
+### Render Dashboard?�서:
+
+1. **Environment** ???�릭
+
+2. **Add Environment Variable** 버튼 ?�릭
+
+3. ?�의 값들???�나???�력:
+   - Key ?�력
+   - Value ?�력 (?�확??복사!)
+   - **Add** 버튼 ?�릭
+
+4. 모든 변???�력 ??**Save Changes** ?�릭
+
+5. ?�동 ?�배???�작!
+
+---
+
+## ???�력 ?�료 ???�인
+
+### Environment ??��??12�?모두 보여????
+
+```
+??CLOUDINARY_API_KEY = 9489686297...
+??CLOUDINARY_API_SECRET = thWYYr33... (?�겨�?
+??CLOUDINARY_CLOUD_NAME = YOUR_CLOUDINARY_CLOUD_NAME
+??DB_HOST = geonhee-1017-itweed-cf64.e.aivencloud.com
+??DB_NAME = defaultdb
+??DB_PASSWORD = AVNS_OQG... (?�겨�?
+??DB_PORT = 26163
+??DB_SSL = true
+??DB_USER = avnadmin
+??GEMINI_API_KEY = AIzaSyC5... (?�겨�?
+??JWT_SECRET = (?�동 ?�성??
+??NODE_ENV = production
+??PORT = 10000
+```
+
+---
+
+## ?? 배포 ?�공 ?�인
+
+### Logs ??��???�음 메시지 ?�인:
+
+```bash
+??Build successful
+??npm --prefix patient-portal run build
+   ??Compiled successfully!
+??npm --prefix admin-dashboard run build
+   ??Compiled successfully!
+??npm --prefix backend install
+??Starting service...
+???�버 ?�작?? http://localhost:10000
+??MySQL ?�결 ?�공  ????메시지 중요!
+???�자 ?�털 빌드 존재 ?��?: true
+??관리자 ?�?�보??빌드 존재 ?��?: true
+```
+
+### Events ??�� ?�시:
+```
+??Deploy live for ... (초록??
+```
+
+---
+
+## ?�� ?�사?�트 ?�스??
+
+배포 ?�료 ??(5-7�?:
+
+### ?�자 ?�털:
+```
+https://medical-diagnosis-platform.onrender.com/patient
+```
+??로그???�이지가 ?�상 ?�시?�어??????
+
+### ?�사 ?�?�보??
+```
+https://medical-diagnosis-platform.onrender.com/admin
+```
+??로그???�이지가 ?�상 ?�시?�어??????
+
+---
+
+## ?�� APK ???�스??
+
+?�사?�트가 ?�상 ?�동?�면:
+
+1. **?�자??APK** ?�치
+   ```
+   E:\?�스\?�학\?�자???�료진단.apk
+   ```
+
+2. **?�사??APK** ?�치
+   ```
+   E:\?�스\?�학\?�사???�료진단.apk
+   ```
+
+3. ???�행 ??Render ?�버???�결??
+
+---
+
+## ?�� 문제 ?�결
+
+### 문제 1: "MySQL ?�결 ?�패"
+**?�인:**
+- DB_HOST가 ?�확?��?
+- DB_PORT가 **26163**?��? (25060 ?�님!)
+- DB_NAME??**defaultdb**?��? (medical_diagnosis ?�님!)
+- DB_PASSWORD가 ?�확??복사?�었?��?
+- DB_SSL??**true**?��?
+
+### 문제 2: ?��?지 ?�로???�류
+**?�인:**
+- CLOUDINARY_CLOUD_NAME ?�인
+- CLOUDINARY_API_KEY ?�인
+- CLOUDINARY_API_SECRET ?�인
+
+### 문제 3: AI 진단 ?�류
+**?�인:**
+- GEMINI_API_KEY ?�인
+
+---
+
+## ?�� 빠른 복사 (Render Environment??붙여?�기)
+
+### Database 관??(6�?:
+```
+DB_HOST=geonhee-1017-itweed-cf64.e.aivencloud.com
+DB_PORT=26163
+DB_USER=avnadmin
+DB_PASSWORD=YOUR_AIVEN_PASSWORD
+DB_NAME=defaultdb
+DB_SSL=true
+```
+
+### API 관??(1�?:
+```
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+### Cloudinary 관??(3�?:
+```
+CLOUDINARY_CLOUD_NAME=YOUR_CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY=YOUR_CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET=YOUR_CLOUDINARY_API_SECRET
+```
+
+---
+
+**?�️ �??�요 ?�간**: 
+- ?�경 변???�력: 5�?
+- Render ?�배?? 5-7�?
+- **�?10-12�?*
+
+**???�제 모든 기능???�상 ?�동?�니??**

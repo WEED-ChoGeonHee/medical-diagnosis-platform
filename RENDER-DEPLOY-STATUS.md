@@ -1,198 +1,198 @@
-# 🚀 Render 배포 완료 가이드
+# ?? Render 배포 ?�료 가?�드
 
-## ✅ GitHub 푸시 완료
+## ??GitHub ?�시 ?�료
 
-다음 수정사항이 GitHub에 푸시되었습니다:
+?�음 ?�정?�항??GitHub???�시?�었?�니??
 
-### 1차 푸시 (bccf9d1)
-- ✅ render.yaml: rootDir 제거, 빌드 명령어 수정
-- ✅ backend/server.js: 정적 파일 경로 수정, 404 처리 추가
-- ✅ README.md: 테스트 결과 업데이트
+### 1�??�시 (bccf9d1)
+- ??render.yaml: rootDir ?�거, 빌드 명령???�정
+- ??backend/server.js: ?�적 ?�일 경로 ?�정, 404 처리 추�?
+- ??README.md: ?�스??결과 ?�데?�트
 
-### 2차 푸시 (711267a) - **중요!**
-- ✅ patient-portal/src/api.js: API URL을 상대 경로로 변경
-- ✅ admin-dashboard/src/api.js: API URL을 상대 경로로 변경
+### 2�??�시 (711267a) - **중요!**
+- ??patient-portal/src/api.js: API URL???��? 경로�?변�?
+- ??admin-dashboard/src/api.js: API URL???��? 경로�?변�?
 
 ---
 
-## 🌐 Render 자동 배포 진행 중
+## ?�� Render ?�동 배포 진행 �?
 
-GitHub에 푸시하면 Render.com이 자동으로 감지하여 배포를 시작합니다.
+GitHub???�시?�면 Render.com???�동?�로 감�??�여 배포�??�작?�니??
 
-### 배포 확인 방법
+### 배포 ?�인 방법
 
-1. **Render 대시보드 접속**
+1. **Render ?�?�보???�속**
    - https://dashboard.render.com
-   - GitHub 계정으로 로그인
+   - GitHub 계정?�로 로그??
 
-2. **배포 상태 확인**
-   - `medical-diagnosis-backend` 서비스 클릭
-   - **Events** 탭에서 배포 진행 상황 확인
-   - **Logs** 탭에서 빌드 로그 확인
+2. **배포 ?�태 ?�인**
+   - `medical-diagnosis-backend` ?�비???�릭
+   - **Events** ??��??배포 진행 ?�황 ?�인
+   - **Logs** ??��??빌드 로그 ?�인
 
-3. **배포 단계**
+3. **배포 ?�계**
    ```
-   1. Building... (3-5분)
+   1. Building... (3-5�?
       - patient-portal npm install & build
       - admin-dashboard npm install & build
       - backend npm install
    
-   2. Deploying... (1-2분)
-      - 새 인스턴스 시작
-      - 헬스 체크
+   2. Deploying... (1-2�?
+      - ???�스?�스 ?�작
+      - ?�스 체크
    
-   3. Live ✅ (배포 완료)
+   3. Live ??(배포 ?�료)
    ```
 
 ---
 
-## ⏱️ 예상 배포 시간
+## ?�️ ?�상 배포 ?�간
 
-- **첫 배포**: 5-10분
-- **재배포**: 3-5분
+- **�?배포**: 5-10�?
+- **?�배??*: 3-5�?
 
-현재 시간 기준으로 **약 5-8분 후** 배포 완료 예상
+?�재 ?�간 기�??�로 **??5-8�???* 배포 ?�료 ?�상
 
 ---
 
-## 🔍 배포 후 테스트
+## ?�� 배포 ???�스??
 
-배포가 완료되면 다음 URL로 접속하여 테스트:
+배포가 ?�료?�면 ?�음 URL�??�속?�여 ?�스??
 
-### 환자 포털
+### ?�자 ?�털
 ```
-https://medical-diagnosis-backend.onrender.com/patient
-```
-
-**예상 결과**: 
-- ✅ 환자 로그인/회원가입 페이지 표시
-- ❌ {"error":"Endpoint not found"} 오류 해결됨!
-
-### 관리자 대시보드
-```
-https://medical-diagnosis-backend.onrender.com/admin
+https://medical-diagnosis-platform.onrender.com/patient
 ```
 
-**예상 결과**:
-- ✅ 의사 로그인 페이지 표시
+**?�상 결과**: 
+- ???�자 로그???�원가???�이지 ?�시
+- ??{"error":"Endpoint not found"} ?�류 ?�결??
 
-### API 엔드포인트
+### 관리자 ?�?�보??
 ```
-https://medical-diagnosis-backend.onrender.com/api/auth/health
+https://medical-diagnosis-platform.onrender.com/admin
 ```
 
-**예상 결과**:
+**?�상 결과**:
+- ???�사 로그???�이지 ?�시
+
+### API ?�드?�인??
+```
+https://medical-diagnosis-platform.onrender.com/api/auth/health
+```
+
+**?�상 결과**:
 ```json
 {"status": "ok", "database": "connected"}
 ```
 
 ---
 
-## 🚨 배포 중 발생 가능한 문제
+## ?�� 배포 �?발생 가?�한 문제
 
-### 1. 빌드 실패
-**원인**: npm install 또는 build 실패
-**해결**: Render Logs에서 에러 메시지 확인
+### 1. 빌드 ?�패
+**?�인**: npm install ?�는 build ?�패
+**?�결**: Render Logs?�서 ?�러 메시지 ?�인
 
-### 2. 시작 실패
-**원인**: 데이터베이스 연결 오류
-**해결**: Render 환경 변수 확인
+### 2. ?�작 ?�패
+**?�인**: ?�이?�베?�스 ?�결 ?�류
+**?�결**: Render ?�경 변???�인
 - DB_HOST
 - DB_PORT
 - DB_USER
 - DB_PASSWORD
 - GEMINI_API_KEY
 
-### 3. 404 에러 (배포 후에도)
-**가능 원인**:
-- 빌드 파일이 생성되지 않음
+### 3. 404 ?�러 (배포 ?�에??
+**가???�인**:
+- 빌드 ?�일???�성?��? ?�음
 - 경로 문제
-**해결**: Render Logs에서 빌드 성공 여부 확인
+**?�결**: Render Logs?�서 빌드 ?�공 ?��? ?�인
 
 ---
 
-## 📊 배포 확인 체크리스트
+## ?�� 배포 ?�인 체크리스??
 
-배포가 완료되면 다음 항목을 확인:
+배포가 ?�료?�면 ?�음 ??��???�인:
 
-- [ ] Render Dashboard에서 "Live" 상태 확인
-- [ ] https://medical-diagnosis-backend.onrender.com/patient 접속 → HTML 페이지 표시
-- [ ] https://medical-diagnosis-backend.onrender.com/admin 접속 → HTML 페이지 표시
-- [ ] 환자 회원가입 테스트
-- [ ] 환자 로그인 테스트
-- [ ] 의사 로그인 테스트 (기존 계정)
-- [ ] 이미지 업로드 테스트
-- [ ] AI 진단 요청 테스트
-
----
-
-## 📱 APK 접속 테스트
-
-배포가 완료되면 APK도 테스트:
-
-### 환자용 APK
-1. `환자용-의료진단.apk` 설치
-2. 앱 실행
-3. 환자 포털 페이지 로드 확인
-4. 회원가입/로그인 테스트
-
-### 의사용 APK
-1. `의사용-의료진단.apk` 설치
-2. 앱 실행
-3. 관리자 대시보드 로드 확인
-4. 로그인 테스트
+- [ ] Render Dashboard?�서 "Live" ?�태 ?�인
+- [ ] https://medical-diagnosis-platform.onrender.com/patient ?�속 ??HTML ?�이지 ?�시
+- [ ] https://medical-diagnosis-platform.onrender.com/admin ?�속 ??HTML ?�이지 ?�시
+- [ ] ?�자 ?�원가???�스??
+- [ ] ?�자 로그???�스??
+- [ ] ?�사 로그???�스??(기존 계정)
+- [ ] ?��?지 ?�로???�스??
+- [ ] AI 진단 ?�청 ?�스??
 
 ---
 
-## 🎯 예상 결과
+## ?�� APK ?�속 ?�스??
 
-### 수정 전 (❌)
+배포가 ?�료?�면 APK???�스??
+
+### ?�자??APK
+1. `?�자???�료진단.apk` ?�치
+2. ???�행
+3. ?�자 ?�털 ?�이지 로드 ?�인
+4. ?�원가??로그???�스??
+
+### ?�사??APK
+1. `?�사???�료진단.apk` ?�치
+2. ???�행
+3. 관리자 ?�?�보??로드 ?�인
+4. 로그???�스??
+
+---
+
+## ?�� ?�상 결과
+
+### ?�정 ??(??
 ```
-https://medical-diagnosis-backend.onrender.com/patient
-→ {"error":"Endpoint not found"}
+https://medical-diagnosis-platform.onrender.com/patient
+??{"error":"Endpoint not found"}
 ```
 
-### 수정 후 (✅)
+### ?�정 ??(??
 ```
-https://medical-diagnosis-backend.onrender.com/patient
-→ 환자 포털 HTML 페이지 표시
-→ React 앱 로드
-→ 로그인/회원가입 화면
+https://medical-diagnosis-platform.onrender.com/patient
+???�자 ?�털 HTML ?�이지 ?�시
+??React ??로드
+??로그???�원가???�면
 ```
 
 ---
 
-## 📞 배포 상태 실시간 확인
+## ?�� 배포 ?�태 ?�시�??�인
 
-Render CLI 사용 (선택사항):
+Render CLI ?�용 (?�택?�항):
 ```bash
-# Render CLI 설치
+# Render CLI ?�치
 npm install -g render-cli
 
-# 로그인
+# 로그??
 render login
 
-# 배포 상태 확인
+# 배포 ?�태 ?�인
 render services list
 
-# 로그 실시간 보기
+# 로그 ?�시�?보기
 render logs medical-diagnosis-backend
 ```
 
 ---
 
-## ⏰ 다음 단계
+## ???�음 ?�계
 
-1. **5-8분 대기** (배포 완료 시간)
-2. **Render Dashboard 확인**
-3. **배포된 URL 테스트**
-4. **APK 테스트**
-5. **문제 발견 시**: Render Logs 확인 후 추가 수정
+1. **5-8�??��?* (배포 ?�료 ?�간)
+2. **Render Dashboard ?�인**
+3. **배포??URL ?�스??*
+4. **APK ?�스??*
+5. **문제 발견 ??*: Render Logs ?�인 ??추�? ?�정
 
 ---
 
-## 📖 관련 문서
+## ?�� 관??문서
 
-- [README.md](README.md) - 프로젝트 개요
-- [DEPLOY.md](DEPLOY.md) - 배포 가이드 상세
-- [TEST-REPORT.md](TEST-REPORT.md) - 로컬 테스트 보고서
+- [README.md](README.md) - ?�로?�트 개요
+- [DEPLOY.md](DEPLOY.md) - 배포 가?�드 ?�세
+- [TEST-REPORT.md](TEST-REPORT.md) - 로컬 ?�스??보고??

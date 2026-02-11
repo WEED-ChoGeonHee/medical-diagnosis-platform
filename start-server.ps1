@@ -1,4 +1,4 @@
-# 의료 진단 플랫폼 - 서버 시작 스크립트
+# ?�료 진단 ?�랫??- ?�버 ?�작 ?�크립트
 
 param(
     [switch]$Production,
@@ -6,45 +6,45 @@ param(
 )
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  의료 진단 플랫폼 서버 시작" -ForegroundColor Cyan
+Write-Host "  ?�료 진단 ?�랫???�버 ?�작" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# 프로젝트 루트 디렉토리
+# ?�로?�트 루트 ?�렉?�리
 $rootDir = $PSScriptRoot
 
-# 모드 확인
+# 모드 ?�인
 $mode = if ($Production) { "production" } else { "development" }
-Write-Host "🚀 모드: $mode" -ForegroundColor Cyan
+Write-Host "?? 모드: $mode" -ForegroundColor Cyan
 Write-Host ""
 
-# 1. MongoDB 서비스 확인
-Write-Host "1. MongoDB 서비스 확인 중..." -ForegroundColor Yellow
+# 1. MongoDB ?�비???�인
+Write-Host "1. MongoDB ?�비???�인 �?.." -ForegroundColor Yellow
 
 $mongoService = Get-Service -Name MongoDB -ErrorAction SilentlyContinue
 
 if ($mongoService) {
     if ($mongoService.Status -eq "Running") {
-        Write-Host "   ✅ MongoDB 실행 중" -ForegroundColor Green
+        Write-Host "   ??MongoDB ?�행 �? -ForegroundColor Green
     } else {
-        Write-Host "   ⚠️  MongoDB 시작 중..." -ForegroundColor Yellow
+        Write-Host "   ?�️  MongoDB ?�작 �?.." -ForegroundColor Yellow
         try {
             Start-Service MongoDB -ErrorAction Stop
             Start-Sleep -Seconds 2
-            Write-Host "   ✅ MongoDB 시작됨" -ForegroundColor Green
+            Write-Host "   ??MongoDB ?�작?? -ForegroundColor Green
         } catch {
-            Write-Host "   ❌ MongoDB 시작 실패. 수동 시작이 필요할 수 있습니다." -ForegroundColor Red
+            Write-Host "   ??MongoDB ?�작 ?�패. ?�동 ?�작???�요?????�습?�다." -ForegroundColor Red
         }
     }
 } else {
-    Write-Host "   ⚠️  MongoDB 서비스를 찾을 수 없습니다." -ForegroundColor Yellow
-    Write-Host "   💡 MongoDB가 설치되지 않았다면: https://www.mongodb.com/try/download/community" -ForegroundColor Gray
+    Write-Host "   ?�️  MongoDB ?�비?��? 찾을 ???�습?�다." -ForegroundColor Yellow
+    Write-Host "   ?�� MongoDB가 ?�치?��? ?�았?�면: https://www.mongodb.com/try/download/community" -ForegroundColor Gray
 }
 
 Write-Host ""
 
-# 2. 환경 변수 파일 확인
-Write-Host "2. 환경 변수 파일 확인 중..." -ForegroundColor Yellow
+# 2. ?�경 변???�일 ?�인
+Write-Host "2. ?�경 변???�일 ?�인 �?.." -ForegroundColor Yellow
 
 $envFiles = @(
     "$rootDir\backend\.env",
@@ -55,29 +55,29 @@ $envFiles = @(
 $allEnvExists = $true
 foreach ($file in $envFiles) {
     if (Test-Path $file) {
-        Write-Host "   ✅ $(Split-Path (Split-Path $file -Parent) -Leaf)/.env 존재" -ForegroundColor Green
+        Write-Host "   ??$(Split-Path (Split-Path $file -Parent) -Leaf)/.env 존재" -ForegroundColor Green
     } else {
-        Write-Host "   ❌ $(Split-Path (Split-Path $file -Parent) -Leaf)/.env 없음" -ForegroundColor Red
+        Write-Host "   ??$(Split-Path (Split-Path $file -Parent) -Leaf)/.env ?�음" -ForegroundColor Red
         $allEnvExists = $false
     }
 }
 
 if (-not $allEnvExists) {
     Write-Host ""
-    Write-Host "⚠️  일부 환경 변수 파일이 없습니다." -ForegroundColor Yellow
-    Write-Host "   backend/.env.example을 참조하여 .env 파일을 생성하세요." -ForegroundColor Gray
+    Write-Host "?�️  ?��? ?�경 변???�일???�습?�다." -ForegroundColor Yellow
+    Write-Host "   backend/.env.example??참조?�여 .env ?�일???�성?�세??" -ForegroundColor Gray
     Write-Host ""
-    $continue = Read-Host "계속 진행하시겠습니까? (y/N)"
+    $continue = Read-Host "계속 진행?�시겠습?�까? (y/N)"
     if ($continue -ne "y" -and $continue -ne "Y") {
-        Write-Host "종료합니다." -ForegroundColor Yellow
+        Write-Host "종료?�니??" -ForegroundColor Yellow
         exit
     }
 }
 
 Write-Host ""
 
-# 3. 의존성 확인 및 설치
-Write-Host "3. 의존성 확인 중..." -ForegroundColor Yellow
+# 3. ?�존???�인 �??�치
+Write-Host "3. ?�존???�인 �?.." -ForegroundColor Yellow
 
 $modules = @(
     @{Path="$rootDir\backend"; Name="Backend"},
@@ -87,178 +87,178 @@ $modules = @(
 
 foreach ($module in $modules) {
     if (Test-Path "$($module.Path)\node_modules") {
-        Write-Host "   ✅ $($module.Name) 의존성 존재" -ForegroundColor Green
+        Write-Host "   ??$($module.Name) ?�존??존재" -ForegroundColor Green
     } else {
-        Write-Host "   📦 $($module.Name) 의존성 설치 중..." -ForegroundColor Yellow
+        Write-Host "   ?�� $($module.Name) ?�존???�치 �?.." -ForegroundColor Yellow
         Push-Location $module.Path
         npm install --silent
         Pop-Location
-        Write-Host "   ✅ $($module.Name) 의존성 설치 완료" -ForegroundColor Green
+        Write-Host "   ??$($module.Name) ?�존???�치 ?�료" -ForegroundColor Green
     }
 }
 
 Write-Host ""
 
-# 4. Production 빌드 (Production 모드인 경우)
+# 4. Production 빌드 (Production 모드??경우)
 if ($Production) {
-    Write-Host "4. Production 빌드 중..." -ForegroundColor Yellow
+    Write-Host "4. Production 빌드 �?.." -ForegroundColor Yellow
     
     # Patient Portal 빌드
     if (-not (Test-Path "$rootDir\patient-portal\build")) {
-        Write-Host "   🔨 Patient Portal 빌드 중..." -ForegroundColor Yellow
+        Write-Host "   ?�� Patient Portal 빌드 �?.." -ForegroundColor Yellow
         Push-Location "$rootDir\patient-portal"
         npm run build --silent
         Pop-Location
-        Write-Host "   ✅ Patient Portal 빌드 완료" -ForegroundColor Green
+        Write-Host "   ??Patient Portal 빌드 ?�료" -ForegroundColor Green
     } else {
-        Write-Host "   ⏭️  Patient Portal 빌드 폴더 존재 (재빌드하려면 build 폴더 삭제)" -ForegroundColor Gray
+        Write-Host "   ??��  Patient Portal 빌드 ?�더 존재 (?�빌?�하?�면 build ?�더 ??��)" -ForegroundColor Gray
     }
     
     # Admin Dashboard 빌드
     if (-not (Test-Path "$rootDir\admin-dashboard\build")) {
-        Write-Host "   🔨 Admin Dashboard 빌드 중..." -ForegroundColor Yellow
+        Write-Host "   ?�� Admin Dashboard 빌드 �?.." -ForegroundColor Yellow
         Push-Location "$rootDir\admin-dashboard"
         npm run build --silent
         Pop-Location
-        Write-Host "   ✅ Admin Dashboard 빌드 완료" -ForegroundColor Green
+        Write-Host "   ??Admin Dashboard 빌드 ?�료" -ForegroundColor Green
     } else {
-        Write-Host "   ⏭️  Admin Dashboard 빌드 폴더 존재 (재빌드하려면 build 폴더 삭제)" -ForegroundColor Gray
+        Write-Host "   ??��  Admin Dashboard 빌드 ?�더 존재 (?�빌?�하?�면 build ?�더 ??��)" -ForegroundColor Gray
     }
     
     Write-Host ""
 }
 
-# 5. PM2 확인
-Write-Host "5. PM2 확인 중..." -ForegroundColor Yellow
+# 5. PM2 ?�인
+Write-Host "5. PM2 ?�인 �?.." -ForegroundColor Yellow
 
 $pm2Installed = $null -ne (Get-Command pm2 -ErrorAction SilentlyContinue)
 
 if ($pm2Installed) {
-    Write-Host "   ✅ PM2 설치됨" -ForegroundColor Green
+    Write-Host "   ??PM2 ?�치?? -ForegroundColor Green
     $usePM2 = $true
 } else {
-    Write-Host "   ⚠️  PM2가 설치되지 않았습니다." -ForegroundColor Yellow
-    Write-Host "   💡 PM2 설치: npm install -g pm2" -ForegroundColor Gray
+    Write-Host "   ?�️  PM2가 ?�치?��? ?�았?�니??" -ForegroundColor Yellow
+    Write-Host "   ?�� PM2 ?�치: npm install -g pm2" -ForegroundColor Gray
     $usePM2 = $false
 }
 
 Write-Host ""
 
-# 6. 서버 시작
+# 6. ?�버 ?�작
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  서버 시작 중..." -ForegroundColor Cyan
+Write-Host "  ?�버 ?�작 �?.." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 if ($usePM2 -and $Production) {
-    # PM2로 시작 (Production)
-    Write-Host "PM2를 사용하여 서비스 시작 중..." -ForegroundColor Cyan
+    # PM2�??�작 (Production)
+    Write-Host "PM2�??�용?�여 ?�비???�작 �?.." -ForegroundColor Cyan
     Write-Host ""
     
-    # Backend 시작
+    # Backend ?�작
     Push-Location "$rootDir\backend"
     pm2 delete medical-backend -s 2>$null
     pm2 start server.js --name medical-backend --log-date-format="YYYY-MM-DD HH:mm:ss"
     Pop-Location
-    Write-Host "   ✅ Backend 시작됨 (PM2)" -ForegroundColor Green
+    Write-Host "   ??Backend ?�작??(PM2)" -ForegroundColor Green
     
-    # Patient Portal 시작 (정적 파일 서빙)
+    # Patient Portal ?�작 (?�적 ?�일 ?�빙)
     Push-Location "$rootDir\patient-portal"
     pm2 delete medical-patient-portal -s 2>$null
     pm2 start "npx serve -s build -l 3000" --name medical-patient-portal
     Pop-Location
-    Write-Host "   ✅ Patient Portal 시작됨 (PM2)" -ForegroundColor Green
+    Write-Host "   ??Patient Portal ?�작??(PM2)" -ForegroundColor Green
     
-    # Admin Dashboard 시작 (정적 파일 서빙)
+    # Admin Dashboard ?�작 (?�적 ?�일 ?�빙)
     Push-Location "$rootDir\admin-dashboard"
     pm2 delete medical-admin-dashboard -s 2>$null
     pm2 start "npx serve -s build -l 3001" --name medical-admin-dashboard
     Pop-Location
-    Write-Host "   ✅ Admin Dashboard 시작됨 (PM2)" -ForegroundColor Green
+    Write-Host "   ??Admin Dashboard ?�작??(PM2)" -ForegroundColor Green
     
     Write-Host ""
-    Write-Host "PM2 프로세스 목록:" -ForegroundColor Cyan
+    Write-Host "PM2 ?�로?�스 목록:" -ForegroundColor Cyan
     pm2 list
     
     Write-Host ""
-    Write-Host "📋 PM2 명령어:" -ForegroundColor Yellow
+    Write-Host "?�� PM2 명령??" -ForegroundColor Yellow
     Write-Host "   - 로그 보기:    pm2 logs" -ForegroundColor Gray
-    Write-Host "   - 상태 확인:    pm2 list" -ForegroundColor Gray
-    Write-Host "   - 재시작:       pm2 restart all" -ForegroundColor Gray
-    Write-Host "   - 중지:         pm2 stop all" -ForegroundColor Gray
-    Write-Host "   - 모니터링:     pm2 monit" -ForegroundColor Gray
+    Write-Host "   - ?�태 ?�인:    pm2 list" -ForegroundColor Gray
+    Write-Host "   - ?�시??       pm2 restart all" -ForegroundColor Gray
+    Write-Host "   - 중�?:         pm2 stop all" -ForegroundColor Gray
+    Write-Host "   - 모니?�링:     pm2 monit" -ForegroundColor Gray
     
 } else {
-    # 일반 모드로 시작 (별도 터미널)
-    Write-Host "새 터미널 창에서 서비스를 시작합니다..." -ForegroundColor Cyan
+    # ?�반 모드�??�작 (별도 ?��???
+    Write-Host "???��???창에???�비?��? ?�작?�니??.." -ForegroundColor Cyan
     Write-Host ""
     
-    # Backend 시작
-    Write-Host "   🚀 Backend 시작 중 (포트 5000)..." -ForegroundColor Yellow
+    # Backend ?�작
+    Write-Host "   ?? Backend ?�작 �?(?�트 5000)..." -ForegroundColor Yellow
     Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$rootDir\backend'; Write-Host '=== Backend Server ===' -ForegroundColor Cyan; node server.js"
     Start-Sleep -Seconds 2
     
     if ($Production) {
-        # Production 모드: 빌드된 파일 서빙
-        Write-Host "   🚀 Patient Portal 시작 중 (포트 3000)..." -ForegroundColor Yellow
+        # Production 모드: 빌드???�일 ?�빙
+        Write-Host "   ?? Patient Portal ?�작 �?(?�트 3000)..." -ForegroundColor Yellow
         Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$rootDir\patient-portal'; Write-Host '=== Patient Portal (Production) ===' -ForegroundColor Cyan; npx serve -s build -l 3000"
         Start-Sleep -Seconds 2
         
-        Write-Host "   🚀 Admin Dashboard 시작 중 (포트 3001)..." -ForegroundColor Yellow
+        Write-Host "   ?? Admin Dashboard ?�작 �?(?�트 3001)..." -ForegroundColor Yellow
         Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$rootDir\admin-dashboard'; Write-Host '=== Admin Dashboard (Production) ===' -ForegroundColor Cyan; npx serve -s build -l 3001"
     } else {
-        # Development 모드: React 개발 서버
-        Write-Host "   🚀 Patient Portal 시작 중 (포트 3000)..." -ForegroundColor Yellow
+        # Development 모드: React 개발 ?�버
+        Write-Host "   ?? Patient Portal ?�작 �?(?�트 3000)..." -ForegroundColor Yellow
         Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$rootDir\patient-portal'; `$env:PORT=3000; Write-Host '=== Patient Portal (Development) ===' -ForegroundColor Cyan; npm start"
         Start-Sleep -Seconds 2
         
-        Write-Host "   🚀 Admin Dashboard 시작 중 (포트 3001)..." -ForegroundColor Yellow
+        Write-Host "   ?? Admin Dashboard ?�작 �?(?�트 3001)..." -ForegroundColor Yellow
         Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$rootDir\admin-dashboard'; `$env:PORT=3001; Write-Host '=== Admin Dashboard (Development) ===' -ForegroundColor Cyan; npm start"
     }
     
     Write-Host ""
-    Write-Host "   ✅ 모든 서비스가 별도 터미널에서 시작되었습니다." -ForegroundColor Green
-    Write-Host "   💡 각 터미널을 닫으면 해당 서비스가 중지됩니다." -ForegroundColor Gray
+    Write-Host "   ??모든 ?�비?��? 별도 ?��??�에???�작?�었?�니??" -ForegroundColor Green
+    Write-Host "   ?�� �??��??�을 ?�으�??�당 ?�비?��? 중�??�니??" -ForegroundColor Gray
 }
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  서버 실행 완료!" -ForegroundColor Cyan
+Write-Host "  ?�버 ?�행 ?�료!" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# 접속 정보 표시
+# ?�속 ?�보 ?�시
 $localIP = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "*Loopback*" -and $_.IPAddress -notlike "169.254.*"} | Select-Object -First 1).IPAddress
 
-Write-Host "🌐 접속 주소:" -ForegroundColor White
+Write-Host "?�� ?�속 주소:" -ForegroundColor White
 Write-Host ""
-Write-Host "   로컬 (이 PC):" -ForegroundColor Cyan
+Write-Host "   로컬 (??PC):" -ForegroundColor Cyan
 Write-Host "   - Backend API:     http://localhost:5000" -ForegroundColor Gray
 Write-Host "   - Patient Portal:  http://localhost:3000" -ForegroundColor Gray
 Write-Host "   - Admin Dashboard: http://localhost:3001" -ForegroundColor Gray
 Write-Host ""
 
 if ($localIP) {
-    Write-Host "   같은 네트워크 (공유기 내부):" -ForegroundColor Cyan
+    Write-Host "   같�? ?�트?�크 (공유�??��?):" -ForegroundColor Cyan
     Write-Host "   - Backend API:     http://${localIP}:5000" -ForegroundColor Gray
     Write-Host "   - Patient Portal:  http://${localIP}:3000" -ForegroundColor Gray
     Write-Host "   - Admin Dashboard: http://${localIP}:3001" -ForegroundColor Gray
     Write-Host ""
 }
 
-Write-Host "⚠️  외부 접속을 위해서는:" -ForegroundColor Yellow
-Write-Host "   1. 공유기 포트 포워딩 설정 필요 (5000, 3000, 3001 포트)" -ForegroundColor Gray
-Write-Host "   2. 환경 변수에 공인 IP 또는 도메인 설정 필요" -ForegroundColor Gray
-Write-Host "   3. LOCAL_SERVER_SETUP.md 파일 참조" -ForegroundColor Gray
+Write-Host "?�️  ?��? ?�속???�해?�는:" -ForegroundColor Yellow
+Write-Host "   1. 공유�??�트 ?�워???�정 ?�요 (5000, 3000, 3001 ?�트)" -ForegroundColor Gray
+Write-Host "   2. ?�경 변?�에 공인 IP ?�는 ?�메???�정 ?�요" -ForegroundColor Gray
+Write-Host "   3. LOCAL_SERVER_SETUP.md ?�일 참조" -ForegroundColor Gray
 Write-Host ""
 
-Write-Host "📚 추가 정보:" -ForegroundColor Yellow
-Write-Host "   - 초기 의사 계정 생성: cd backend && node create-doctor.js" -ForegroundColor Gray
-Write-Host "   - 데이터베이스 리셋:   cd backend && node reset-db.js" -ForegroundColor Gray
+Write-Host "?�� 추�? ?�보:" -ForegroundColor Yellow
+Write-Host "   - 초기 ?�사 계정 ?�성: cd backend && node create-doctor.js" -ForegroundColor Gray
+Write-Host "   - ?�이?�베?�스 리셋:   cd backend && node reset-db.js" -ForegroundColor Gray
 Write-Host ""
 
-# 웹 브라우저 자동 열기
-$openBrowser = Read-Host "웹 브라우저를 여시겠습니까? (Y/n)"
+# ??브라?��? ?�동 ?�기
+$openBrowser = Read-Host "??브라?��?�??�시겠습?�까? (Y/n)"
 if ($openBrowser -ne "n" -and $openBrowser -ne "N") {
     Start-Sleep -Seconds 3
     Start-Process "http://localhost:3000"
@@ -266,5 +266,5 @@ if ($openBrowser -ne "n" -and $openBrowser -ne "N") {
 }
 
 Write-Host ""
-Write-Host "✅ 서버가 실행 중입니다!" -ForegroundColor Green
+Write-Host "???�버가 ?�행 중입?�다!" -ForegroundColor Green
 Write-Host ""

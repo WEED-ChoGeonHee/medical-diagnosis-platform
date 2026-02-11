@@ -10,7 +10,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     
     // 배포된 웹사이트 URL (Render.com)
-    private static final String APP_URL = "https://medical-diagnosis-backend.onrender.com/patient";
+    private static final String APP_URL = "https://medical-diagnosis-platform.onrender.com/patient";
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,73 +1,73 @@
-# 🚀 간단한 APK 빌드 가이드
+# ?? 간단??APK 빌드 가?�드
 
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host "   의료 진단 APK 빌드" -ForegroundColor Cyan
+Write-Host "   ?�료 진단 APK 빌드" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
 
-$androidDir = "e:\소스\의학\android-app"
+$androidDir = "e:\?�스\?�학\android-app"
 
-# Android Studio 확인
+# Android Studio ?�인
 $studioPath = "C:\Program Files\Android\Android Studio\bin\studio64.exe"
 $hasAndroidStudio = Test-Path $studioPath
 
-Write-Host "📱 APK 설정 정보:" -ForegroundColor Green
-Write-Host "   웹사이트 URL: https://medical-diagnosis-backend.onrender.com/patient" -ForegroundColor White
-Write-Host "   앱 이름: 의료 진단" -ForegroundColor White
-Write-Host "   패키지: com.medical.patient" -ForegroundColor White
+Write-Host "?�� APK ?�정 ?�보:" -ForegroundColor Green
+Write-Host "   ?�사?�트 URL: https://medical-diagnosis-platform.onrender.com/patient" -ForegroundColor White
+Write-Host "   ???�름: ?�료 진단" -ForegroundColor White
+Write-Host "   ?�키지: com.medical.patient" -ForegroundColor White
 Write-Host ""
 
 if ($hasAndroidStudio) {
-    Write-Host "✅ Android Studio가 설치되어 있습니다!" -ForegroundColor Green
+    Write-Host "??Android Studio가 ?�치?�어 ?�습?�다!" -ForegroundColor Green
     Write-Host ""
-    Write-Host "APK를 빌드하려면:" -ForegroundColor Cyan
-    Write-Host "   1. Android Studio 열기" -ForegroundColor White
+    Write-Host "APK�?빌드?�려�?" -ForegroundColor Cyan
+    Write-Host "   1. Android Studio ?�기" -ForegroundColor White
     Write-Host "   2. File > Open > $androidDir" -ForegroundColor White
-    Write-Host "   3. Gradle 동기화 대기" -ForegroundColor White
+    Write-Host "   3. Gradle ?�기???��? -ForegroundColor White
     Write-Host "   4. Build > Build Bundle(s) / APK(s) > Build APK(s)" -ForegroundColor White
     Write-Host ""
     
-    $openStudio = Read-Host "지금 Android Studio를 여시겠습니까? (Y/N)"
+    $openStudio = Read-Host "지�?Android Studio�??�시겠습?�까? (Y/N)"
     if ($openStudio -eq 'Y' -or $openStudio -eq 'y') {
-        Write-Host "Android Studio 실행 중..." -ForegroundColor Green
+        Write-Host "Android Studio ?�행 �?.." -ForegroundColor Green
         Start-Process $studioPath -ArgumentList $androidDir
         Write-Host ""
-        Write-Host "Android Studio에서 프로젝트가 열리면:" -ForegroundColor Yellow
+        Write-Host "Android Studio?�서 ?�로?�트가 ?�리�?" -ForegroundColor Yellow
         Write-Host "   Build > Build Bundle(s) / APK(s) > Build APK(s)" -ForegroundColor White
         Write-Host ""
-        Write-Host "빌드된 APK 위치:" -ForegroundColor Cyan
+        Write-Host "빌드??APK ?�치:" -ForegroundColor Cyan
         Write-Host "   $androidDir\app\build\outputs\apk\debug\app-debug.apk" -ForegroundColor Gray
     }
 } else {
-    Write-Host "❌ Android Studio가 설치되어 있지 않습니다." -ForegroundColor Yellow
+    Write-Host "??Android Studio가 ?�치?�어 ?��? ?�습?�다." -ForegroundColor Yellow
     Write-Host ""
     Write-Host "APK 빌드 방법:" -ForegroundColor Cyan
     Write-Host ""
     
-    Write-Host "방법 1: Android Studio 설치 (추천)" -ForegroundColor White
-    Write-Host "   1. https://developer.android.com/studio 접속" -ForegroundColor Gray
-    Write-Host "   2. Android Studio 다운로드 및 설치" -ForegroundColor Gray
-    Write-Host "   3. 이 스크립트 다시 실행" -ForegroundColor Gray
+    Write-Host "방법 1: Android Studio ?�치 (추천)" -ForegroundColor White
+    Write-Host "   1. https://developer.android.com/studio ?�속" -ForegroundColor Gray
+    Write-Host "   2. Android Studio ?�운로드 �??�치" -ForegroundColor Gray
+    Write-Host "   3. ???�크립트 ?�시 ?�행" -ForegroundColor Gray
     Write-Host ""
     
-    Write-Host "방법 2: 온라인 빌드 서비스 (Android Studio 없이)" -ForegroundColor White
-    Write-Host "   1. android-app 폴더를 ZIP으로 압축" -ForegroundColor Gray
-    Write-Host "   2. https://www.appetize.io/ 또는 온라인 빌드 서비스 사용" -ForegroundColor Gray
+    Write-Host "방법 2: ?�라??빌드 ?�비??(Android Studio ?�이)" -ForegroundColor White
+    Write-Host "   1. android-app ?�더�?ZIP?�로 ?�축" -ForegroundColor Gray
+    Write-Host "   2. https://www.appetize.io/ ?�는 ?�라??빌드 ?�비???�용" -ForegroundColor Gray
     Write-Host ""
     
-    Write-Host "방법 3: GitHub Actions (자동화)" -ForegroundColor White
-    Write-Host "   1. GitHub에 코드 푸시" -ForegroundColor Gray
-    Write-Host "   2. GitHub Actions로 자동 APK 빌드" -ForegroundColor Gray
+    Write-Host "방법 3: GitHub Actions (?�동??" -ForegroundColor White
+    Write-Host "   1. GitHub??코드 ?�시" -ForegroundColor Gray
+    Write-Host "   2. GitHub Actions�??�동 APK 빌드" -ForegroundColor Gray
     Write-Host ""
     
-    $download = Read-Host "Android Studio 다운로드 페이지를 여시겠습니까? (Y/N)"
+    $download = Read-Host "Android Studio ?�운로드 ?�이지�??�시겠습?�까? (Y/N)"
     if ($download -eq 'Y' -or $download -eq 'y') {
         Start-Process "https://developer.android.com/studio"
     }
 }
 
 Write-Host ""
-Write-Host "📖 자세한 가이드:" -ForegroundColor Cyan
+Write-Host "?�� ?�세??가?�드:" -ForegroundColor Cyan
 Write-Host "   - APK-BUILD-GUIDE.md" -ForegroundColor White
 Write-Host "   - android-app/README.md" -ForegroundColor White
 Write-Host ""
