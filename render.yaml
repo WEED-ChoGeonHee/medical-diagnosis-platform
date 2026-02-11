@@ -1,12 +1,11 @@
 services:
-  # Backend API Server
+  # Backend API Server + Frontend Static Files
   - type: web
     name: medical-diagnosis-backend
     runtime: node
     env: node
-    rootDir: backend
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: cd patient-portal && npm install && npm run build && cd ../admin-dashboard && npm install && npm run build && cd ../backend && npm install
+    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production

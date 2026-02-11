@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
@@ -19,11 +20,40 @@ const startServer = async () => {
   try {
     await initDatabase();
     
-    // Routes
+    // API Routes
     app.use('/api/auth', require('./routes/auth'));
     app.use('/api/patients', require('./routes/patients'));
     app.use('/api/diagnoses', require('./routes/diagnoses'));
     app.use('/api/admin', require('./routes/admin'));
+
+    // 환자 포털 정적 파일 서빙
+    const patientBuildPath = path.join(__dirname, '../patient-portal/build');
+    app.use('/patient', express.static(patientBuildPath));
+    app.get('/patient/*', (req, res) => {
+      res.sendFile(path.join(patientBuildPath, 'index.html'));
+    });
+
+    // 관리자 대시보드 정적 파일 서빙
+    const adminBuildPath = path.join(__dirname, '../admin-dashboard/build');
+    app.use('/admin', express.static(adminBuildPath));
+    app.get('/admin/*', (req, res) => {
+      res.sendFile(path.join(adminBuildPath, 'index.html'));
+    });
+
+    // 루트 경로 - 환자 포털로 리다이렉트
+    app.get('/', (req, res) => {
+      res.redirect('/patient');
+    });
+
+    // 404 처리 - API가 아닌 경로는 에러 반환
+    app.use((req, res, next) => {
+      if (req.path.startsWith('/api')) {
+        res.status(404).json({ error: 'Endpoint not found' });
+      } else {
+        // 정적 파일 404는 환자 포털로 리다이렉트
+        res.redirect('/patient');
+      }
+    });
 
     // Error handling middleware
     app.use((err, req, res, next) => {
