@@ -7,7 +7,6 @@ services:
     region: singapore
     plan: free
     buildCommand: |
-      npm install
       npm --prefix patient-portal install
       npm --prefix patient-portal run build
       npm --prefix admin-dashboard install
