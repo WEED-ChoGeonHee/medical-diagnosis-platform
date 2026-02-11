@@ -4,7 +4,15 @@ services:
     name: medical-diagnosis-backend
     runtime: node
     env: node
-    buildCommand: npm install && npm --prefix patient-portal install && npm --prefix patient-portal run build && npm --prefix admin-dashboard install && npm --prefix admin-dashboard run build && npm --prefix backend install
+    region: singapore
+    plan: free
+    buildCommand: |
+      npm install
+      npm --prefix patient-portal install
+      npm --prefix patient-portal run build
+      npm --prefix admin-dashboard install
+      npm --prefix admin-dashboard run build
+      npm --prefix backend install
     startCommand: npm --prefix backend start
     envVars:
       - key: NODE_ENV
