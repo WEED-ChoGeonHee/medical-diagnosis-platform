@@ -88,8 +88,12 @@ function DiagnosisDetail() {
               {diagnosis.images.map((image, index) => (
                 <img 
                   key={index} 
-                  src={`http://localhost:5000/${image}`} 
-                  alt={`진단 이미지 ${index + 1}`} 
+                  src={image.image_path || image} 
+                  alt={`진단 이미지 ${index + 1}`}
+                  onError={(e) => {
+                    console.error('이미지 로드 실패:', image);
+                    e.target.style.display = 'none';
+                  }}
                 />
               ))}
             </div>
