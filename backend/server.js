@@ -32,8 +32,10 @@ const startServer = async () => {
     });
 
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+    const HOST = '0.0.0.0'; // 모든 네트워크 인터페이스에서 접근 가능
+    app.listen(PORT, HOST, () => {
+      console.log(`서버가 ${HOST}:${PORT}에서 실행 중입니다.`);
+      console.log(`네트워크 접속: http://10.10.30.175:${PORT}`);
     });
   } catch (error) {
     console.error('서버 시작 실패:', error);

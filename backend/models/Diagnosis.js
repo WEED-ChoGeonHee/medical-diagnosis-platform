@@ -3,14 +3,14 @@ const { pool } = require('../config/database');
 const Diagnosis = {
   // 진단 생성
   async create(diagnosisData) {
-    const { patient_id, symptoms, gpt_diagnosis, status = 'pending' } = diagnosisData;
+    const { patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status = 'pending' } = diagnosisData;
     
     const [result] = await pool.query(
-      'INSERT INTO diagnoses (patient_id, symptoms, gpt_diagnosis, status) VALUES (?, ?, ?, ?)',
-      [patient_id, symptoms, gpt_diagnosis, status]
+      'INSERT INTO diagnoses (patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status]
     );
     
-    return { id: result.insertId, patient_id, symptoms, gpt_diagnosis, status };
+    return { id: result.insertId, patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status };
   },
 
   // 이미지 추가
@@ -90,7 +90,7 @@ const Diagnosis = {
 
   // 모든 진단 조회 (관리자용)
   async findAll(options = {}) {
-    const { status, page = 1, limit = 10 } = options;
+    const { status, symptom_type, skin_type, page = 1, limit = 10 } = options;
     const offset = (page - 1) * limit;
     
     let query = `
@@ -100,10 +100,25 @@ const Diagnosis = {
     `;
     
     const params = [];
+    const conditions = [];
     
     if (status) {
-      query += ' WHERE d.status = ?';
+      conditions.push('d.status = ?');
       params.push(status);
+    }
+    
+    if (symptom_type) {
+      conditions.push('d.symptom_type = ?');
+      params.push(symptom_type);
+    }
+    
+    if (skin_type) {
+      conditions.push('d.skin_type = ?');
+      params.push(skin_type);
+    }
+    
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
     }
     
     query += ' ORDER BY d.created_at DESC LIMIT ? OFFSET ?';
@@ -130,10 +145,27 @@ const Diagnosis = {
     // 총 개수
     let countQuery = 'SELECT COUNT(*) as count FROM diagnoses';
     const countParams = [];
+    const countConditions = [];
+    
     if (status) {
-      countQuery += ' WHERE status = ?';
+      countConditions.push('status = ?');
       countParams.push(status);
     }
+    
+    if (symptom_type) {
+      countConditions.push('symptom_type = ?');
+      countParams.push(symptom_type);
+    }
+    
+    if (skin_type) {
+      countConditions.push('skin_type = ?');
+      countParams.push(skin_type);
+    }
+    
+    if (countConditions.length > 0) {
+      countQuery += ' WHERE ' + countConditions.join(' AND ');
+    }
+    
     const [countResult] = await pool.query(countQuery, countParams);
     const total = countResult[0].count;
     
@@ -176,11 +208,23 @@ const Diagnosis = {
       ['reviewed']
     );
     
+    // 증상 종류별 통계
+    const [symptomStats] = await pool.query(
+      'SELECT symptom_type, COUNT(*) as count FROM diagnoses GROUP BY symptom_type'
+    );
+    
+    // 피부 타입별 통계
+    const [skinTypeStats] = await pool.query(
+      'SELECT skin_type, COUNT(*) as count FROM diagnoses GROUP BY skin_type'
+    );
+    
     return {
       totalPatients: totalPatients[0].count,
       totalDiagnoses: totalDiagnoses[0].count,
       pendingDiagnoses: pendingDiagnoses[0].count,
-      reviewedDiagnoses: reviewedDiagnoses[0].count
+      reviewedDiagnoses: reviewedDiagnoses[0].count,
+      symptomStats: symptomStats,
+      skinTypeStats: skinTypeStats
     };
   }
 };

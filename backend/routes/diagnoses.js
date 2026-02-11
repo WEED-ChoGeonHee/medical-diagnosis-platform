@@ -8,7 +8,7 @@ const { protect } = require('../middleware/auth');
 
 // Gemini API 설정
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent';
 
 // Multer 설정 (이미지 업로드)
 const storage = multer.diskStorage({
@@ -39,11 +39,11 @@ const upload = multer({
 // 진단 요청 생성
 router.post('/', protect, upload.array('images', 5), async (req, res) => {
   try {
-    const { symptoms } = req.body;
+    const { patient_name, symptom_type, skin_type, symptoms } = req.body;
     const images = req.files ? req.files.map(file => file.path) : [];
 
-    if (!symptoms) {
-      return res.status(400).json({ message: '증상을 입력해주세요.' });
+    if (!patient_name || !symptom_type || !skin_type || !symptoms) {
+      return res.status(400).json({ message: '모든 필수 정보를 입력해주세요.' });
     }
 
     let gptDiagnosis = '';
@@ -58,7 +58,7 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
           {
             contents: [{
               parts: [{
-                text: `당신은 의료 전문가입니다. 환자의 증상을 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 의사와 상담이 필요함을 명시하세요.\n\n다음 증상에 대한 가능한 진단명과 설명을 제공해주세요:\n\n${symptoms}`
+                text: `당신은 피부과 전문의입니다. 환자의 피부 증상을 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 피부과 전문의와 상담이 필요함을 명시하세요.\n\n증상 종류: ${symptom_type}\n피부 타입: ${skin_type}\n증상 설명: ${symptoms}\n\n위 정보를 바탕으로 가능한 피부과 진단명과 설명을 제공해주세요.`
               }]
             }]
           },
@@ -75,7 +75,7 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
           {
             contents: [{
               parts: [{
-                text: `관련 의학 논문 3개의 제목과 간단한 요약을 JSON 배열 형식으로 제공해주세요. 형식: [{"title": "논문 제목", "summary": "요약"}]\n\n다음 증상과 관련된 의학 논문: ${symptoms}`
+                text: `관련 피부과 논문 3개의 제목과 간단한 요약을 JSON 배열 형식으로 제공해주세요. 형식: [{"title": "논문 제목", "summary": "요약"}]\n\n다음 피부 증상과 관련된 논문: ${symptom_type} - ${symptoms}`
               }]
             }]
           },
@@ -113,6 +113,9 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
     // DB에 저장
     const diagnosis = await Diagnosis.create({
       patient_id: req.user.id,
+      patient_name,
+      symptom_type,
+      skin_type,
       symptoms,
       gpt_diagnosis: gptDiagnosis,
       status: 'pending'

@@ -39,11 +39,14 @@ const initDatabase = async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    // 진단 테이블
+    // 진단 테이블 (피부과 전용)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS diagnoses (
         id INT AUTO_INCREMENT PRIMARY KEY,
         patient_id INT NOT NULL,
+        patient_name VARCHAR(255),
+        symptom_type VARCHAR(100) NOT NULL,
+        skin_type VARCHAR(100) NOT NULL,
         symptoms TEXT NOT NULL,
         gpt_diagnosis TEXT,
         status ENUM('pending', 'reviewed', 'completed') DEFAULT 'pending',

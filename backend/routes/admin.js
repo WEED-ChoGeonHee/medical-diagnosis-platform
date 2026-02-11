@@ -7,9 +7,9 @@ const { protect, authorize } = require('../middleware/auth');
 // 모든 진단 목록 조회 (의사 전용)
 router.get('/diagnoses', protect, authorize('doctor'), async (req, res) => {
   try {
-    const { status, page = 1, limit = 10 } = req.query;
+    const { status, symptom_type, skin_type, page = 1, limit = 10 } = req.query;
 
-    const result = await Diagnosis.findAll({ status, page, limit });
+    const result = await Diagnosis.findAll({ status, symptom_type, skin_type, page, limit });
 
     res.json(result);
   } catch (error) {
