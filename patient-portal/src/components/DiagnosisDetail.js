@@ -57,10 +57,23 @@ function DiagnosisDetail() {
 
       <div className="card">
         <div className="detail-header">
-          <h2>진단 상세 정보</h2>
+          <h2>피부과 진단 상세 정보</h2>
           <span className={`status-badge status-${diagnosis.status}`}>
             {getStatusText(diagnosis.status)}
           </span>
+        </div>
+
+        <div className="detail-section">
+          <div className="info-grid">
+            <div className="info-item">
+              <span className="info-label">증상 종류</span>
+              <span className="info-value">{diagnosis.symptom_type}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">피부 타입</span>
+              <span className="info-value">{diagnosis.skin_type}</span>
+            </div>
+          </div>
         </div>
 
         <div className="detail-section">

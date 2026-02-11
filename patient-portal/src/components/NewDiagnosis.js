@@ -1,15 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import './NewDiagnosis.css';
 
 function NewDiagnosis() {
+  const [patientName, setPatientName] = useState('');
+  const [symptomType, setSymptomType] = useState('');
+  const [skinType, setSkinType] = useState('');
   const [symptoms, setSymptoms] = useState('');
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showCamera, setShowCamera] = useState(false);
   const navigate = useNavigate();
+  
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+
+  // 피부과 증상 종류
+  const symptomTypes = [
+    '여드름/뾰루지',
+    '아토피/습진',
+    '건선',
+    '두드러기',
+    '사마귀',
+    '무좀',
+    '백반/색소침착',
+    '탈모',
+    '피부염/발진',
+    '기타'
+  ];
+
+  // 피부 타입
+  const skinTypes = [
+    '지성',
+    '건성',
+    '복합성',
+    '민감성',
+    '정상'
+  ];
+
+  // 카메라 시작
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } // 후면 카메라 우선
+      });
+      videoRef.current.srcObject = stream;
+      streamRef.current = stream;
+      setShowCamera(true);
+    } catch (err) {
+      setError('카메라 접근에 실패했습니다. 권한을 확인해주세요.');
+      console.error(err);
+    }
+  };
+
+  // 사진 촬영
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0);
+
+    canvas.toBlob((blob) => {
+      const file = new File([blob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      
+      if (images.length >= 5) {
+        setError('최대 5개의 이미지만 업로드할 수 있습니다.');
+        return;
+      }
+
+      setImages([...images, file]);
+      setPreviews([...previews, URL.createObjectURL(blob)]);
+      
+      // 카메라 종료
+      stopCamera();
+    }, 'image/jpeg');
+  };
+
+  // 카메라 종료
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setShowCamera(false);
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -40,8 +121,8 @@ function NewDiagnosis() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!symptoms.trim()) {
-      setError('증상을 입력해주세요.');
+    if (!patientName.trim() || !symptomType || !skinType || !symptoms.trim()) {
+      setError('모든 필수 정보를 입력해주세요.');
       return;
     }
 
@@ -49,6 +130,9 @@ function NewDiagnosis() {
     setLoading(true);
 
     const formData = new FormData();
+    formData.append('patient_name', patientName);
+    formData.append('symptom_type', symptomType);
+    formData.append('skin_type', skinType);
     formData.append('symptoms', symptoms);
     images.forEach(image => {
       formData.append('images', image);
@@ -72,29 +156,94 @@ function NewDiagnosis() {
   return (
     <div className="container new-diagnosis">
       <div className="card">
-        <h2>새 진단 요청</h2>
+        <h2>환자 진단 등록</h2>
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>환자 이름 *</label>
+            <input
+              type="text"
+              value={patientName}
+              onChange={(e) => setPatientName(e.target.value)}
+              placeholder="환자 이름을 입력하세요"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>증상 종류 *</label>
+            <select
+              value={symptomType}
+              onChange={(e) => setSymptomType(e.target.value)}
+              required
+            >
+              <option value="">선택해주세요</option>
+              {symptomTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>피부 타입 *</label>
+            <select
+              value={skinType}
+              onChange={(e) => setSkinType(e.target.value)}
+              required
+            >
+              <option value="">선택해주세요</option>
+              {skinTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
           <div className="form-group">
             <label>증상 설명 *</label>
             <textarea
               value={symptoms}
               onChange={(e) => setSymptoms(e.target.value)}
-              placeholder="현재 겪고 있는 증상을 자세히 설명해주세요..."
+              placeholder="환자의 피부 증상을 자세히 설명해주세요. 예: 언제부터 시작되었는지, 위치, 가려움증 여부 등"
               rows="8"
               required
             />
           </div>
 
           <div className="form-group">
-            <label>관련 이미지 (선택사항, 최대 5개)</label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageChange}
-              disabled={images.length >= 5}
-            />
+            <label>피부 사진 (선택사항, 최대 5개)</label>
+            <div className="image-upload-options">
+              <button
+                type="button"
+                onClick={startCamera}
+                className="btn btn-secondary"
+                disabled={images.length >= 5 || showCamera}
+              >
+                📷 사진 촬영
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+                disabled={images.length >= 5}
+                style={{ marginLeft: '10px' }}
+              />
+            </div>
           </div>
+
+          {showCamera && (
+            <div className="camera-container">
+              <video ref={videoRef} autoPlay playsInline />
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+              <div className="camera-controls">
+                <button type="button" onClick={capturePhoto} className="btn btn-primary">
+                  촬영
+                </button>
+                <button type="button" onClick={stopCamera} className="btn btn-secondary">
+                  취소
+                </button>
+              </div>
+            </div>
+          )}
 
           {previews.length > 0 && (
             <div className="image-previews">
@@ -128,7 +277,7 @@ function NewDiagnosis() {
               className="btn btn-primary" 
               disabled={loading}
             >
-              {loading ? 'AI 분석 중...' : '진단 요청'}
+              {loading ? 'AI 분석 중...' : '진단 등록'}
             </button>
           </div>
         </form>

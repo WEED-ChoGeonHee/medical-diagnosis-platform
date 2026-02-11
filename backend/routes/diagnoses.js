@@ -8,7 +8,7 @@ const { protect } = require('../middleware/auth');
 
 // Gemini API 설정
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // Multer 설정 (이미지 업로드)
 const storage = multer.diskStorage({

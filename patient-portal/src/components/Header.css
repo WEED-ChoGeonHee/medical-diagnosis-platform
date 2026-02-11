@@ -1,8 +1,12 @@
 .header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 1.2rem 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -12,31 +16,56 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .header h1 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   margin: 0;
+  font-weight: 800;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .header nav {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .header nav a {
   color: white;
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  transition: background 0.3s;
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .header nav a:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .user-info {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.4rem;
+  }
+  
+  .header nav {
+    gap: 10px;
+  }
+  
+  .header nav a {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
 }

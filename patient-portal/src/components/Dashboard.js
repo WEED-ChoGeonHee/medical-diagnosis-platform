@@ -43,16 +43,16 @@ function Dashboard() {
   return (
     <div className="container dashboard">
       <div className="dashboard-header">
-        <h2>내 진단 내역</h2>
-        <Link to="/new-diagnosis" className="btn btn-primary">새 진단 요청</Link>
+        <h2>진단 관리</h2>
+        <Link to="/new-diagnosis" className="btn btn-primary">환자 진단 등록</Link>
       </div>
 
       {error && <div className="error">{error}</div>}
 
       {diagnoses.length === 0 ? (
         <div className="card">
-          <p>아직 진단 내역이 없습니다.</p>
-          <Link to="/new-diagnosis" className="btn btn-primary">첫 진단 요청하기</Link>
+          <p>등록된 진단이 없습니다.</p>
+          <Link to="/new-diagnosis" className="btn btn-primary">첫 진단 등록하기</Link>
         </div>
       ) : (
         <div className="diagnoses-list">
@@ -63,7 +63,7 @@ function Dashboard() {
               className="diagnosis-card"
             >
               <div className="diagnosis-header">
-                <h3>진단 요청</h3>
+                <h3>진단</h3>
                 <span className={getStatusClass(diagnosis.status)}>
                   {getStatusText(diagnosis.status)}
                 </span>

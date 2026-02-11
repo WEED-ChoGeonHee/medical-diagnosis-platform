@@ -11,35 +11,18 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
-      - key: MONGODB_URI
+        value: 10000
+      - key: DB_HOST
         sync: false
+      - key: DB_PORT
+        value: 25060
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: medical_diagnosis
       - key: JWT_SECRET
         generateValue: true
-      - key: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
         sync: false
-    healthCheckPath: /
-    
-  # Patient Portal (Frontend)
-  - type: web
-    name: medical-diagnosis-patient-portal
-    runtime: node
-    env: node
-    rootDir: patient-portal
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./build
-    envVars:
-      - key: REACT_APP_API_URL
-        value: https://medical-diagnosis-backend.onrender.com
-    
-  # Admin Dashboard (Frontend)
-  - type: web
-    name: medical-diagnosis-admin-dashboard
-    runtime: node
-    env: node
-    rootDir: admin-dashboard
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./build
-    envVars:
-      - key: REACT_APP_API_URL
-        value: https://medical-diagnosis-backend.onrender.com

@@ -8,7 +8,9 @@ function Dashboard() {
     totalPatients: 0,
     totalDiagnoses: 0,
     pendingDiagnoses: 0,
-    reviewedDiagnoses: 0
+    reviewedDiagnoses: 0,
+    symptomStats: [],
+    skinTypeStats: []
   });
   const [recentDiagnoses, setRecentDiagnoses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ function Dashboard() {
 
   return (
     <div className="container dashboard">
-      <h2>관리자 대시보드</h2>
+      <h2>피부과 관리자 대시보드</h2>
       
       <div className="stats-grid">
         <div className="stat-card">
@@ -84,6 +86,36 @@ function Dashboard() {
         </div>
       </div>
 
+      <div className="stats-row">
+        {stats.symptomStats && stats.symptomStats.length > 0 && (
+          <div className="card stats-card">
+            <h3>증상 종류별 통계</h3>
+            <div className="stats-list">
+              {stats.symptomStats.map((stat, index) => (
+                <div key={index} className="stats-item">
+                  <span className="stats-label">{stat.symptom_type}</span>
+                  <span className="stats-value">{stat.count}건</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {stats.skinTypeStats && stats.skinTypeStats.length > 0 && (
+          <div className="card stats-card">
+            <h3>피부 타입별 통계</h3>
+            <div className="stats-list">
+              {stats.skinTypeStats.map((stat, index) => (
+                <div key={index} className="stats-item">
+                  <span className="stats-label">{stat.skin_type}</span>
+                  <span className="stats-value">{stat.count}건</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="card">
         <div className="card-header">
           <h3>최근 진단 요청</h3>
@@ -98,7 +130,8 @@ function Dashboard() {
               <thead>
                 <tr>
                   <th>환자명</th>
-                  <th>증상</th>
+                  <th>증상 종류</th>
+                  <th>피부 타입</th>
                   <th>상태</th>
                   <th>작성일</th>
                   <th>동작</th>
@@ -108,9 +141,8 @@ function Dashboard() {
                 {recentDiagnoses.map((diagnosis) => (
                   <tr key={diagnosis._id}>
                     <td>{diagnosis.patient?.name}</td>
-                    <td className="symptoms-cell">
-                      {diagnosis.symptoms.substring(0, 50)}...
-                    </td>
+                    <td>{diagnosis.symptom_type}</td>
+                    <td>{diagnosis.skin_type}</td>
                     <td>
                       <span className={`status-badge status-${diagnosis.status}`}>
                         {getStatusText(diagnosis.status)}

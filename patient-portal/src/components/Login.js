@@ -66,7 +66,7 @@ function Login({ onLogin }) {
           </button>
         </form>
         <p className="auth-link">
-          계정이 없으신가요? <Link to="/register">회원가입</Link>
+          계정이 없으신가요? <Link to="/register">직원 등록</Link>
         </p>
       </div>
     </div>

@@ -80,7 +80,7 @@ function DiagnosisDetail() {
         <div className="main-content">
           <div className="card">
             <div className="detail-header">
-              <h2>진단 상세 정보</h2>
+              <h2>피부과 진단 상세 정보</h2>
               <span className={`status-badge status-${diagnosis.status}`}>
                 {getStatusText(diagnosis.status)}
               </span>
@@ -91,6 +91,14 @@ function DiagnosisDetail() {
               <p><strong>이름:</strong> {diagnosis.patient?.name}</p>
               <p><strong>이메일:</strong> {diagnosis.patient?.email}</p>
               <p><strong>전화번호:</strong> {diagnosis.patient?.phone || '-'}</p>
+            </div>
+
+            <div className="detail-section">
+              <h3>진단 정보</h3>
+              <div className="info-grid">
+                <p><strong>증상 종류:</strong> {diagnosis.symptom_type}</p>
+                <p><strong>피부 타입:</strong> {diagnosis.skin_type}</p>
+              </div>
             </div>
 
             <div className="detail-section">

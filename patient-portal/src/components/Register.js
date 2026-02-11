@@ -40,7 +40,7 @@ function Register({ onLogin }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>회원가입</h2>
+        <h2>직원 등록</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>이름</label>

@@ -50,5 +50,16 @@ backend/uploads/*
 # Optional npm cache directory
 .npm
 
+# APK files
+*.apk
+
+# Text files (디버그용)
+*.txt
+
+# Mobile projects (사용하지 않음)
+patient-portal-mobile/
+admin-dashboard-mobile/
+.npm
+
 # Optional eslint cache
 .eslintcache

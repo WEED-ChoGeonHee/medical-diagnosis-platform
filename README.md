@@ -1,39 +1,38 @@
 # 의료 진단 플랫폼
 
-AI 기반 의료 진단 플랫폼으로, 환자가 증상과 이미지를 업로드하면 GPT API가 진단 정보와 관련 의학 논문을 제공하고, 의사가 관리자 대시보드에서 환자 정보를 확인할 수 있습니다.
+AI 기반 의료 진단 플랫폼으로, 환자가 증상과 이미지를 업로드하면 Gemini API가 진단 정보와 관련 의학 논문을 제공하고, 의사가 관리자 대시보드에서 환자 정보를 확인할 수 있습니다.
 
-## 🌐 배포 및 실행
+## 🌐 배포
 
-### 클라우드 배포 (Render)
+### 클라우드 배포
+- **데이터베이스**: Aiven MySQL (무료 티어, 5GB)
+- **백엔드**: Render.com Web Service (무료 티어, 750시간/월)
+- **프론트엔드**: Android APK (WebView)
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/WEED-ChoGeonHee/medical-diagnosis-platform)
+📖 **배포 가이드**: [DEPLOY.md](DEPLOY.md) 참조
 
-- **GitHub Repository**: [medical-diagnosis-platform](https://github.com/WEED-ChoGeonHee/medical-diagnosis-platform)
-- **클라우드 배포 가이드**: [DEPLOYMENT.md](DEPLOYMENT.md) 참조
+### 로컬 개발 서버 (Windows)
 
-### 로컬 PC를 서버로 사용 (Windows)
-
-PC를 서버로 사용하려면:
-
+빠른 시작:
 ```powershell
-# 1. 네트워크 설정 (관리자 권한 필요)
-.\setup-network.ps1
-
-# 2. 서버 시작
-.\start-server.ps1
-
-# 3. 서버 중지 (필요 시)
-.\stop-server.ps1
+.\quick-start.ps1
 ```
 
-- **로컬 서버 설정 가이드**: [LOCAL_SERVER_SETUP.md](LOCAL_SERVER_SETUP.md) 참조
+개별 실행:
+```powershell
+# 서버 시작
+.\start-server.ps1
+
+# 서버 중지
+.\stop-server.ps1
+```
 
 ## 📋 프로젝트 구조
 
 ```
 의학/
 ├── backend/              # Node.js + Express 백엔드 서버
-│   ├── models/          # MongoDB 모델 (User, Diagnosis)
+│   ├── models/          # MySQL 모델 (User, Diagnosis)
 │   ├── routes/          # API 라우트
 │   ├── middleware/      # 인증 미들웨어
 │   └── server.js        # 서버 진입점
