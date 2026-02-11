@@ -45,6 +45,10 @@ const startServer = async () => {
         DB_NAME: process.env.DB_NAME ? '✅ ' + process.env.DB_NAME : '❌ missing',
         DB_SSL: process.env.DB_SSL || 'not set',
         JWT_SECRET: process.env.JWT_SECRET ? '✅ set (' + process.env.JWT_SECRET.substring(0, 8) + '...)' : '❌ missing',
+        CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? '✅ set' : '❌ missing',
+        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ? '✅ set' : '❌ missing',
+        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ? '✅ set' : '❌ missing',
+        GEMINI_API_KEY: process.env.GEMINI_API_KEY ? '✅ set' : '❌ missing',
         NODE_ENV: process.env.NODE_ENV || 'not set'
       };
 

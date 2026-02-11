@@ -19,6 +19,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+console.log('Cloudinary 설정 확인:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? '✅ set' : '❌ missing',
+  api_key: process.env.CLOUDINARY_API_KEY ? '✅ set' : '❌ missing',
+  api_secret: process.env.CLOUDINARY_API_SECRET ? '✅ set' : '❌ missing'
+});
+
 // Cloudinary Storage 설정
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -37,8 +43,18 @@ const upload = multer({
 // 진단 요청 생성
 router.post('/', protect, upload.array('images', 5), async (req, res) => {
   try {
+    console.log('===== 진단 요청 시작 =====');
+    console.log('Body:', req.body);
+    console.log('Files:', req.files);
+    console.log('Files count:', req.files ? req.files.length : 0);
+    
     const { patient_name, symptom_type, skin_type, symptoms } = req.body;
-    const images = req.files ? req.files.map(file => file.path) : [];
+    const images = req.files ? req.files.map(file => {
+      console.log('Image uploaded:', file.path);
+      return file.path;
+    }) : [];
+    
+    console.log('Processed images:', images);
 
     if (!patient_name || !symptom_type || !skin_type || !symptoms) {
       return res.status(400).json({ message: '모든 필수 정보를 입력해주세요.' });
