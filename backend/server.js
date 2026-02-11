@@ -3,8 +3,16 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 dotenv.config();
+
+// JWT_SECRET이 없으면 자동 생성 (프로덕션에서는 환경변수 설정 권장)
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = crypto.randomBytes(64).toString('hex');
+  console.log('⚠️ JWT_SECRET이 설정되지 않아 자동 생성되었습니다.');
+  console.log('프로덕션 환경에서는 환경 변수로 설정하는 것을 권장합니다.');
+}
 
 const { initDatabase } = require('./config/database');
 
