@@ -1,7 +1,7 @@
 services:
   # Backend API Server + Frontend Static Files
   - type: web
-    name: medical-diagnosis-backend
+    name: medical-diagnosis-platform
     runtime: node
     env: node
     region: singapore
