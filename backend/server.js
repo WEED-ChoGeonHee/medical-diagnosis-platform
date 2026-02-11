@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -28,17 +29,33 @@ const startServer = async () => {
 
     // 환자 포털 정적 파일 서빙
     const patientBuildPath = path.join(__dirname, '../patient-portal/build');
-    app.use('/patient', express.static(patientBuildPath));
-    app.get('/patient/*', (req, res) => {
-      res.sendFile(path.join(patientBuildPath, 'index.html'));
-    });
+    console.log('환자 포털 빌드 경로:', patientBuildPath);
+    console.log('환자 포털 빌드 존재 여부:', fs.existsSync(patientBuildPath));
+    
+    if (fs.existsSync(patientBuildPath)) {
+      app.use('/patient', express.static(patientBuildPath));
+      app.get('/patient/*', (req, res) => {
+        res.sendFile(path.join(patientBuildPath, 'index.html'));
+      });
+      console.log('✅ 환자 포털 정적 파일 서빙 설정 완료');
+    } else {
+      console.warn('⚠️ 환자 포털 빌드 폴더를 찾을 수 없습니다:', patientBuildPath);
+    }
 
     // 관리자 대시보드 정적 파일 서빙
     const adminBuildPath = path.join(__dirname, '../admin-dashboard/build');
-    app.use('/admin', express.static(adminBuildPath));
-    app.get('/admin/*', (req, res) => {
-      res.sendFile(path.join(adminBuildPath, 'index.html'));
-    });
+    console.log('관리자 대시보드 빌드 경로:', adminBuildPath);
+    console.log('관리자 대시보드 빌드 존재 여부:', fs.existsSync(adminBuildPath));
+    
+    if (fs.existsSync(adminBuildPath)) {
+      app.use('/admin', express.static(adminBuildPath));
+      app.get('/admin/*', (req, res) => {
+        res.sendFile(path.join(adminBuildPath, 'index.html'));
+      });
+      console.log('✅ 관리자 대시보드 정적 파일 서빙 설정 완료');
+    } else {
+      console.warn('⚠️ 관리자 대시보드 빌드 폴더를 찾을 수 없습니다:', adminBuildPath);
+    }
 
     // 루트 경로 - 환자 포털로 리다이렉트
     app.get('/', (req, res) => {
