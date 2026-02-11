@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (token && userData) {
       const parsedUser = JSON.parse(userData);
       if (parsedUser.role === 'doctor') {
@@ -45,33 +45,33 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename="/admin">
       <div className="App">
         {user && <Header user={user} onLogout={handleLogout} />}
         <Routes>
-          <Route 
-            path="/login" 
-            element={user ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />} 
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />}
           />
-          <Route 
-            path="/dashboard" 
-            element={user ? <Dashboard /> : <Navigate to="/login" />} 
+          <Route
+            path="/dashboard"
+            element={user ? <Dashboard /> : <Navigate to="/login" />}
           />
-          <Route 
-            path="/diagnoses" 
-            element={user ? <DiagnosisList /> : <Navigate to="/login" />} 
+          <Route
+            path="/diagnoses"
+            element={user ? <DiagnosisList /> : <Navigate to="/login" />}
           />
-          <Route 
-            path="/diagnosis/:id" 
-            element={user ? <DiagnosisDetail /> : <Navigate to="/login" />} 
+          <Route
+            path="/diagnosis/:id"
+            element={user ? <DiagnosisDetail /> : <Navigate to="/login" />}
           />
-          <Route 
-            path="/patients" 
-            element={user ? <PatientList /> : <Navigate to="/login" />} 
+          <Route
+            path="/patients"
+            element={user ? <PatientList /> : <Navigate to="/login" />}
           />
-          <Route 
-            path="/" 
-            element={<Navigate to={user ? "/dashboard" : "/login"} />} 
+          <Route
+            path="/"
+            element={<Navigate to={user ? "/dashboard" : "/login"} />}
           />
         </Routes>
       </div>

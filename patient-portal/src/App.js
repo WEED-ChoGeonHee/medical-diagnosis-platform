@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
@@ -38,33 +38,33 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename="/patient">
       <div className="App">
         {user && <Header user={user} onLogout={handleLogout} />}
         <Routes>
-          <Route 
-            path="/login" 
-            element={user ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />} 
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />}
           />
-          <Route 
-            path="/register" 
-            element={user ? <Navigate to="/dashboard" /> : <Register onLogin={handleLogin} />} 
+          <Route
+            path="/register"
+            element={user ? <Navigate to="/dashboard" /> : <Register onLogin={handleLogin} />}
           />
-          <Route 
-            path="/dashboard" 
-            element={user ? <Dashboard /> : <Navigate to="/login" />} 
+          <Route
+            path="/dashboard"
+            element={user ? <Dashboard /> : <Navigate to="/login" />}
           />
-          <Route 
-            path="/new-diagnosis" 
-            element={user ? <NewDiagnosis /> : <Navigate to="/login" />} 
+          <Route
+            path="/new-diagnosis"
+            element={user ? <NewDiagnosis /> : <Navigate to="/login" />}
           />
-          <Route 
-            path="/diagnosis/:id" 
-            element={user ? <DiagnosisDetail /> : <Navigate to="/login" />} 
+          <Route
+            path="/diagnosis/:id"
+            element={user ? <DiagnosisDetail /> : <Navigate to="/login" />}
           />
-          <Route 
-            path="/" 
-            element={<Navigate to={user ? "/dashboard" : "/login"} />} 
+          <Route
+            path="/"
+            element={<Navigate to={user ? "/dashboard" : "/login"} />}
           />
         </Routes>
       </div>
