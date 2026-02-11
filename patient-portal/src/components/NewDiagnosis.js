@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import './NewDiagnosis.css';
@@ -12,12 +12,7 @@ function NewDiagnosis() {
   const [previews, setPreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showCamera, setShowCamera] = useState(false);
   const navigate = useNavigate();
-  
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const streamRef = useRef(null);
 
   // 피부과 증상 종류
   const symptomTypes = [
@@ -42,55 +37,7 @@ function NewDiagnosis() {
     '정상'
   ];
 
-  // 카메라 시작
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } // 후면 카메라 우선
-      });
-      videoRef.current.srcObject = stream;
-      streamRef.current = stream;
-      setShowCamera(true);
-    } catch (err) {
-      setError('카메라 접근에 실패했습니다. 권한을 확인해주세요.');
-      console.error(err);
-    }
-  };
 
-  // 사진 촬영
-  const capturePhoto = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0);
-
-    canvas.toBlob((blob) => {
-      const file = new File([blob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });
-      
-      if (images.length >= 5) {
-        setError('최대 5개의 이미지만 업로드할 수 있습니다.');
-        return;
-      }
-
-      setImages([...images, file]);
-      setPreviews([...previews, URL.createObjectURL(blob)]);
-      
-      // 카메라 종료
-      stopCamera();
-    }, 'image/jpeg');
-  };
-
-  // 카메라 종료
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setShowCamera(false);
-  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -210,40 +157,24 @@ function NewDiagnosis() {
 
           <div className="form-group">
             <label>피부 사진 (선택사항, 최대 5개)</label>
-            <div className="image-upload-options">
-              <button
-                type="button"
-                onClick={startCamera}
-                className="btn btn-secondary"
-                disabled={images.length >= 5 || showCamera}
-              >
-                📷 사진 촬영
-              </button>
+            <div className="image-upload-container">
               <input
                 type="file"
                 accept="image/*"
                 multiple
+                capture="environment"
                 onChange={handleImageChange}
                 disabled={images.length >= 5}
-                style={{ marginLeft: '10px' }}
+                className="file-input"
+                id="imageUpload"
               />
+              <label htmlFor="imageUpload" className={`file-label ${images.length >= 5 ? 'disabled' : ''}`}>
+                <span className="icon">📷</span>
+                <span className="text">사진 선택 / 촬영</span>
+                <span className="hint">최대 5개까지 가능</span>
+              </label>
             </div>
           </div>
-
-          {showCamera && (
-            <div className="camera-container">
-              <video ref={videoRef} autoPlay playsInline />
-              <canvas ref={canvasRef} style={{ display: 'none' }} />
-              <div className="camera-controls">
-                <button type="button" onClick={capturePhoto} className="btn btn-primary">
-                  촬영
-                </button>
-                <button type="button" onClick={stopCamera} className="btn btn-secondary">
-                  취소
-                </button>
-              </div>
-            </div>
-          )}
 
           {previews.length > 0 && (
             <div className="image-previews">
