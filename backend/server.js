@@ -5,16 +5,19 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
+// 환경변수 먼저 로드
 dotenv.config();
 
-// JWT_SECRET이 없으면 자동 생성 (프로덕션에서는 환경변수 설정 권장)
-if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === '') {
+// JWT_SECRET 강제 설정 (환경변수 없으면 자동 생성)
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === '' || process.env.JWT_SECRET === 'undefined') {
   const generatedSecret = crypto.randomBytes(64).toString('hex');
   process.env.JWT_SECRET = generatedSecret;
   console.log('⚠️ JWT_SECRET이 설정되지 않아 자동 생성되었습니다.');
   console.log('   생성된 키 (처음 16자):', generatedSecret.substring(0, 16) + '...');
-  console.log('프로덕션 환경에서는 환경 변수로 고정값을 설정하는 것을 권장합니다.');
+  console.log('⚠️ 프로덕션 환경에서는 환경 변수로 고정값을 설정하세요!');
 }
+
+console.log('✅ JWT_SECRET 확인:', process.env.JWT_SECRET ? '설정됨 (' + process.env.JWT_SECRET.length + '자)' : '❌ 없음');
 
 const { initDatabase } = require('./config/database');
 
