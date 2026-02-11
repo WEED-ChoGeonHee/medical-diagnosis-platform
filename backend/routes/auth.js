@@ -52,8 +52,12 @@ router.post('/register',
         }
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: '회원가입 중 오류가 발생했습니다.' });
+      console.error('회원가입 에러 상세:', error.message, error.code, error.errno);
+      res.status(500).json({
+        message: '회원가입 중 오류가 발생했습니다.',
+        debug_error: error.message,
+        debug_code: error.code
+      });
     }
   }
 );
