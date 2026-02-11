@@ -20,7 +20,55 @@ app.use('/uploads', express.static('uploads'));
 const startServer = async () => {
   try {
     await initDatabase();
-    
+
+    // DB 디버그 엔드포인트 (배포 후 삭제할 것)
+    app.get('/api/debug/db', async (req, res) => {
+      const { pool } = require('./config/database');
+      const result = { env: {}, connection: null, tables: null, usersSchema: null, error: null };
+
+      // 환경변수 확인 (값은 숨김)
+      result.env = {
+        DB_HOST: process.env.DB_HOST ? '✅ set' : '❌ missing',
+        DB_PORT: process.env.DB_PORT ? '✅ ' + process.env.DB_PORT : '❌ missing',
+        DB_USER: process.env.DB_USER ? '✅ set' : '❌ missing',
+        DB_PASSWORD: process.env.DB_PASSWORD ? '✅ set' : '❌ missing',
+        DB_NAME: process.env.DB_NAME ? '✅ ' + process.env.DB_NAME : '❌ missing',
+        DB_SSL: process.env.DB_SSL || 'not set',
+        JWT_SECRET: process.env.JWT_SECRET ? '✅ set' : '❌ missing',
+        NODE_ENV: process.env.NODE_ENV || 'not set'
+      };
+
+      try {
+        // DB 연결 테스트
+        const [rows] = await pool.query('SELECT 1 as test');
+        result.connection = '✅ connected';
+
+        // 테이블 목록
+        const [tables] = await pool.query('SHOW TABLES');
+        result.tables = tables;
+
+        // users 테이블 스키마
+        try {
+          const [schema] = await pool.query('DESCRIBE users');
+          result.usersSchema = schema;
+        } catch (e) {
+          result.usersSchema = 'Error: ' + e.message;
+        }
+
+        // users 수
+        try {
+          const [count] = await pool.query('SELECT COUNT(*) as count FROM users');
+          result.userCount = count[0].count;
+        } catch (e) { }
+
+      } catch (e) {
+        result.connection = '❌ failed';
+        result.error = e.message;
+      }
+
+      res.json(result);
+    });
+
     // API Routes
     app.use('/api/auth', require('./routes/auth'));
     app.use('/api/patients', require('./routes/patients'));
@@ -31,7 +79,7 @@ const startServer = async () => {
     const patientBuildPath = path.join(__dirname, '../patient-portal/build');
     console.log('환자 포털 빌드 경로:', patientBuildPath);
     console.log('환자 포털 빌드 존재 여부:', fs.existsSync(patientBuildPath));
-    
+
     if (fs.existsSync(patientBuildPath)) {
       app.use('/patient', express.static(patientBuildPath));
       app.get('/patient/*', (req, res) => {
@@ -46,7 +94,7 @@ const startServer = async () => {
     const adminBuildPath = path.join(__dirname, '../admin-dashboard/build');
     console.log('관리자 대시보드 빌드 경로:', adminBuildPath);
     console.log('관리자 대시보드 빌드 존재 여부:', fs.existsSync(adminBuildPath));
-    
+
     if (fs.existsSync(adminBuildPath)) {
       app.use('/admin', express.static(adminBuildPath));
       app.get('/admin/*', (req, res) => {
