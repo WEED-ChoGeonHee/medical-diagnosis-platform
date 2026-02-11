@@ -113,12 +113,19 @@ function DiagnosisDetail() {
                   {diagnosis.images.map((image, index) => (
                     <img 
                       key={index} 
-                  src={image.image_path || image} 
-                  alt={`진단 이미지 ${index + 1}`}
-                  onError={(e) => {
-                    console.error('이미지 로드 실패:', image);
-                    e.target.style.display = 'none';
-                  }}
+                      src={image.image_path || image} 
+                      alt={`진단 이미지 ${index + 1}`}
+                      onError={(e) => {
+                        console.error('이미지 로드 실패:', image);
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {diagnosis.gptDiagnosis && (
               <div className="detail-section gpt-section">
                 <h3>AI 진단 결과</h3>
                 <div className="gpt-content">
