@@ -11,19 +11,19 @@ function DiagnosisDetail() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchDiagnosis = async () => {
+      try {
+        const response = await api.get(`/diagnoses/${id}`);
+        setDiagnosis(response.data);
+      } catch (err) {
+        setError('진단 정보를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchDiagnosis();
   }, [id]);
-
-  const fetchDiagnosis = async () => {
-    try {
-      const response = await api.get(`/diagnoses/${id}`);
-      setDiagnosis(response.data);
-    } catch (err) {
-      setError('진단 정보를 불러오는데 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getStatusText = (status) => {
     const statusMap = {

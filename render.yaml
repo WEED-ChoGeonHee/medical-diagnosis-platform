@@ -7,9 +7,17 @@ services:
     region: singapore
     plan: free
     buildCommand: |
-      cd patient-portal && PUBLIC_URL=/patient npm install && PUBLIC_URL=/patient npm run build && cd ..
-      cd admin-dashboard && PUBLIC_URL=/admin npm install && PUBLIC_URL=/admin npm run build && cd ..
+      echo "=== Installing Backend Dependencies ==="
       cd backend && npm install && cd ..
+      echo "=== Installing Patient Portal Dependencies ==="
+      cd patient-portal && npm install && cd ..
+      echo "=== Installing Admin Dashboard Dependencies ==="
+      cd admin-dashboard && npm install && cd ..
+      echo "=== Building Patient Portal ==="
+      cd patient-portal && npm run build && cd ..
+      echo "=== Building Admin Dashboard ==="
+      cd admin-dashboard && npm run build && cd ..
+      echo "=== Build Complete ==="
     startCommand: npm --prefix backend start
     envVars:
       - key: NODE_ENV
