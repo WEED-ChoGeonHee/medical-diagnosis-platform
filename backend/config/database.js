@@ -14,7 +14,7 @@ const poolConfig = {
 
 // Aiven SSL 설정 (클라우드 DB인 경우)
 if (process.env.DB_SSL === 'true') {
-  poolConfig.ssl = { 
+  poolConfig.ssl = {
     rejectUnauthorized: false,
     minVersion: 'TLSv1.2'
   };
@@ -97,6 +97,33 @@ const initDatabase = async () => {
     `);
 
     console.log('MySQL 데이터베이스 연결 및 테이블 생성 완료');
+
+    // 마이그레이션: 누락된 컬럼 추가
+    console.log('📋 마이그레이션 확인 중...');
+    const migrations = [
+      { table: 'diagnoses', column: 'doctor_notes', definition: 'TEXT AFTER status' },
+      { table: 'diagnoses', column: 'updated_at', definition: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER created_at' },
+      { table: 'diagnoses', column: 'patient_name', definition: 'VARCHAR(255) AFTER patient_id' },
+    ];
+
+    for (const m of migrations) {
+      try {
+        const [cols] = await pool.query(
+          `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+          [process.env.DB_NAME, m.table, m.column]
+        );
+        if (cols.length === 0) {
+          await pool.query(`ALTER TABLE ${m.table} ADD COLUMN ${m.column} ${m.definition}`);
+          console.log(`  ✅ ${m.table}.${m.column} 컬럼 추가 완료`);
+        }
+      } catch (e) {
+        // 이미 존재하면 무시
+        if (e.code !== 'ER_DUP_FIELDNAME') {
+          console.error(`  ⚠️ ${m.table}.${m.column} 마이그레이션 실패:`, e.message);
+        }
+      }
+    }
+    console.log('📋 마이그레이션 완료');
   } catch (error) {
     console.error('데이터베이스 초기화 오류:', error);
     throw error;
