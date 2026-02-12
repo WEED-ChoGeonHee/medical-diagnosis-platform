@@ -89,7 +89,14 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
           {
             contents: [{
               parts: [{
-                text: `관련 피부과 논문 3개의 제목과 간단한 요약을 JSON 배열 형식으로 제공해주세요. 형식: [{"title": "논문 제목", "summary": "요약"}]\n\n다음 피부 증상과 관련된 논문: ${symptom_type} - ${symptoms}`
+                text: `관련 피부과 논문 3개의 제목, URL, 간단한 요약을 JSON 배열 형식으로 제공해주세요. 
+형식: [{"title": "논문 제목", "url": "https://pubmed.ncbi.nlm.nih.gov/...", "summary": "요약"}]
+
+주의사항:
+- url은 실제 접근 가능한 PubMed 또는 학술 논문 링크를 제공해주세요
+- 링크가 없으면 null로 설정해주세요
+
+다음 피부 증상과 관련된 논문: ${symptom_type} - ${symptoms}`
               }]
             }]
           },

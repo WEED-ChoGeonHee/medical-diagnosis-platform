@@ -104,6 +104,7 @@ const initDatabase = async () => {
       `ALTER TABLE diagnoses ADD COLUMN doctor_notes TEXT`,
       `ALTER TABLE diagnoses ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`,
       `ALTER TABLE diagnoses ADD COLUMN patient_name VARCHAR(255)`,
+      `ALTER TABLE diagnoses MODIFY COLUMN status ENUM('pending', 'reviewed', 'completed') DEFAULT 'pending'`,
     ];
 
     for (const sql of migrations) {
