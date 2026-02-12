@@ -1,82 +1,52 @@
-# ?�� ?�사?�트 ?�속 가?�드
+# 🌐 웹사이트 접속 가이드
 
-## ?�� 로컬 ?�버 ?�행 (개발??
+## 배포 서버 접속
 
-### 1?�계: MySQL ?�버 ?�작
-PowerShell?�서 ?�행:
-```powershell
-# MySQL ?�비???�작 (Windows)
-Start-Service MySQL80  # MySQL 8.0 기�?
-
-# ?�는 XAMPP ?�용 ??
-# XAMPP Control Panel?�서 MySQL ?�작
+### 환자 포털
+```
+https://medical-diagnosis-platform.onrender.com/patient
 ```
 
-### 2?�계: 백엔??.env ?�일 ?�정
-`backend\.env` ?�일 ?�성 (?�으�?:
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=medical_diagnosis
-GEMINI_API_KEY=YOUR_GEMINI_API_KEY
-JWT_SECRET=your_secret_key_here
-PORT=5000
+### 관리자 대시보드
 ```
-
-### 3?�계: 백엔???�버 ?�작
-```powershell
-cd e:\?�스\?�학\backend
-npm install
-npm start
+https://medical-diagnosis-platform.onrender.com/admin
 ```
-
-백엔?��? http://localhost:5000 ?�서 ?�행?�니??
-
-### 4?�계: ?�자 ?�털 ?�작 (???��???
-```powershell
-cd e:\?�스\?�학\patient-portal
-npm install
-npm start
-```
-
-?�동?�로 브라?��?가 ?�리�?http://localhost:3000 ?�서 ?�속?�니??
-
-### 5?�계: 관리자 ?�?�보???�작 (?�요?? ???��???
-```powershell
-cd e:\?�스\?�학\admin-dashboard
-npm install
-npm start
-```
-
-http://localhost:3001 ?�서 ?�속?�니??
 
 ---
 
-## ?�️ 배포???�버 ?�속 (추천)
+## 로컬 개발 서버 접속
 
-배포가 ?�료?�었?�면:
-- **?�자 ?�털**: https://medical-diagnosis-platform.onrender.com/patient
-- **관리자 ?�?�보??*: https://medical-diagnosis-platform.onrender.com/admin
+### 백엔드 API 서버
+```bash
+cd backend && node server.js
+# http://localhost:5000
+```
 
-?�️ �??�속 ??30�?1�??��?(무료 ?�버 ?�시??
+### 환자 포털 (개발 모드)
+```bash
+cd patient-portal && npm start
+# http://localhost:3000
+```
+
+### 관리자 대시보드 (개발 모드)
+```bash
+cd admin-dashboard && PORT=3001 npm start
+# http://localhost:3001/login
+```
 
 ---
 
-## ?�� 모바?�에???�속
+## 계정 정보
 
-### Wi-Fi�??�속 (같�? ?�트?�크)
-1. PC?� 모바?�이 같�? Wi-Fi???�결
-2. PC??IP 주소 ?�인:
-   ```powershell
-   ipconfig
-   # IPv4 주소 ?�인 (?? 192.168.0.10)
-   ```
-3. 모바??브라?��??�서 ?�속:
-   - ?�자 ?�털: `http://192.168.0.10:3000`
-   - 관리자: `http://192.168.0.10:3001`
+### 의사 계정
+- **이메일**: `doctor@hospital.com`
+- **비밀번호**: `doctor123`
 
-### 배포 ?�버 ?�속 (?�디?�나)
-- 모바??브라?��??�서 배포 URL ?�속
-- ???�면??추�??�여 ?�처???�용 가??
+### 환자 계정
+- 회원가입 후 사용
+
+---
+
+## 참고
+> 무료 Render 플랜은 15분 비활성 시 슬립 모드에 진입합니다.
+> 첫 접속 시 30초~1분 정도 로딩이 걸릴 수 있습니다.

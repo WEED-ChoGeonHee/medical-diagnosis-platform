@@ -1,108 +1,32 @@
-# ?�️ MySQL ?�성 가?�드 (빠른 참조)
+# ⚡ Aiven MySQL 설정 가이드 (빠른 참조)
 
-## 1️⃣ Kafka ?�비????�� (비용 방�?)
+## 1. Aiven 계정 생성
+1. https://console.aiven.io/signup 접속
+2. 이메일로 회원가입 (신용카드 불필요)
 
-1. Aiven 콘솔: https://console.aiven.io
-2. **kafka-4aafc99** ?�비???�릭
-3. **Settings** ??**Danger Zone** ??**Delete service**
-4. ?�인 ????��
+## 2. MySQL 서비스 생성
+1. **Create service** → **MySQL** 선택
+2. Cloud: **Google Cloud**
+3. Region: **asia-northeast3** (서울)
+4. Plan: **Free** 선택
+5. 서비스 이름 입력 → 생성
 
----
+## 3. 접속 정보 확인
+서비스 대시보드 → **Overview** → **Connection information**:
+- **Host**: `xxx.aivencloud.com`
+- **Port**: `26163` (예시)
+- **User**: `avnadmin`
+- **Password**: (표시된 비밀번호 복사)
+- **Database**: `defaultdb`
 
-## 2️⃣ MySQL ?�비???�성 (무료)
-
-### ?�계�?가?�드:
-
-1. **Create service** ?�릭
-
-2. **?�비???�택**
-   ```
-   ??MySQL (?�이?�베?�스)
-   ??Kafka (메시지 ??- ?�리 ?�로?�트??불필??
-   ```
-
-3. **?�라?�드 ?�공??*
-   - Google Cloud ?�택
-
-4. **리전**
-   - Seoul (asia-northeast3) ?�는
-   - Tokyo (asia-northeast1)
-
-5. **?�랜** �?중요!
-   ```
-   ??Hobbyist - Free (무료)
-      - 5GB ?�토리�?
-      - ?�용카드 불필??
-      - ?�구 무료
-   
-   ??Startup, Business, Premium (?�료)
-   ```
-
-6. **?�비???�름**
-   ```
-   medical-diagnosis-db (?�는 ?�하???�름)
-   ```
-
-7. **Create service** ?�릭
-
----
-
-## 3️⃣ ?�결 ?�보 ?�인 (2-3�???
-
-?�비???�작?�면 **Overview** ??��??
-
-```
-Host: medical-diagnosis-db-xxx.aivencloud.com
-Port: 25060
-User: avnadmin
-Password: [?�동 ?�성??비�?번호]
-Database: defaultdb
+## 4. 환경 변수에 입력
+```env
+DB_HOST=xxx.aivencloud.com
+DB_PORT=26163
+DB_USER=avnadmin
+DB_PASSWORD=your_password
+DB_NAME=defaultdb
+DB_SSL=true
 ```
 
-### ???�보�?복사?�서 ?�?? ?��
-
----
-
-## 4️⃣ ?�이?�베?�스 ?�름 변�?(?�택?�항)
-
-1. **Databases** ??
-2. **Create database** ?�릭
-3. ?�름: `medical_diagnosis`
-4. **Add database** ?�릭
-
----
-
-## ???�인?�항
-
-- [ ] ?�비???�?? **MySQL** (Kafka ??
-- [ ] ?�랜: **Hobbyist - Free** (무료)
-- [ ] 리전: Seoul ?�는 Tokyo (가까운 �?
-- [ ] ?�태: Running (초록??
-
----
-
-## ?�� ?�금 ?�인
-
-**Hobbyist ?�랜?� ?�구 무료?�니??**
-- ??$0
-- ?�용카드 ?�록 불필??
-- 5GB 무료 ?�토리�?
-
----
-
-## ?�� 문제 발생 ??
-
-1. Kafka ?�비?��? ?�금 발생?�면: **즉시 ??��!**
-2. MySQL Hobbyist ?�랜 ?�택 ?�인
-3. "Free" ?�는 "$0/month" ?�시 ?�인
-
----
-
-## ?�음 ?�계
-
-MySQL ?�성 ??
-```powershell
-code DEPLOY.md
-```
-
-3?�계부??진행! (GitHub ?�시 ??Render 배포)
+> ⚠️ `DB_SSL=true` 필수 — Aiven은 SSL 연결만 허용합니다.

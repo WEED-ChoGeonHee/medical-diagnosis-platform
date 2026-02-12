@@ -1,160 +1,24 @@
-# ?? APK 빌드 �?배포 ?�료!
+# ✅ APK 빌드 및 배포 완료!
 
-## ?�� ?�사?�트 주소
+## 생성된 APK 파일
+- **환자용**: `환자용_의료진단.apk` (약 5MB)
+- **의사용**: `의사용_의료진단.apk` (약 5MB)
 
-배포???�이??주소:
+## 설치 방법
 
-### **?�자 ?�털 (모바?�용)**
-```
-https://medical-diagnosis-platform.onrender.com/patient
-```
+### Android 기기에서 직접 설치
+1. APK 파일을 Android 기기로 전송
+2. 파일 관리자에서 APK 탭
+3. "알 수 없는 출처" 허용 설치
+4. 설치 완료!
 
-### **관리자 ?�?�보??(?�사??**  
-```
-https://medical-diagnosis-platform.onrender.com/admin
-```
+### 주의사항
+- Android 7.0 (API 24) 이상 필요
+- 인터넷 연결 필요 (서버 통신)
+- 카메라/갤러리 권한 허용 필요
 
-### **API ?�버**
-```
-https://medical-diagnosis-platform.onrender.com/api
-```
-
----
-
-## ?�� APK 빌드 방법
-
-### 방법 1: ?�동 빌드 ?�크립트 (가??간단)
-
-```powershell
-cd e:\?�스\?�학
-.\build-android-apk.ps1
-```
-
-???�크립트가 ?�동?�로:
-1. Gradle�?APK 빌드
-2. APK�?`medical-diagnosis.apk`�?복사
-3. ?�치 방법 ?�내
-
----
-
-### 방법 2: Android Studio ?�용
-
-1. **Android Studio ?�운로드**
-   - https://developer.android.com/studio
-
-2. **?�로?�트 ?�기**
-   - `File > Open > e:\?�스\?�학\android-app`
-
-3. **Gradle ?�기???��?*
-   - ?�동?�로 ?�존???�운로드
-
-4. **APK 빌드**
-   - `Build > Build Bundle(s) / APK(s) > Build APK(s)`
-
-5. **APK ?�일 ?�치**
-   ```
-   android-app\app\build\outputs\apk\debug\app-debug.apk
-   ```
-
----
-
-### 방법 3: 명령줄로 직접 빌드
-
-Android SDK가 ?��? ?�치?�어 ?�다�?
-
-```powershell
-cd e:\?�스\?�학\android-app
-
-# Windows
-.\gradlew.bat assembleDebug
-
-# ?�공?�면 APK ?�성??
-# ?�치: app\build\outputs\apk\debug\app-debug.apk
-```
-
----
-
-## ?�� 배포 ?�데?�트 (Render.com)
-
-코드�?GitHub???�시?�면 ?�동?�로 배포?�니??
-
-```powershell
-cd e:\?�스\?�학
-
-git add .
-git commit -m "?�론?�엔???�적 ?�일 ?�빙 추�?"
-git push origin main
-```
-
-Render.com?�서 ?�동?�로:
-1. ?�자 ?�털 빌드
-2. 관리자 ?�?�보??빌드  
-3. 백엔???�버?�서 모두 ?�빙
-
-배포 ?�료?�면 (5-10�??�요):
-- https://medical-diagnosis-platform.onrender.com/patient
-- https://medical-diagnosis-platform.onrender.com/admin
-
----
-
-## ?�� APK ?�치 방법
-
-1. **APK ?�일???�마?�폰?�로 ?�송**
-   - USB 케?�블
-   - Google Drive
-   - 카카?�톡 ?�일 ?�송
-   - ?�메??
-
-2. **?�마?�폰?�서 ?�치**
-   - ?�일 관리자 ?�에??APK ?�릭
-   - "?????�는 출처" ???�치 ?�용
-   - ?�치 ?�료!
-
----
-
-## ??APK ?�정 ?�인
-
-APK???�음 URL�??�속?�도�??�정?�어 ?�습?�다:
-
-**MainActivity.java**:
-```java
-private static final String APP_URL = "https://medical-diagnosis-platform.onrender.com/patient";
-```
-
----
-
-## ?�� 최종 ?�인 체크리스??
-
-### 로컬 ?�스??(개발??
-- [ ] 백엔???�버 ?�행: `cd backend && npm start`
-- [ ] ?�자 ?�털 ?�행: `cd patient-portal && npm start`
-- [ ] http://localhost:3000 ?�속 ?�인
-
-### 배포 (?�로?�션)
-- [ ] GitHub??코드 ?�시
-- [ ] Render.com 배포 ?�료 ?��?
-- [ ] https://medical-diagnosis-platform.onrender.com/patient ?�속 ?�인
-- [ ] APK 빌드 �??�스??
-
----
-
-## ?�� 주의?�항
-
-### �??�속 ???�림
-- 무료 ?�버??15�?비활?????�립 모드
-- �??�속 ??30�?1�??��?(?�동 ?�시??
-- ?�후 ?�상 ?�도�??�작
-
-### APK URL 변경이 ?�요??경우
-1. `android-app\app\src\main\java\com\medical\patient\MainActivity.java` ?�정
-2. `APP_URL` 변�?
-3. APK ?�시 빌드
-
----
-
-## ?�� ?��?�?
-
-???�세???�용?�:
-- [QUICK-START.md](QUICK-START.md) - ?�체 가?�드
-- [android-app/README.md](android-app/README.md) - Android ???�세 가?�드
-- [DEPLOY.md](DEPLOY.md) - 배포 가?�드
+## 기능
+- 환자 포털 WebView 앱
+- 카메라로 피부 사진 촬영
+- 갤러리에서 이미지 선택
+- 여러 이미지 동시 업로드

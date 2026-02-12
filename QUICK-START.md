@@ -1,246 +1,47 @@
-# ?�� ?�료 진단 ?�랫??- ?�용 가?�드
+# 🚀 의료 진단 플랫폼 - 사용 가이드
 
-## ?�� ?�사?�트 ?�속 방법
+## 빠른 시작
 
-### ??가??간단??방법: ??브라?��?�??�속
+### 환자 포털
+1. 브라우저에서 접속: https://medical-diagnosis-platform.onrender.com/patient
+2. 회원가입 후 로그인
+3. "새 진단 요청" 클릭
+4. 증상 정보 입력:
+   - 증상 종류 선택 (여드름, 아토피, 건선 등)
+   - 피부 타입 선택 (지성, 건성, 복합성 등)
+   - 증상 상세 설명
+5. 피부 사진 업로드 (최대 5장)
+6. 제출 → AI 진단 결과 확인
 
-#### 로컬 ?�버 ?�행 ???�속:
+### 관리자 대시보드 (의사용)
+1. 브라우저에서 접속: https://medical-diagnosis-platform.onrender.com/admin
+2. 의사 계정으로 로그인
+   - 이메일: `doctor@hospital.com`
+   - 비밀번호: `doctor123`
+3. 대시보드에서 진단 현황 확인
+4. 진단 목록에서 환자 진단 상세 조회
+5. 의사 소견 작성 및 상태 업데이트
 
-1. **백엔???�버 ?�작** (??PowerShell ?��???:
-```powershell
-cd e:\?�스\?�학\backend
-npm install
-npm start
+### Android 앱 (환자용)
+1. APK 파일 다운로드
+2. Android 기기에 설치
+3. 앱 실행 → 환자 포털 접속
+
+---
+
+## 로컬 개발 환경
+
+### 백엔드
+```bash
+cd backend && npm install && node server.js
 ```
 
-2. **?�자 ?�털 ?�작** (??PowerShell ?��???:
-```powershell
-cd e:\?�스\?�학\patient-portal
-npm install
-npm start
+### 환자 포털
+```bash
+cd patient-portal && npm install && npm start
 ```
 
-3. **브라?��??�서 ?�속**:
-   - ?�자 ?�털: http://localhost:3000
-   - 관리자 ?�?�보?? http://localhost:3001 (추�? ?��??�에??admin-dashboard ?�행)
-
-#### 모바?�에???�속 (같�? Wi-Fi):
-1. PC??IP 주소 ?�인:
-```powershell
-ipconfig
-# IPv4 주소 ?�인 (?? 192.168.0.10)
+### 관리자 대시보드
+```bash
+cd admin-dashboard && npm install && PORT=3001 npm start
 ```
-
-2. 모바??브라?��??�서:
-   - http://192.168.0.10:3000
-
----
-
-### ?�️ 배포???�버 ?�속 (?�디?�나)
-
-배포가 ?�료?�었?�면:
-- **?�자 ?�털**: https://medical-diagnosis-platform.onrender.com/patient
-- **관리자 ?�?�보??*: https://medical-diagnosis-platform.onrender.com/admin
-
-?�️ **참고**: 무료 ?�버??처음 ?�속 ??30�?1�??�도 ?��??�간???�습?�다 (?�립 모드 ?�제).
-
----
-
-## ?�� Android APK ?�성 방법
-
-### 방법 1: 빠른 빌드 (?�동???�크립트)
-
-```powershell
-cd e:\?�스\?�학
-.\build-android-apk.ps1
-```
-
-???�크립트가 ?�동?�로:
-1. Android SDK ?�인
-2. Gradle�?APK 빌드
-3. APK ?�일??`medical-diagnosis.apk`�?복사
-
-**?�요?�항**: Android Studio ?�는 Android SDK ?�치 ?�요
-
----
-
-### 방법 2: Android Studio ?�용 (추천)
-
-1. **Android Studio ?�운로드 �??�치**:
-   - https://developer.android.com/studio
-
-2. **?�로?�트 ?�기**:
-   ```
-   File > Open > e:\?�스\?�학\android-app
-   ```
-
-3. **APK 빌드**:
-   ```
-   Build > Build Bundle(s) / APK(s) > Build APK(s)
-   ```
-
-4. **APK ?�일 ?�치**:
-   ```
-   android-app\app\build\outputs\apk\debug\app-debug.apk
-   ```
-
----
-
-### 방법 3: ?�라??빌드 ?�비??(Android Studio ?�이)
-
-Android Studio ?�치 ?�이 APK�??�성?????�습?�다:
-
-#### AppGyver BuildApp.io
-1. https://www.buildapp.io/ ?�속
-2. `android-app` ?�더�?ZIP?�로 ?�축
-3. ?�로?�하�?빌드
-
-#### GitHub Actions (?�동??
-- GitHub??코드�??�시?�면 ?�동?�로 APK ?�성
-- ?�정 방법?� `android-app/README.md` 참조
-
----
-
-### 방법 4: Capacitor ?�용 (React ??-> ?�이?�브)
-
-```powershell
-cd e:\?�스\?�학\patient-portal
-
-# Capacitor ?�치
-npm install @capacitor/core @capacitor/cli @capacitor/android
-
-# 초기??
-npx cap init medicalApp com.medical.patient --web-dir=build
-
-# 빌드 �?Android 추�?
-npm run build
-npx cap add android
-npx cap sync
-
-# Android Studio ?�기
-npx cap open android
-```
-
-Android Studio?�서 Build > Build APK(s)
-
----
-
-## ?�� APK ?�치 방법
-
-1. **APK ?�일 ?�송**:
-   - USB 케?�블�??�결
-   - ?�는 Google Drive, 카카?�톡 ?�으�??�송
-
-2. **?�마?�폰?�서 APK ?�일 ?�기**:
-   - ?�일 관리자 ?�에??APK ?�일 ?�릭
-
-3. **?�치 ?�용**:
-   - "?????�는 출처" ???�치 ?�용
-   - (?�정 > 보안 > ?????�는 출처)
-
-4. **?�치 ?�료!** ?��
-
----
-
-## ?�️ ???�정 변�?
-
-### ?�사?�트 URL 변�?
-APK가 ?�속???�사?�트 주소�?변경하?�면:
-
-**?�일**: `android-app\app\src\main\java\com\medical\patient\MainActivity.java`
-
-```java
-private static final String APP_URL = "https://your-website-url.com";
-```
-
-배포???�버 주소�?변�?
-```java
-private static final String APP_URL = "https://medical-diagnosis-platform.onrender.com/patient";
-```
-
-변�????�시 APK 빌드!
-
-### ???�름 변�?
-**?�일**: `android-app\app\src\main\res\values\strings.xml`
-
-```xml
-<string name="app_name">?�료 진단</string>
-```
-
----
-
-## ?�� 문제 ?�결
-
-### 1. "MongoDB service not found"
-- ?�로?�트가 MySQL�?변경되?�습?�다
-- `backend\.env` ?�일??MySQL ?�정 ?�요:
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=medical_diagnosis
-```
-
-### 2. 백엔???�결 ?�패
-- 백엔???�버가 ?�행 중인지 ?�인
-- ?�경 변??(.env) ?�정 ?�인
-- 방화�??�정 ?�인
-
-### 3. APK 빌드 ?�패
-- Android Studio ?�치 ?�인
-- Gradle ?�기?? `File > Sync Project with Gradle Files`
-- SDK ?�이?�스 ?�의: `sdkmanager --licenses`
-
-### 4. APK ?�치 ?�패
-- "?????�는 출처" ???�치 ?�용
-- ?�??공간 ?�인
-- ?�전 버전 ????�� ???�설�?
-
----
-
-## ?�� 추�? ?��?�?
-
-- **?�사?�트 ?�속**: [START-WEB.md](START-WEB.md)
-- **APK 빌드**: [BUILD-APK.md](BUILD-APK.md)
-- **Android ??*: [android-app/README.md](android-app/README.md)
-- **배포 가?�드**: [DEPLOY.md](DEPLOY.md)
-
----
-
-## ?�� 빠른 ?�작 체크리스??
-
-### ?�사?�트�??�용?�기:
-- [ ] 백엔???�버 ?�작
-- [ ] ?�자 ?�털 ?�작
-- [ ] 브라?��??�서 http://localhost:3000 ?�속
-
-### APK ?�용?�기:
-- [ ] Android Studio ?�치
-- [ ] `build-android-apk.ps1` ?�행
-- [ ] APK ?�일???�마?�폰?�로 ?�송
-- [ ] APK ?�치
-
-### 배포?�기:
-- [ ] [DEPLOY.md](DEPLOY.md) 참조
-- [ ] Aiven MySQL ?�정
-- [ ] Render.com 배포
-- [ ] APK URL ?�데?�트
-
----
-
-## ??기능 ?�약
-
-### ?�자 ?�털
-- ???�원가??�?로그??
-- ???��? 증상 ?�력 �??��?지 ?�로??
-- ??AI 진단 결과 ?�인
-- ???�사 ?�견 ?�인
-
-### 관리자 ?�?�보??
-- ??모든 진단 ?�역 조회
-- ???�자 ?�보 관�?
-- ???�사 ?�견 ?�성
-- ???�계 ?�?�보??
-
-**기술 ?�택**: React + Node.js + MySQL + Gemini AI

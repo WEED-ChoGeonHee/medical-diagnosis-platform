@@ -1,72 +1,38 @@
-# ?�� Android APK ?�성 가?�드
+# 📱 Android APK 생성 가이드
 
-## 방법 1: Capacitor ?�용 (추천)
+## 사전 준비
+- Android Studio 설치
+- Java JDK 17+
 
-### 1?�계: Capacitor ?�치
-```powershell
-cd e:\?�스\?�학\patient-portal
+## 빌드 순서
 
-# Capacitor ?�치
-npm install @capacitor/core @capacitor/cli
-npm install @capacitor/android
-
-# Capacitor 초기??
-npx cap init medicalApp com.medical.patient
+### 1. 프로젝트 열기
+```
+Android Studio → Open → android-app/ 폴더 선택
 ```
 
-### 2?�계: ?�로?�션 빌드
-```powershell
-# React ??빌드
-npm run build
+### 2. Gradle Sync
+Android Studio가 자동으로 Gradle 동기화 실행
 
-# Android ?�랫??추�?
-npx cap add android
+### 3. 서버 URL 설정
+`app/src/main/java/.../MainActivity.java`에서:
+```java
+webView.loadUrl("https://medical-diagnosis-platform.onrender.com/patient");
 ```
 
-### 3?�계: API URL ?�정
-`src/api.js` ?�일 ?�정:
-```javascript
-const API_URL = 'https://medical-diagnosis-platform.onrender.com/api';
+### 4. 디버그 APK 빌드
+```
+Build → Build Bundle(s) / APK(s) → Build APK(s)
+```
+생성 경로: `app/build/outputs/apk/debug/app-debug.apk`
+
+### 5. 릴리즈 APK 빌드
+```
+Build → Generate Signed Bundle / APK → APK
+→ 키스토어 생성 또는 선택 → Release 빌드
 ```
 
-그리�??�시 빌드:
-```powershell
-npm run build
-npx cap sync
-```
-
-### 4?�계: APK ?�성
-
-#### ?�션 A: Android Studio ?�용
-```powershell
-npx cap open android
-```
-Android Studio?�서:
-1. **Build > Build Bundle(s) / APK(s) > Build APK(s)**
-2. 빌드 ?�료 ??APK ?�치 ?�인
-
-#### ?�션 B: 명령줄로 빌드 (Android Studio ?�이)
-```powershell
-cd android
-.\gradlew assembleDebug
-```
-?�성??APK ?�치: `android\app\build\outputs\apk\debug\app-debug.apk`
-
----
-
-## 방법 2: 간단??WebView APK ?�로?�트
-
-Android Studio ?�이 간단??WebView ?�을 만들 ???�습?�다.
-??방법?� 별도 가?�드 ?�일??참조?�세??
-
----
-
-## ?�� 빠른 APK ?�성 ?�크립트
-
-?�래 ?�크립트�??�행?�여 ?�동?�로 APK�??�성?�니??
-
-```powershell
-.\build-apk.ps1
-```
-
-?�크립트 ?�용?� ?�음 ?�계?�서 ?�성?�니??
+## 주요 설정 파일
+- `app/build.gradle` — 앱 버전, SDK 설정
+- `AndroidManifest.xml` — 권한 (인터넷, 카메라, 갤러리)
+- `MainActivity.java` — WebView 설정, 파일 업로드 처리

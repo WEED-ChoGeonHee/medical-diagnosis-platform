@@ -1,114 +1,58 @@
-# Android WebView ??빌드 ?�동??
-# ?�용�? .\build-android-apk.ps1
+# Android WebView APK 빌드 자동화 스크립트
+# 사용법: .\build-android-apk.ps1
 
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host "   Android APK 빌드 ?�크립트" -ForegroundColor Cyan
+Write-Host "  Android WebView APK 빌드 자동화" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host ""
 
-$appDir = "e:\?�스\?�학\android-app"
+$rootDir = $PSScriptRoot
 
-# Android Studio ?�는 Android SDK ?�인
-$androidHome = $env:ANDROID_HOME
-$androidSdk = $env:ANDROID_SDK_ROOT
-
-if (-not $androidHome -and -not $androidSdk) {
-    Write-Host "?�️  Android SDK�?찾을 ???�습?�다!" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "?�음 �??�나�??�택?�세??" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "1. Android Studio ?�치 (추천)" -ForegroundColor White
-    Write-Host "   https://developer.android.com/studio" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "2. Android Studio?�서 ?�로?�트 ?�기" -ForegroundColor White
-    Write-Host "   File > Open > $appDir" -ForegroundColor Gray
-    Write-Host "   Build > Build Bundle(s) / APK(s) > Build APK(s)" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "3. ?�라??빌드 ?�비???�용" -ForegroundColor White
-    Write-Host "   https://www.buildapp.io/" -ForegroundColor Gray
-    Write-Host ""
-    
-    $choice = Read-Host "Android Studio�??�시겠습?�까? (Y/N)"
-    if ($choice -eq 'Y' -or $choice -eq 'y') {
-        # Android Studio 경로 찾기
-        $studioPath = "C:\Program Files\Android\Android Studio\bin\studio64.exe"
-        if (Test-Path $studioPath) {
-            Write-Host "Android Studio ?�행 �?.." -ForegroundColor Green
-            Start-Process $studioPath -ArgumentList $appDir
+# 환자용 앱 빌드
+Write-Host "`n[1/2] 환자용 앱 빌드..." -ForegroundColor Yellow
+$patientApp = "$rootDir\android-app"
+if (Test-Path $patientApp) {
+    Set-Location $patientApp
+    if (Test-Path "gradlew.bat") {
+        .\gradlew.bat assembleDebug
+        if ($LASTEXITCODE -eq 0) {
+            $apk = Get-ChildItem "$patientApp\app\build\outputs\apk\debug\*.apk" -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($apk) {
+                Copy-Item $apk.FullName "$rootDir\환자용_의료진단.apk" -Force
+                Write-Host "  환자용 APK 빌드 완료!" -ForegroundColor Green
+            }
         } else {
-            Write-Host "Android Studio�?찾을 ???�습?�다. ?�동?�로 ?�치?�세??" -ForegroundColor Red
-            Start-Process "https://developer.android.com/studio"
-        }
-    }
-    exit
-}
-
-# Gradle Wrapper ?�인
-cd $appDir
-
-if (-not (Test-Path "gradlew.bat")) {
-    Write-Host "Gradle Wrapper ?�성 �?.." -ForegroundColor Yellow
-    gradle wrapper
-}
-
-Write-Host "[1/3] ?�로?�트 ?�리 �?.." -ForegroundColor Yellow
-.\gradlew.bat clean
-
-Write-Host "[2/3] APK 빌드 �?.." -ForegroundColor Yellow
-.\gradlew.bat assembleDebug
-
-if ($?) {
-    Write-Host ""
-    Write-Host "====================================" -ForegroundColor Green
-    Write-Host "   ??APK 빌드 ?�료!" -ForegroundColor Green
-    Write-Host "====================================" -ForegroundColor Green
-    Write-Host ""
-    
-    $apkPath = "app\build\outputs\apk\debug\app-debug.apk"
-    
-    if (Test-Path $apkPath) {
-        $fullPath = (Resolve-Path $apkPath).Path
-        $fileSize = (Get-Item $apkPath).Length / 1MB
-        
-        Write-Host "?�� APK ?�일 ?�보:" -ForegroundColor Cyan
-        Write-Host "   ?�치: $fullPath" -ForegroundColor White
-        Write-Host "   ?�기: $([math]::Round($fileSize, 2)) MB" -ForegroundColor White
-        Write-Host ""
-        
-        # APK�?루트�?복사
-        $destPath = "..\medical-diagnosis.apk"
-        Copy-Item $apkPath $destPath -Force
-        
-        Write-Host "[3/3] APK 복사 ?�료:" -ForegroundColor Green
-        Write-Host "   e:\?�스\?�학\medical-diagnosis.apk" -ForegroundColor White
-        Write-Host ""
-        
-        # ?�치 ?�내
-        Write-Host "?�� ?�치 방법:" -ForegroundColor Cyan
-        Write-Host "   1. APK ?�일???�마?�폰?�로 ?�송" -ForegroundColor White
-        Write-Host "   2. ?�일 관리자?�서 APK ?�릭" -ForegroundColor White
-        Write-Host "   3. '?????�는 출처' ???�치 ?�용" -ForegroundColor White
-        Write-Host "   4. ?�치 ?�료!" -ForegroundColor White
-        Write-Host ""
-        
-        # ?�일 ?�색기로 ?�기
-        $openChoice = Read-Host "?�일 ?�색기로 APK ?�치�??�시겠습?�까? (Y/N)"
-        if ($openChoice -eq 'Y' -or $openChoice -eq 'y') {
-            explorer.exe /select,$fullPath
+            Write-Host "  환자용 APK 빌드 실패" -ForegroundColor Red
         }
     } else {
-        Write-Host "APK ?�일??찾을 ???�습?�다: $apkPath" -ForegroundColor Red
+        Write-Host "  gradlew.bat 없음 - Android Studio에서 먼저 빌드하세요" -ForegroundColor Red
     }
-} else {
-    Write-Host ""
-    Write-Host "====================================" -ForegroundColor Red
-    Write-Host "   ??APK 빌드 ?�패" -ForegroundColor Red
-    Write-Host "====================================" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "문제 ?�결:" -ForegroundColor Yellow
-    Write-Host "   1. Android Studio?�서 ?�로?�트�??�어보세?? -ForegroundColor White
-    Write-Host "   2. Sync Project with Gradle Files ?�행" -ForegroundColor White
-    Write-Host "   3. 빌드 로그?�서 ?�러 ?�인" -ForegroundColor White
 }
 
-Write-Host ""
+# 의사용 앱 빌드
+Write-Host "`n[2/2] 의사용 앱 빌드..." -ForegroundColor Yellow
+$adminApp = "$rootDir\android-app-admin"
+if (Test-Path $adminApp) {
+    Set-Location $adminApp
+    if (Test-Path "gradlew.bat") {
+        .\gradlew.bat assembleDebug
+        if ($LASTEXITCODE -eq 0) {
+            $apk = Get-ChildItem "$adminApp\app\build\outputs\apk\debug\*.apk" -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($apk) {
+                Copy-Item $apk.FullName "$rootDir\의사용_의료진단.apk" -Force
+                Write-Host "  의사용 APK 빌드 완료!" -ForegroundColor Green
+            }
+        } else {
+            Write-Host "  의사용 APK 빌드 실패" -ForegroundColor Red
+        }
+    } else {
+        Write-Host "  gradlew.bat 없음 - Android Studio에서 먼저 빌드하세요" -ForegroundColor Red
+    }
+} else {
+    Write-Host "  android-app-admin 폴더 없음 - 건너뜁니다" -ForegroundColor Yellow
+}
+
+Write-Host "`n====================================" -ForegroundColor Cyan
+Write-Host "  빌드 완료!" -ForegroundColor Green
+Write-Host "====================================" -ForegroundColor Cyan
+
+Set-Location $rootDir

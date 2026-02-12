@@ -1,73 +1,34 @@
-# ?? 간단??APK 빌드 가?�드
+# Android APK 간편 빌드 스크립트
+# 사용법: .\build-apk-simple.ps1
 
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host "   ?�료 진단 APK 빌드" -ForegroundColor Cyan
+Write-Host "  APK 간편 빌드" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host ""
 
-$androidDir = "e:\?�스\?�학\android-app"
+$rootDir = $PSScriptRoot
+$appDir = "$rootDir\android-app"
 
-# Android Studio ?�인
-$studioPath = "C:\Program Files\Android\Android Studio\bin\studio64.exe"
-$hasAndroidStudio = Test-Path $studioPath
-
-Write-Host "?�� APK ?�정 ?�보:" -ForegroundColor Green
-Write-Host "   ?�사?�트 URL: https://medical-diagnosis-platform.onrender.com/patient" -ForegroundColor White
-Write-Host "   ???�름: ?�료 진단" -ForegroundColor White
-Write-Host "   ?�키지: com.medical.patient" -ForegroundColor White
-Write-Host ""
-
-if ($hasAndroidStudio) {
-    Write-Host "??Android Studio가 ?�치?�어 ?�습?�다!" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "APK�?빌드?�려�?" -ForegroundColor Cyan
-    Write-Host "   1. Android Studio ?�기" -ForegroundColor White
-    Write-Host "   2. File > Open > $androidDir" -ForegroundColor White
-    Write-Host "   3. Gradle ?�기???��? -ForegroundColor White
-    Write-Host "   4. Build > Build Bundle(s) / APK(s) > Build APK(s)" -ForegroundColor White
-    Write-Host ""
-    
-    $openStudio = Read-Host "지�?Android Studio�??�시겠습?�까? (Y/N)"
-    if ($openStudio -eq 'Y' -or $openStudio -eq 'y') {
-        Write-Host "Android Studio ?�행 �?.." -ForegroundColor Green
-        Start-Process $studioPath -ArgumentList $androidDir
-        Write-Host ""
-        Write-Host "Android Studio?�서 ?�로?�트가 ?�리�?" -ForegroundColor Yellow
-        Write-Host "   Build > Build Bundle(s) / APK(s) > Build APK(s)" -ForegroundColor White
-        Write-Host ""
-        Write-Host "빌드??APK ?�치:" -ForegroundColor Cyan
-        Write-Host "   $androidDir\app\build\outputs\apk\debug\app-debug.apk" -ForegroundColor Gray
-    }
-} else {
-    Write-Host "??Android Studio가 ?�치?�어 ?��? ?�습?�다." -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "APK 빌드 방법:" -ForegroundColor Cyan
-    Write-Host ""
-    
-    Write-Host "방법 1: Android Studio ?�치 (추천)" -ForegroundColor White
-    Write-Host "   1. https://developer.android.com/studio ?�속" -ForegroundColor Gray
-    Write-Host "   2. Android Studio ?�운로드 �??�치" -ForegroundColor Gray
-    Write-Host "   3. ???�크립트 ?�시 ?�행" -ForegroundColor Gray
-    Write-Host ""
-    
-    Write-Host "방법 2: ?�라??빌드 ?�비??(Android Studio ?�이)" -ForegroundColor White
-    Write-Host "   1. android-app ?�더�?ZIP?�로 ?�축" -ForegroundColor Gray
-    Write-Host "   2. https://www.appetize.io/ ?�는 ?�라??빌드 ?�비???�용" -ForegroundColor Gray
-    Write-Host ""
-    
-    Write-Host "방법 3: GitHub Actions (?�동??" -ForegroundColor White
-    Write-Host "   1. GitHub??코드 ?�시" -ForegroundColor Gray
-    Write-Host "   2. GitHub Actions�??�동 APK 빌드" -ForegroundColor Gray
-    Write-Host ""
-    
-    $download = Read-Host "Android Studio ?�운로드 ?�이지�??�시겠습?�까? (Y/N)"
-    if ($download -eq 'Y' -or $download -eq 'y') {
-        Start-Process "https://developer.android.com/studio"
-    }
+if (-not (Test-Path $appDir)) {
+    Write-Host "android-app 폴더를 찾을 수 없습니다." -ForegroundColor Red
+    exit 1
 }
 
-Write-Host ""
-Write-Host "?�� ?�세??가?�드:" -ForegroundColor Cyan
-Write-Host "   - APK-BUILD-GUIDE.md" -ForegroundColor White
-Write-Host "   - android-app/README.md" -ForegroundColor White
-Write-Host ""
+Set-Location $appDir
+
+# 빌드 실행
+Write-Host "`n디버그 APK 빌드 중..." -ForegroundColor Yellow
+.\gradlew.bat assembleDebug 2>&1 | Tee-Object -Variable buildOutput
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "`n빌드 성공!" -ForegroundColor Green
+    
+    $apkPath = Get-ChildItem -Path "$appDir\app\build\outputs\apk" -Filter "*.apk" -Recurse | Select-Object -First 1
+    if ($apkPath) {
+        Write-Host "APK: $($apkPath.FullName)" -ForegroundColor White
+        Write-Host "크기: $([math]::Round($apkPath.Length / 1MB, 2)) MB" -ForegroundColor White
+    }
+} else {
+    Write-Host "`n빌드 실패" -ForegroundColor Red
+}
+
+Set-Location $rootDir

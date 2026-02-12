@@ -1,62 +1,39 @@
-# Simple Server Start Script
+# 의료 진단 플랫폼 - 빠른 시작 스크립트
+# 사용법: .\quick-start.ps1
 
-Write-Host "================================" -ForegroundColor Cyan
-Write-Host "Starting Servers" -ForegroundColor Cyan
-Write-Host "================================" -ForegroundColor Cyan
-Write-Host ""
+Write-Host "====================================" -ForegroundColor Cyan
+Write-Host "  의료 진단 플랫폼 빠른 시작" -ForegroundColor Cyan
+Write-Host "====================================" -ForegroundColor Cyan
 
-# Check MongoDB
-Write-Host "[1/4] Checking MongoDB..." -ForegroundColor Yellow
-$mongoService = Get-Service -Name MongoDB -ErrorAction SilentlyContinue
-if ($mongoService) {
-    if ($mongoService.Status -ne 'Running') {
-        Write-Host "   Starting MongoDB..." -ForegroundColor Gray
-        Start-Service MongoDB
-    }
-    Write-Host "   MongoDB is running" -ForegroundColor Green
-} else {
-    Write-Host "   MongoDB service not found" -ForegroundColor Yellow
-}
+$rootDir = $PSScriptRoot
 
-Write-Host ""
+# 1. 백엔드 의존성 설치
+Write-Host "`n[1/3] 백엔드 의존성 설치..." -ForegroundColor Yellow
+Set-Location "$rootDir\backend"
+if (-not (Test-Path "node_modules")) { npm install }
+Write-Host "  완료!" -ForegroundColor Green
 
-# Start Backend Server
-Write-Host "[2/4] Starting Backend Server..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD\backend'; npm start"
-Write-Host "   Backend: http://localhost:5000" -ForegroundColor Green
+# 2. 환자 포털 의존성 설치
+Write-Host "`n[2/3] 환자 포털 의존성 설치..." -ForegroundColor Yellow
+Set-Location "$rootDir\patient-portal"
+if (-not (Test-Path "node_modules")) { npm install }
+Write-Host "  완료!" -ForegroundColor Green
 
-Write-Host ""
+# 3. 관리자 대시보드 의존성 설치
+Write-Host "`n[3/3] 관리자 대시보드 의존성 설치..." -ForegroundColor Yellow
+Set-Location "$rootDir\admin-dashboard"
+if (-not (Test-Path "node_modules")) { npm install }
+Write-Host "  완료!" -ForegroundColor Green
 
-# Start Patient Portal
-Write-Host "[3/4] Starting Patient Portal..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD\patient-portal'; npm start"
-Write-Host "   Patient Portal: http://localhost:3000" -ForegroundColor Green
+# 서버 시작
+Write-Host "`n====================================" -ForegroundColor Cyan
+Write-Host "  모든 의존성 설치 완료!" -ForegroundColor Green
+Write-Host "====================================" -ForegroundColor Cyan
+Write-Host "`n서버 시작:" -ForegroundColor Yellow
+Write-Host "  .\start-server.ps1" -ForegroundColor White
+Write-Host "`n접속 URL:" -ForegroundColor Yellow
+Write-Host "  환자 포털:         http://localhost:3000" -ForegroundColor White
+Write-Host "  관리자 대시보드:  http://localhost:3001" -ForegroundColor White
+Write-Host "  백엔드 API:       http://localhost:5000" -ForegroundColor White
 
-Write-Host ""
-
-# Start Admin Dashboard
-Write-Host "[4/4] Starting Admin Dashboard..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD\admin-dashboard'; npm start"
-Write-Host "   Admin Dashboard: http://localhost:3001" -ForegroundColor Green
-
-Write-Host ""
-Write-Host "================================" -ForegroundColor Green
-Write-Host "All Servers Started!" -ForegroundColor Green
-Write-Host "================================" -ForegroundColor Green
-Write-Host ""
-Write-Host "Services:" -ForegroundColor Cyan
-Write-Host "   - Backend API: http://localhost:5000" -ForegroundColor White
-Write-Host "   - Patient Portal: http://localhost:3000" -ForegroundColor White
-Write-Host "   - Admin Dashboard: http://localhost:3001" -ForegroundColor White
-Write-Host ""
-
-# Open Browser
-$openBrowser = Read-Host "Open browser? (Y/n)"
-if ($openBrowser -ne "n" -and $openBrowser -ne "N") {
-    Start-Sleep -Seconds 3
-    Start-Process "http://localhost:3000"
-    Start-Process "http://localhost:3001"
-}
-
-Write-Host ""
-Write-Host "To stop: Close each PowerShell window" -ForegroundColor Gray
+Set-Location $rootDir

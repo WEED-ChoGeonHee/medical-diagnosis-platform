@@ -1,112 +1,43 @@
-# ?�자 ?�털 APK 빌드 ?�동???�크립트
-# ?�용�? .\build-apk.ps1
+# Android APK 빌드 스크립트
+# 사용법: .\build-apk.ps1
 
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host "   ?�료 진단 ?�랫??APK 빌드" -ForegroundColor Cyan
+Write-Host "  Android APK 빌드" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host ""
 
-# Capacitor가 ?�치?�어 ?�는지 ?�인
-$patientPortalDir = "e:\?�스\?�학\patient-portal"
-cd $patientPortalDir
+$rootDir = $PSScriptRoot
 
-Write-Host "[1/6] Capacitor ?�인 �?.." -ForegroundColor Yellow
-
-# package.json?�서 capacitor ?�인
-$packageJson = Get-Content "package.json" -Raw | ConvertFrom-Json
-if (-not $packageJson.dependencies."@capacitor/core") {
-    Write-Host "Capacitor ?�치 �?.." -ForegroundColor Green
-    npm install --save @capacitor/core @capacitor/cli @capacitor/android
-    
-    Write-Host "Capacitor 초기??�?.." -ForegroundColor Green
-    npx cap init medicalApp com.medical.patient --web-dir=build
-}
-
-Write-Host "[2/6] React ??빌드 �?.." -ForegroundColor Yellow
-
-# API URL??배포 ?�버�?변�?
-$apiFile = "src\api.js"
-if (Test-Path $apiFile) {
-    $apiContent = Get-Content $apiFile -Raw
-    if ($apiContent -match "localhost") {
-        Write-Host "   ?�️  API URL??배포 ?�버�?변경해???�니??" -ForegroundColor Red
-        Write-Host "   src/api.js ?�일?�서 API_URL???�인?�세??" -ForegroundColor Red
-        Write-Host ""
-        Read-Host "계속?�려�?Enter�??�르?�요"
-    }
-}
-
-# ?�로?�션 빌드
-npm run build
-
-if (-not $?) {
-    Write-Host "빌드 ?�패!" -ForegroundColor Red
+# android-app 폴더 확인
+$appDir = "$rootDir\android-app"
+if (-not (Test-Path $appDir)) {
+    Write-Host "android-app 폴더가 없습니다." -ForegroundColor Red
     exit 1
 }
 
-Write-Host "[3/6] Android ?�랫???�인 �?.." -ForegroundColor Yellow
+Set-Location $appDir
 
-# Android ?�랫??추�? (?��? ?�으�??�킵)
-if (-not (Test-Path "android")) {
-    npx cap add android
+# Gradle Wrapper 확인
+if (-not (Test-Path "gradlew.bat")) {
+    Write-Host "gradlew.bat가 없습니다. Android Studio에서 프로젝트를 먼저 열어주세요." -ForegroundColor Red
+    exit 1
 }
 
-Write-Host "[4/6] Capacitor ?�기??�?.." -ForegroundColor Yellow
-npx cap sync android
+# 디버그 APK 빌드
+Write-Host "`nAPK 빌드 중..." -ForegroundColor Yellow
+.\gradlew.bat assembleDebug
 
-Write-Host "[5/6] APK 빌드 �?.." -ForegroundColor Yellow
-
-# Gradle???�치?�어 ?�는지 ?�인
-if (Test-Path "android\gradlew.bat") {
-    cd android
-    .\gradlew.bat assembleDebug
-    
-    if ($?) {
-        Write-Host ""
-        Write-Host "====================================" -ForegroundColor Green
-        Write-Host "   APK 빌드 ?�료!" -ForegroundColor Green
-        Write-Host "====================================" -ForegroundColor Green
-        Write-Host ""
+if ($LASTEXITCODE -eq 0) {
+    $apkPath = "$appDir\app\build\outputs\apk\debug\app-debug.apk"
+    if (Test-Path $apkPath) {
+        Write-Host "`n빌드 성공!" -ForegroundColor Green
+        Write-Host "APK 경로: $apkPath" -ForegroundColor White
         
-        $apkPath = "app\build\outputs\apk\debug\app-debug.apk"
-        if (Test-Path $apkPath) {
-            $fullPath = (Resolve-Path $apkPath).Path
-            Write-Host "?�� APK ?�일 ?�치:" -ForegroundColor Cyan
-            Write-Host "   $fullPath" -ForegroundColor White
-            Write-Host ""
-            
-            # ?�일 ?�기 ?�시
-            $fileSize = (Get-Item $apkPath).Length / 1MB
-            Write-Host "?�� ?�일 ?�기: $([math]::Round($fileSize, 2)) MB" -ForegroundColor Cyan
-            Write-Host ""
-            
-            # APK�?루트 ?�렉?�리�?복사
-            $destPath = "..\..\patient-portal.apk"
-            Copy-Item $apkPath $destPath -Force
-            Write-Host "??APK ?�일??복사?�었?�니??" -ForegroundColor Green
-            Write-Host "   $patientPortalDir\patient-portal.apk" -ForegroundColor White
-        }
-    } else {
-        Write-Host "APK 빌드 ?�패!" -ForegroundColor Red
-        Write-Host "Android Studio�??�치?�고 ?�시 ?�도?�세??" -ForegroundColor Yellow
+        # APK를 루트 폴더로 복사
+        Copy-Item $apkPath "$rootDir\환자용_의료진단.apk" -Force
+        Write-Host "복사 완료: $rootDir\환자용_의료진단.apk" -ForegroundColor Green
     }
-    
-    cd ..
 } else {
-    Write-Host ""
-    Write-Host "====================================" -ForegroundColor Yellow
-    Write-Host "   Android Studio ?�요" -ForegroundColor Yellow
-    Write-Host "====================================" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "APK�?빌드?�려�?Android Studio가 ?�요?�니??" -ForegroundColor White
-    Write-Host ""
-    Write-Host "?�음 명령?�로 Android Studio�??�고 ?�동?�로 빌드?�세??" -ForegroundColor Cyan
-    Write-Host "   npx cap open android" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Android Studio?�서:" -ForegroundColor Cyan
-    Write-Host "   Build > Build Bundle(s) / APK(s) > Build APK(s)" -ForegroundColor White
+    Write-Host "`n빌드 실패! Android Studio를 확인하세요." -ForegroundColor Red
 }
 
-Write-Host ""
-Write-Host "[6/6] ?�료!" -ForegroundColor Green
-Write-Host ""
+Set-Location $rootDir

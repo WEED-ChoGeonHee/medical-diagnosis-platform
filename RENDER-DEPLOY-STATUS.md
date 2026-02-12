@@ -1,198 +1,37 @@
-# ?? Render 배포 ?�료 가?�드
+# ✅ Render 배포 완료 가이드
 
-## ??GitHub ?�시 ?�료
+## GitHub 푸시 완료
 
-?�음 ?�정?�항??GitHub???�시?�었?�니??
+다음 수정사항이 GitHub에 푸시되었습니다.
 
-### 1�??�시 (bccf9d1)
-- ??render.yaml: rootDir ?�거, 빌드 명령???�정
-- ??backend/server.js: ?�적 ?�일 경로 ?�정, 404 처리 추�?
-- ??README.md: ?�스??결과 ?�데?�트
-
-### 2�??�시 (711267a) - **중요!**
-- ??patient-portal/src/api.js: API URL???��? 경로�?변�?
-- ??admin-dashboard/src/api.js: API URL???��? 경로�?변�?
+### 주요 변경 사항
+- `render.yaml`: 빌드 명령어 수정
+- `backend/server.js`: 정적 파일 경로 수정, 404 처리 추가
+- `patient-portal/src/api.js`: API URL을 상대 경로로 변경
+- `admin-dashboard/src/api.js`: API URL을 상대 경로로 변경
+- `backend/config/database.js`: 마이그레이션 로직 추가
 
 ---
 
-## ?�� Render ?�동 배포 진행 �?
+## 배포 확인 방법
 
-GitHub???�시?�면 Render.com???�동?�로 감�??�여 배포�??�작?�니??
+### 1. Render 빌드 상태 확인
+- Render Dashboard → Events 탭
+- "Deploy live" 표시 확인
 
-### 배포 ?�인 방법
+### 2. 서비스 접속 테스트
 
-1. **Render ?�?�보???�속**
-   - https://dashboard.render.com
-   - GitHub 계정?�로 로그??
+| 서비스 | URL |
+|--------|-----|
+| 환자 포털 | https://medical-diagnosis-platform.onrender.com/patient |
+| 관리자 대시보드 | https://medical-diagnosis-platform.onrender.com/admin |
+| API 상태 | https://medical-diagnosis-platform.onrender.com/api/debug/db |
 
-2. **배포 ?�태 ?�인**
-   - `medical-diagnosis-backend` ?�비???�릭
-   - **Events** ??��??배포 진행 ?�황 ?�인
-   - **Logs** ??��??빌드 로그 ?�인
-
-3. **배포 ?�계**
-   ```
-   1. Building... (3-5�?
-      - patient-portal npm install & build
-      - admin-dashboard npm install & build
-      - backend npm install
-   
-   2. Deploying... (1-2�?
-      - ???�스?�스 ?�작
-      - ?�스 체크
-   
-   3. Live ??(배포 ?�료)
-   ```
-
----
-
-## ?�️ ?�상 배포 ?�간
-
-- **�?배포**: 5-10�?
-- **?�배??*: 3-5�?
-
-?�재 ?�간 기�??�로 **??5-8�???* 배포 ?�료 ?�상
-
----
-
-## ?�� 배포 ???�스??
-
-배포가 ?�료?�면 ?�음 URL�??�속?�여 ?�스??
-
-### ?�자 ?�털
-```
-https://medical-diagnosis-platform.onrender.com/patient
-```
-
-**?�상 결과**: 
-- ???�자 로그???�원가???�이지 ?�시
-- ??{"error":"Endpoint not found"} ?�류 ?�결??
-
-### 관리자 ?�?�보??
-```
-https://medical-diagnosis-platform.onrender.com/admin
-```
-
-**?�상 결과**:
-- ???�사 로그???�이지 ?�시
-
-### API ?�드?�인??
-```
-https://medical-diagnosis-platform.onrender.com/api/auth/health
-```
-
-**?�상 결과**:
-```json
-{"status": "ok", "database": "connected"}
-```
-
----
-
-## ?�� 배포 �?발생 가?�한 문제
-
-### 1. 빌드 ?�패
-**?�인**: npm install ?�는 build ?�패
-**?�결**: Render Logs?�서 ?�러 메시지 ?�인
-
-### 2. ?�작 ?�패
-**?�인**: ?�이?�베?�스 ?�결 ?�류
-**?�결**: Render ?�경 변???�인
-- DB_HOST
-- DB_PORT
-- DB_USER
-- DB_PASSWORD
-- GEMINI_API_KEY
-
-### 3. 404 ?�러 (배포 ?�에??
-**가???�인**:
-- 빌드 ?�일???�성?��? ?�음
-- 경로 문제
-**?�결**: Render Logs?�서 빌드 ?�공 ?��? ?�인
-
----
-
-## ?�� 배포 ?�인 체크리스??
-
-배포가 ?�료?�면 ?�음 ??��???�인:
-
-- [ ] Render Dashboard?�서 "Live" ?�태 ?�인
-- [ ] https://medical-diagnosis-platform.onrender.com/patient ?�속 ??HTML ?�이지 ?�시
-- [ ] https://medical-diagnosis-platform.onrender.com/admin ?�속 ??HTML ?�이지 ?�시
-- [ ] ?�자 ?�원가???�스??
-- [ ] ?�자 로그???�스??
-- [ ] ?�사 로그???�스??(기존 계정)
-- [ ] ?��?지 ?�로???�스??
-- [ ] AI 진단 ?�청 ?�스??
-
----
-
-## ?�� APK ?�속 ?�스??
-
-배포가 ?�료?�면 APK???�스??
-
-### ?�자??APK
-1. `?�자???�료진단.apk` ?�치
-2. ???�행
-3. ?�자 ?�털 ?�이지 로드 ?�인
-4. ?�원가??로그???�스??
-
-### ?�사??APK
-1. `?�사???�료진단.apk` ?�치
-2. ???�행
-3. 관리자 ?�?�보??로드 ?�인
-4. 로그???�스??
-
----
-
-## ?�� ?�상 결과
-
-### ?�정 ??(??
-```
-https://medical-diagnosis-platform.onrender.com/patient
-??{"error":"Endpoint not found"}
-```
-
-### ?�정 ??(??
-```
-https://medical-diagnosis-platform.onrender.com/patient
-???�자 ?�털 HTML ?�이지 ?�시
-??React ??로드
-??로그???�원가???�면
-```
-
----
-
-## ?�� 배포 ?�태 ?�시�??�인
-
-Render CLI ?�용 (?�택?�항):
-```bash
-# Render CLI ?�치
-npm install -g render-cli
-
-# 로그??
-render login
-
-# 배포 ?�태 ?�인
-render services list
-
-# 로그 ?�시�?보기
-render logs medical-diagnosis-backend
-```
-
----
-
-## ???�음 ?�계
-
-1. **5-8�??��?* (배포 ?�료 ?�간)
-2. **Render Dashboard ?�인**
-3. **배포??URL ?�스??*
-4. **APK ?�스??*
-5. **문제 발견 ??*: Render Logs ?�인 ??추�? ?�정
-
----
-
-## ?�� 관??문서
-
-- [README.md](README.md) - ?�로?�트 개요
-- [DEPLOY.md](DEPLOY.md) - 배포 가?�드 ?�세
-- [TEST-REPORT.md](TEST-REPORT.md) - 로컬 ?�스??보고??
+### 3. 기능 테스트 체크리스트
+- [ ] 환자 회원가입/로그인
+- [ ] 진단 요청 및 이미지 업로드
+- [ ] AI 진단 결과 확인
+- [ ] 의사 로그인 (`doctor@hospital.com` / `doctor123`)
+- [ ] 대시보드 통계 표시
+- [ ] 의사 소견 저장
+- [ ] 환자 목록 조회
