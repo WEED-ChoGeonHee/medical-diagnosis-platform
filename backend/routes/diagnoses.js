@@ -186,14 +186,8 @@ router.get('/:id', protect, async (req, res) => {
       return res.status(403).json({ message: '접근 권한이 없습니다.' });
     }
 
-    res.json({
-      ...diagnosis,
-      _id: diagnosis.id,
-      gptDiagnosis: diagnosis.gpt_diagnosis,
-      doctorNotes: diagnosis.doctor_notes,
-      createdAt: diagnosis.created_at,
-      updatedAt: diagnosis.updated_at
-    });
+    // findById에서 이미 camelCase 변환됨
+    res.json(diagnosis);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: '진단 조회 중 오류가 발생했습니다.' });

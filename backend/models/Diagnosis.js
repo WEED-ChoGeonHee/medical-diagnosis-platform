@@ -82,14 +82,20 @@ const Diagnosis = {
       [patientId]
     );
 
-    // 각 진단에 이미지 추가
+    // 각 진단에 이미지 추가 및 camelCase 변환
     for (let diagnosis of diagnoses) {
       const [images] = await pool.query(
         'SELECT image_path FROM diagnosis_images WHERE diagnosis_id = ?',
         [diagnosis.id]
       );
       diagnosis.images = images.map(img => img.image_path);
-      diagnosis._id = diagnosis.id; // 프론트엔드 호환
+      
+      // camelCase 별칭 추가 (프론트엔드 호환)
+      diagnosis._id = diagnosis.id;
+      diagnosis.gptDiagnosis = diagnosis.gpt_diagnosis;
+      diagnosis.doctorNotes = diagnosis.doctor_notes;
+      diagnosis.createdAt = diagnosis.created_at;
+      diagnosis.updatedAt = diagnosis.updated_at;
     }
 
     return diagnoses;

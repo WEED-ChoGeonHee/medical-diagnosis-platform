@@ -43,16 +43,10 @@ router.put('/diagnoses/:id', protect, authorize('doctor'), async (req, res) => {
       return res.status(404).json({ message: '진단을 찾을 수 없습니다.' });
     }
 
+    // update에서 findById를 호출하므로 이미 camelCase 변환됨
     res.json({
       message: '의사 소견이 추가되었습니다.',
-      diagnosis: {
-        ...diagnosis,
-        _id: diagnosis.id,
-        gptDiagnosis: diagnosis.gpt_diagnosis,
-        doctorNotes: diagnosis.doctor_notes,
-        createdAt: diagnosis.created_at,
-        updatedAt: diagnosis.updated_at
-      }
+      diagnosis: diagnosis
     });
   } catch (error) {
     console.error(error);
