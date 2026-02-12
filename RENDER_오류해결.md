@@ -1,254 +1,61 @@
-# ?�� Render 배포 ?�류 ?�결 (긴급)
+# 🚨 Render 배포 오류 해결
 
-## ???�재 문제
+## 📋 일반적인 문제와 해결 방법
 
-로그 분석:
-```
-==> Running 'yarn'  ??Render가 yarn ?�행 (?�못??)
-==> Application exited early  ???�버 ?�작 ?�패
-==> No open ports detected  ???�트 ?�리지 ?�음
-```
+### 문제 1: Application exited early / No open ports detected
 
-**?�인**: 
-1. Render가 `render.yaml`??무시?�고 기본 ?�정 ?�용
-2. Build Command가 비어?��? ?�거???�못 ?�정??
-3. ?�론?�엔??빌드가 ?�행?��? ?�음
-4. ?�경 변??미입??
+**원인**: Render가 `render.yaml`을 무시하고 기본 설정 적용
 
----
-
-## ???�결 방법 (5�?
-
-### 1?�계: Settings ???�인 ?�️
-
-#### Render Dashboard ??medical-diagnosis-backend ??Settings
-
-#### ?�� Build & Deploy ?�션?�서:
-
-##### ??Build Command ?�인:
-**?�재 ?�태 ?�인**: 비어?��? ?�으�?문제!
-
-**?�바�??�정 2가지 방법**:
-
-**방법 A: 비워?�기 (추천)** ??
-```
-Build Command: [비워?�기 - render.yaml ?�용]
-```
-
-**방법 B: 명시???�력**
-```
-Build Command:
-npm --prefix patient-portal install && npm --prefix patient-portal run build && npm --prefix admin-dashboard install && npm --prefix admin-dashboard run build && npm --prefix backend install
-```
-
-?�️ **주의**: `npm install`??�??�에 ?�으�????�니?? (루트??package.json???�음)
-
-##### ??Start Command ?�인:
-**?�재 ?�태 ?�인**: `yarn start` ?�는 ?�른 값이 ?�으�?문제!
-
-**?�바�??�정**:
-```
-Start Command: npm --prefix backend start
-```
-?�는
-```
-Start Command: [비워?�기 - render.yaml ?�용]
-```
-
-##### ??Auto-Deploy:
-```
-??Yes (?�성??
-```
-
----
-
-### 2?�계: Environment ?�인
-
-#### Environment ?�션?�서:
-```
-Environment: Node  ??반드??"Node"?�야 ??
-```
-
-**Docker�??�어 ?�으�?*: 
-1. Edit Configuration ?�릭
-2. Environment�?`Node`�?변�?
-3. Update Web Service ?�릭
-
----
-
-### 3?�계: ?�경 변???�력 (Environment ??
-
-#### medical-diagnosis-backend ??Environment ??
-
-**?�수 4�?변??*:
-
-```
-GEMINI_API_KEY = YOUR_GEMINI_API_KEY
-DB_HOST = (Aiven MySQL ?�스??
-DB_USER = avnadmin
-DB_PASSWORD = (Aiven MySQL 비�?번호)
-```
-
-#### ?�력 방법:
-1. **Add Environment Variable** 버튼 ?�릭
-2. Key/Value ?�력
-3. **Add** ?�릭
-4. 4�?모두 ?�력 ??**Save Changes** ?�릭
-
----
-
-### 4?�계: Manual Deploy ??��???�배??
-
-#### Settings 변�???
-
-1. **Manual Deploy** ???�릭
-2. **Clear build cache & deploy** ?�택 �?
-3. **Deploy** 버튼 ?�릭
-
-?�️ **중요**: Clear build cache�??�택?�야 ?�전 ?�정???�전??초기?�됨!
-
----
-
-## ?�� ?�바�?배포 로그 ?�시
-
-?�정???��?�??�면 ?�음�?같이 ?��??�야 ??
-
+**해결**:
+1. Render Dashboard → Settings → Build & Deploy 확인
+2. Build Command가 비어있으면 아래 입력:
 ```bash
-==> Building...
-==> Running build command from render.yaml...
-
-# npm install (루트)
-added 1 packages
-
-# npm --prefix patient-portal install
-added 1500 packages
-
-# npm --prefix patient-portal run build
-Creating an optimized production build...
-Compiled successfully!  ????메시지 ?�수!
-Build folder ready.
-
-# npm --prefix admin-dashboard install
-added 1500 packages
-
-# npm --prefix admin-dashboard run build
-Creating an optimized production build...
-Compiled successfully!  ????메시지 ?�수!
-Build folder ready.
-
-# npm --prefix backend install
-added 100 packages
-
-==> Build succeeded!
-
-==> Deploying...
-==> Running 'npm --prefix backend start'
-
-?�버 ?�작?? http://localhost:10000  ???�버 ?�작
-?�자 ?�털 빌드 존재 ?��?: true  ??빌드 ?�인
-관리자 ?�?�보??빌드 존재 ?��?: true  ??빌드 ?�인
-MySQL ?�결 ?�공  ??DB ?�결
-
-==> Your service is live ?��
+cd patient-portal && PUBLIC_URL=/patient npm install && PUBLIC_URL=/patient npm run build && cd .. && cd admin-dashboard && PUBLIC_URL=/admin npm install && PUBLIC_URL=/admin npm run build && cd .. && cd backend && npm install && cd ..
 ```
+3. Start Command: `npm --prefix backend start`
 
 ---
 
-## ?�� ?�재 vs ?�바�??�정 비교
+### 문제 2: npm error ENOENT package.json
 
-### ???�재 (?�못??로그):
-```
-==> Running 'yarn'  ??yarn ?�행 (?�못??
-==> Application exited early  ???�버 ?�패
-```
+**원인**: Build Command가 루트에서 npm 실행 시도
 
-### ???�바�?로그:
-```
-==> Running build command from render.yaml...
-==> npm --prefix patient-portal run build
-Compiled successfully!  ???�론?�엔??빌드
-==> npm --prefix admin-dashboard run build
-Compiled successfully!  ???�론?�엔??빌드
-==> Running 'npm --prefix backend start'
-?�버 ?�작?? http://localhost:10000  ???�버 ?�작
-MySQL ?�결 ?�공  ??DB ?�결
-```
+**해결**: Build Command에 `cd backend &&` 접두사 확인
 
 ---
 
-## ?�� 체크리스??
+### 문제 3: yarn 실행 오류
 
-### Settings ??
-- [ ] Environment: `Node` (Docker ??
-- [ ] Build Command: 비워?�기 ?�는 npm 명령??
-- [ ] Start Command: `npm --prefix backend start` ?�는 비워?�기
-- [ ] Auto-Deploy: Yes
+**원인**: Render가 자동으로 yarn 감지
 
-### Environment ??
-- [ ] GEMINI_API_KEY ?�력
-- [ ] DB_HOST ?�력
-- [ ] DB_USER ?�력
-- [ ] DB_PASSWORD ?�력
-- [ ] Save Changes ?�릭
-
-### Manual Deploy:
-- [ ] Clear build cache & deploy ?�택
-- [ ] Deploy 버튼 ?�릭
-
-### 배포 ?�공 ?�인:
-- [ ] Logs??"Compiled successfully!" 2�??�시
-- [ ] Logs??"?�버 ?�작?? ?�시
-- [ ] Logs??"MySQL ?�결 ?�공" ?�시
-- [ ] Events ??�� "Deploy live" (초록??
+**해결**: Settings → Build & Deploy에서 Build Command를 명시적으로 설정
 
 ---
 
-## ?�� 문제 ?�결 ??
+### 문제 4: 환경 변수 미설정
 
-### 문제: Settings?�서 Build Command�?비웠?�데??yarn ?�행
+**증상**: DB 연결 실패, JWT 오류 등
 
-**?�결**:
-1. Settings ??Build & Deploy
-2. **Override build command** 체크박스 ?�인
-3. 체크 ?�제?�거?? 명시?�으�?npm 명령???�력
-
-### 문제: render.yaml???�식 ????
-
-**?�결**:
-1. GitHub ?�?�소?�서 `render.yaml` ?�일??루트???�는지 ?�인
-2. ?�일�??�?�문???�인 (`render.yaml` ?? `Render.yaml` ??
-3. Settings?�서 Branch가 `master`�??�어 ?�는지 ?�인
-
-### 문제: ?�경 변???�력?�는?�도 "Application exited early"
-
-**?�인**:
-1. Environment ??��??4�?변??모두 ?�력?�었?��?
-2. DB_HOST???�트 번호(`:25060`) ?�함 ???�는지
-3. Aiven MySQL ?�비?��? ?�성??Running) ?�태?��?
-4. Logs?�서 ?�확???�러 메시지 ?�인
+**해결**:
+1. Dashboard → Environment 탭
+2. 모든 환경 변수 입력 확인
+3. [RENDER_환경변수_완전체크리스트.md](RENDER_환경변수_완전체크리스트.md) 참조
 
 ---
 
-## ?? 빠른 ?�설??(가???�실??방법)
+### 문제 5: 무료 플랜 슬립 모드
 
-만약 ??방법?�로?????�면:
+**증상**: 첫 접속 시 30초~1분 대기
 
-### ?�비????�� ???�생??
+**원인**: 무료 플랜은 15분 비활성 시 서버 슬립
 
-1. **Settings** ???�이지 ?�단 ??**Delete Web Service**
-2. **New +** ??**Web Service**
-3. ?�?�소 ?�결: `WEED-ChoGeonHee/medical-diagnosis-platform`
-4. ?�정:
-   - Environment: `Node` ??
-   - Build Command: **?�전??비워?�기**
-   - Start Command: **?�전??비워?�기**
-5. ?�경 변??4�??�력
-6. Create Web Service ?�릭
+**해결**: 정상 동작, 첫 요청 시 자동 웨이크업
 
 ---
 
-**?�️ ?�상 ?�요 ?�간**: 
-- Settings ?�정: 2�?
-- ?�경 변???�력: 3�?
-- ?�배???��? 3-5�?
-- **�?10�?*
+## 🔍 디버그 방법
+
+배포 후 환경 변수 상태 확인:
+```
+https://[서비스명].onrender.com/api/debug/db
+```
