@@ -118,8 +118,15 @@ function DiagnosisDetail() {
               {diagnosis.medicalPapers.map((paper, index) => (
                 <div key={index} className="paper-item">
                   <h4>{paper.title}</h4>
+                  {paper.url && (
+                    <p>
+                      <strong>논문 링크:</strong>{' '}
+                      <a href={paper.url} target="_blank" rel="noopener noreferrer">
+                        {paper.url}
+                      </a>
+                    </p>
+                  )}
                   <p>{paper.summary}</p>
-                  {paper.url && <a href={paper.url} target="_blank" rel="noopener noreferrer">자세히 보기</a>}
                 </div>
               ))}
             </div>

@@ -41,9 +41,10 @@ function DiagnosisDetail() {
       });
       
       setDiagnosis(response.data.diagnosis);
-      setSuccess('의사 소견이 저장되었습니다.');
+      setSuccess(`의사 소견이 저장되었습니다. (상태: ${getStatusText(status)})`);
     } catch (err) {
-      setError('저장에 실패했습니다.');
+      console.error('의사 소견 저장 오류:', err);
+      setError(err.response?.data?.message || '저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -143,6 +144,14 @@ function DiagnosisDetail() {
                   {diagnosis.medicalPapers.map((paper, index) => (
                     <div key={index} className="paper-item">
                       <h4>{paper.title}</h4>
+                      {paper.url && (
+                        <p>
+                          <strong>논문 링크:</strong>{' '}
+                          <a href={paper.url} target="_blank" rel="noopener noreferrer">
+                            {paper.url}
+                          </a>
+                        </p>
+                      )}
                       <p>{paper.summary}</p>
                     </div>
                   ))}

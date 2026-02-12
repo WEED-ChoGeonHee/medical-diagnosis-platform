@@ -33,6 +33,11 @@ router.get('/patients/:patientId/diagnoses', protect, authorize('doctor'), async
 router.put('/diagnoses/:id', protect, authorize('doctor'), async (req, res) => {
   try {
     const { doctorNotes, status } = req.body;
+    
+    console.log('=== 진단 업데이트 요청 ===');
+    console.log('진단 ID:', req.params.id);
+    console.log('의사 소견:', doctorNotes);
+    console.log('상태:', status);
 
     const diagnosis = await Diagnosis.update(req.params.id, {
       doctor_notes: doctorNotes,
@@ -43,13 +48,15 @@ router.put('/diagnoses/:id', protect, authorize('doctor'), async (req, res) => {
       return res.status(404).json({ message: '진단을 찾을 수 없습니다.' });
     }
 
+    console.log('업데이트된 진단 상태:', diagnosis.status);
+
     // update에서 findById를 호출하므로 이미 camelCase 변환됨
     res.json({
       message: '의사 소견이 추가되었습니다.',
       diagnosis: diagnosis
     });
   } catch (error) {
-    console.error(error);
+    console.error('의사 소견 추가 오류:', error);
     res.status(500).json({ message: '의사 소견 추가 중 오류가 발생했습니다.' });
   }
 });
