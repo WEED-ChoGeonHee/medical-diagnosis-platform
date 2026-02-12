@@ -1,250 +1,174 @@
-# ?�료 진단 ?�랫??
+# 🏥 피부과 AI 의료 진단 플랫폼
 
-AI 기반 ?�료 진단 ?�랫?�으�? ?�자가 증상�??��?지�??�로?�하�?Gemini API가 진단 ?�보?� 관???�학 ?�문???�공?�고, ?�사가 관리자 ?�?�보?�에???�자 ?�보�??�인?????�습?�다.
+환자가 피부 증상을 입력하고 이미지를 업로드하면, AI(Gemini)가 자동으로 진단하고 관련 의학 정보를 제공하는 통합 의료 플랫폼입니다.
 
-## ?? 빠른 ?�작
+## 📋 주요 기능
 
-### ?�� ?�사?�트 ?�속
+### 환자 포털 (Patient Portal)
+- 피부 증상 입력 및 이미지 업로드 (최대 5장)
+- AI(Gemini) 기반 자동 피부과 진단
+- 관련 의학 논문 정보 제공
+- 진단 기록 조회
 
-#### 로컬 개발 ?�버
-```powershell
-# 백엔???�버
+### 관리자 대시보드 (Admin Dashboard)
+- 의사 전용 로그인 (역할 기반 접근 제어)
+- 환자 진단 목록 관리 (필터링, 페이지네이션)
+- 의사 소견 작성 및 진단 상태 관리
+- KPI 통계 대시보드 (진단 현황, 증상/피부타입 차트)
+- 환자 목록 조회
+
+### Android 앱
+- 환자 포털 WebView 앱
+- 카메라 촬영 및 갤러리 이미지 선택
+- Android 13+ 권한 정책 대응
+
+---
+
+## 🛠️ 기술 스택
+
+| 구분 | 기술 |
+|------|------|
+| **백엔드** | Node.js, Express.js |
+| **데이터베이스** | MySQL (Aiven Cloud) |
+| **프론트엔드** | React.js |
+| **AI 진단** | Google Gemini API |
+| **이미지 저장** | Cloudinary |
+| **배포** | Render.com |
+| **모바일** | Android (Java, WebView) |
+| **인증** | JWT + bcrypt |
+
+---
+
+## 🚀 시작하기
+
+### 사전 요구사항
+- Node.js 18+
+- npm
+
+### 1. 저장소 클론
+```bash
+git clone https://github.com/WEED-ChoGeonHee/medical-diagnosis-platform.git
+cd medical-diagnosis-platform
+```
+
+### 2. 백엔드 설정
+```bash
 cd backend
 npm install
-npm start
+```
 
-# ???��??�에???�자 ?�털
+`.env` 파일 생성:
+```env
+DB_HOST=your_db_host
+DB_PORT=your_db_port
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_NAME=your_db_name
+DB_SSL=true
+JWT_SECRET=your_jwt_secret
+GEMINI_API_KEY=your_gemini_api_key
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+```bash
+# 의사 계정 생성
+node create-doctor.js
+
+# 서버 실행
+node server.js
+```
+
+### 3. 환자 포털 실행 (개발 모드)
+```bash
 cd patient-portal
 npm install
 npm start
 ```
-브라?��??�서 http://localhost:3000 ?�속
+브라우저에서 http://localhost:3000 접속
 
-#### 배포???�버 (?�로?�션)
-- **?�자 ?�털**: https://medical-diagnosis-platform.onrender.com/patient
-- **관리자 ?�?�보??*: https://medical-diagnosis-platform.onrender.com/admin
-
-### ?�� Android APK
-
-빌드??APK ?�일:
-- **?�자??*: `?�자???�료진단.apk` (5.16 MB)
-- **?�사??*: `?�사???�료진단.apk` (5.16 MB)
-
-APK ?�치 방법:
-1. APK ?�일???�마?�폰?�로 ?�송
-2. ?�일 관리자?�서 APK ?�릭
-3. "?????�는 출처" ???�치 ?�용
-4. ?�치 ?�료!
-
-?�� **?�세??가?�드**: [QUICK-START.md](QUICK-START.md) | [APK-BUILD-GUIDE.md](APK-BUILD-GUIDE.md)
-
----
-
-## ?�� 배포
-
-### ?�라?�드 배포
-- **?�이?�베?�스**: Aiven MySQL (무료 ?�어, 5GB)
-- **백엔??*: Render.com Web Service (무료 ?�어, 750?�간/??
-- **?�론?�엔??*: 백엔?�에???�적 ?�일�??�빙
-- **모바??*: Android APK 2�?(?�자?? ?�사??
-
-?�� **배포 가?�드**: [DEPLOY.md](DEPLOY.md)
-
----
-
-## ???�스???�료
-
-### 로컬 ?�버 ?�스??
-- ??백엔??API: http://localhost:5000/api
-- ???�자 ?�털: http://localhost:5000/patient (200 OK)
-- ??관리자 ?�?�보?? http://localhost:5000/admin (200 OK)
-
-### APK 빌드
-- ???�자??APK 빌드 ?�공
-- ???�사??APK 빌드 ?�공
-- ??WebView URL ?�정 ?�료
-
-## ?�� ?�로?�트 구조
-
-```
-?�학/
-?��??� backend/              # Node.js + Express 백엔???�버
-??  ?��??� models/          # MySQL 모델 (User, Diagnosis)
-??  ?��??� routes/          # API ?�우??
-??  ?��??� middleware/      # ?�증 미들?�어
-??  ?��??� server.js        # ?�버 진입??
-?��??� patient-portal/      # React ?�자 ?�털
-??  ?��??� src/
-??      ?��??� components/  # React 컴포?�트
-??      ?��??� api.js       # API ?�라?�언??
-?��??� admin-dashboard/     # React ?�사 관리자 ?�?�보??
-    ?��??� src/
-        ?��??� components/  # React 컴포?�트
-        ?��??� api.js       # API ?�라?�언??
-```
-
-## ?? 기능
-
-### ?�자 ?�털
-- ???�원가??�?로그??
-- ??증상 ?�명 �??��?지 ?�로??(최�? 5�?
-- ??AI 진단 결과 �?관???�학 ?�문 ?�인
-- ??진단 ?�역 조회
-- ???�사 ?�견 ?�인
-
-### ?�사 관리자 ?�?�보??
-- ???�계 ?�?�보??(?�자 ?? 진단 ????
-- ??모든 진단 ?�청 목록 조회
-- ??진단 ?�세 ?�보 �??�자 ?�보 ?�인
-- ???�사 ?�견 ?�성 �??�태 ?�데?�트
-- ???�자 목록 관�?
-
-## ?���?기술 ?�택
-
-- **Backend**: Node.js, Express, MongoDB, Mongoose
-- **Frontend**: React, React Router
-- **Authentication**: JWT (JSON Web Tokens)
-- **AI**: OpenAI GPT-4 API
-- **File Upload**: Multer
-- **Validation**: express-validator
-
-## ?�� ?�치 방법
-
-### ?�전 ?�구?�항
-- Node.js (v16 ?�상)
-- MongoDB (v5 ?�상)
-- OpenAI API Key
-
-### 1. 백엔???�정
-
-```powershell
-# 백엔???�렉?�리�??�동
-cd backend
-
-# ?�존???�치
-npm install
-
-# ?�경 변???�정
-cp .env.example .env
-# .env ?�일???�어???�음 값들???�정:
-# - MONGODB_URI: MongoDB ?�결 문자??
-# - JWT_SECRET: JWT ?�크�???
-# - OPENAI_API_KEY: OpenAI API ??
-
-# uploads ?�더 ?�성
-mkdir uploads
-
-# ?�버 ?�작
-npm start
-# ?�는 개발 모드�??�작
-npm install -D nodemon
-npm run dev
-```
-
-### 2. ?�자 ?�털 ?�정
-
-```powershell
-# ?�자 ?�털 ?�렉?�리�??�동
-cd patient-portal
-
-# ?�존???�치
-npm install
-
-# 개발 ?�버 ?�작 (?�트 3000)
-npm start
-```
-
-### 3. 관리자 ?�?�보???�정
-
-```powershell
-# 관리자 ?�?�보???�렉?�리�??�동
+### 4. 관리자 대시보드 실행 (개발 모드)
+```bash
 cd admin-dashboard
-
-# ?�존???�치
 npm install
+PORT=3001 npm start
+```
+브라우저에서 http://localhost:3001/login 접속
 
-# 개발 ?�버 ?�작 (?�트 3001)
-$env:PORT=3001; npm start
+---
+
+## 🌐 배포 URL (프로덕션)
+
+| 서비스 | URL |
+|--------|-----|
+| **환자 포털** | https://medical-diagnosis-platform.onrender.com/patient |
+| **관리자 대시보드** | https://medical-diagnosis-platform.onrender.com/admin |
+
+### 의사 계정
+- **이메일**: `doctor@hospital.com`
+- **비밀번호**: `doctor123`
+
+---
+
+## 📁 프로젝트 구조
+
+```
+medical-diagnosis-platform/
+├── backend/                  # Express.js API 서버
+│   ├── config/
+│   │   └── database.js       # MySQL 연결 + 마이그레이션
+│   ├── middleware/
+│   │   └── auth.js           # JWT 인증/인가
+│   ├── models/
+│   │   ├── User.js           # 사용자 모델
+│   │   └── Diagnosis.js      # 진단 모델
+│   ├── routes/
+│   │   ├── auth.js           # 인증 API
+│   │   ├── admin.js          # 관리자 API
+│   │   ├── diagnoses.js      # 진단 API
+│   │   └── patients.js       # 환자 API
+│   ├── create-doctor.js      # 의사 계정 시딩
+│   └── server.js             # 서버 엔트리포인트
+├── patient-portal/           # 환자용 React 앱
+├── admin-dashboard/          # 관리자용 React 앱
+├── android-app/              # Android WebView 앱
+└── render.yaml               # Render 배포 설정
 ```
 
-## ?�� ?�경 변???�정
+---
 
-### backend/.env
-```
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/medical-diagnosis
-JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
-OPENAI_API_KEY=sk-your-openai-api-key-here
-```
+## 📊 API 엔드포인트
 
-## ?�� ?�용 방법
+### 인증
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| POST | `/api/auth/register` | 환자 회원가입 |
+| POST | `/api/auth/login` | 로그인 |
 
-### ?�자 ?�털 (http://localhost:3000)
+### 진단 (환자용)
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| POST | `/api/diagnoses` | 새 진단 요청 (이미지 포함) |
+| GET | `/api/diagnoses/my` | 내 진단 목록 |
+| GET | `/api/diagnoses/:id` | 진단 상세 |
 
-1. **?�원가??*: ?�름, ?�메?? 비�?번호, ?�화번호�?가??
-2. **로그??*: ?�메?�과 비�?번호�?로그??
-3. **??진단 ?�청**: 
-   - 증상???�세???�성
-   - 관???��?지 ?�로??(?�택?�항)
-   - AI가 진단 결과?� 관???�학 ?�문 ?�공
-4. **진단 ?�역**: 과거 진단 ?�청 �??�사 ?�견 ?�인
+### 관리자 (의사용)
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/admin/stats` | 통계 정보 |
+| GET | `/api/admin/diagnoses` | 전체 진단 목록 |
+| PUT | `/api/admin/diagnoses/:id` | 의사 소견 저장 |
+| GET | `/api/admin/patients` | 환자 목록 |
 
-### 관리자 ?�?�보??(http://localhost:3001)
+---
 
-1. **?�사 계정?�로 로그??*: role??'doctor'??계정 ?�요
-2. **?�?�보??*: ?�체 ?�계 ?�인
-3. **진단 목록**: 모든 ?�자??진단 ?�청 ?�인
-4. **진단 ?�세**: 
-   - ?�자 ?�보 ?�인
-   - AI 진단 결과 검??
-   - ?�사 ?�견 ?�성
-   - ?�태 ?�데?�트 (검???�료/?�료)
-5. **?�자 목록**: ?�록??모든 ?�자 ?�인
+## 📱 Android APK 빌드
 
-## ?�� ?�사 계정 ?�성
+자세한 내용은 [APK-BUILD-GUIDE.md](APK-BUILD-GUIDE.md) 참조
 
-?�사 계정?� MongoDB?�서 직접 ?�성?�거???�자 ?�원가??API�??�용????`role: "doctor"`�?추�??�면 ?�니??
+---
 
-```javascript
-// POST /api/auth/register
-{
-  "name": "?�길??,
-  "email": "doctor@example.com",
-  "password": "password123",
-  "phone": "010-1234-5678",
-  "role": "doctor"
-}
-```
-
-## ?�� API ?�드?�인??
-
-### ?�증
-- `POST /api/auth/register` - ?�원가??
-- `POST /api/auth/login` - 로그??
-
-### 진단 (?�자)
-- `POST /api/diagnoses` - ??진단 ?�청 (?��?지 ?�로???�함)
-- `GET /api/diagnoses/my` - ??진단 목록
-- `GET /api/diagnoses/:id` - 진단 ?�세 조회
-
-### 관리자 (?�사)
-- `GET /api/admin/stats` - ?�계 ?�보
-- `GET /api/admin/diagnoses` - 모든 진단 목록
-- `GET /api/admin/diagnoses/:id` - 진단 ?�세
-- `PUT /api/admin/diagnoses/:id` - ?�사 ?�견 추�?
-- `GET /api/admin/patients` - ?�자 목록
-
-## ?�️ 주의?�항
-
-- ???�랫?��? **참고??*?�며, ?�제 ?�료 진단???�체할 ???�습?�다.
-- OpenAI API ?�용 ??비용??발생?????�습?�다.
-- ?�로?�션 ?�경?�서??반드??HTTPS�??�용?�세??
-- ?�자 ?�이?�는 민감 ?�보?��?�?보안??각별??주의?�세??
-
-## ?�� ?�이?�스
+## 📄 라이선스
 
 MIT License
-
-## ?�� 기여
-
-?�슈?� ?� 리퀘스?�는 ?�제???�영?�니??

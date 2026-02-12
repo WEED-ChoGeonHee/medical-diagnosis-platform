@@ -1,209 +1,74 @@
-# ?? ?�료 진단 ?�랫??배포 가?�드
+# 🚀 의료 진단 플랫폼 배포 가이드
 
-## ?�� 배포 구성
-- **?�이?�베?�스**: Aiven MySQL (무료 ?�어)
-- **백엔??*: Render.com Web Service (무료 ?�어)
-- **?�론?�엔??*: APK ?�일�?배포 ?�료
-
----
-
-## 1️⃣ Aiven MySQL 무료 ?�이?�베?�스 ?�성
-
-### 1-1. Aiven 계정 ?�성
-1. https://console.aiven.io/signup ?�속
-2. ?�메?�로 ?�원가??(?�용카드 불필??)
-3. ?�메???�증
-
-### 1-2. MySQL ?�이?�베?�스 ?�성
-1. Aiven 콘솔?�서 **Create service** ?�릭
-2. ?�비???�택: **MySQL**
-3. ?�라?�드 ?�공?? **Google Cloud** (무료)
-4. 리전: **Seoul** (asia-northeast3) - 가??가까운 지??
-5. ?�랜: **Hobbyist - Free** ?�택
-6. ?�비???�름: `medical-diagnosis-db` (?�하???�름)
-7. **Create service** ?�릭
-
-### 1-3. ?�이?�베?�스 ?�결 ?�보 ?�인
-?�비?��? ?�작?�면 (2-3�??�요):
-1. **Overview** ??��???�결 ?�보 ?�인
-2. ?�음 ?�보�?메모?�에 복사:
-   - **Host** (?? medical-diagnosis-db-xxx.aivencloud.com)
-   - **Port** (기본�? 25060)
-   - **User** (기본�? avnadmin)
-   - **Password** (?�동 ?�성??비�?번호)
-   - **Database** (기본�? defaultdb)
-
-### 1-4. ?�이?�베?�스 ?�름 변�?(?�택?�항)
-1. **Databases** ??���??�동
-2. **Create database** ?�릭
-3. ?�이?�베?�스 ?�름: `medical_diagnosis` ?�력
-4. **Add database** ?�릭
+## 📌 배포 구성
+- **데이터베이스**: Aiven MySQL (무료 티어, 5GB)
+- **백엔드**: Render.com Web Service (무료 티어, 750시간/월)
+- **프론트엔드**: 백엔드에서 정적 파일로 서빙
+- **모바일**: Android APK (환자용, 의사용)
 
 ---
 
-## 2️⃣ GitHub ?�?�소 ?�성 �?코드 ?�로??
+## 1️⃣ Aiven MySQL 데이터베이스 설정
 
-### 2-1. GitHub ?�?�소 ?�성
-1. https://github.com/new ?�속
-2. Repository name: `medical-diagnosis`
-3. **Public** ?�택 (무료 배포 ?�수)
-4. **Create repository** ?�릭
+### 1-1. Aiven 계정 생성
+1. https://console.aiven.io/signup 접속
+2. 이메일로 회원가입 (신용카드 불필요)
+3. 이메일 인증
 
-### 2-2. 코드 ?�시
-PowerShell?�서 ?�행:
+### 1-2. MySQL 데이터베이스 생성
+1. Aiven 콘솔에서 **Create service** 클릭
+2. 서비스 선택: **MySQL**
+3. 클라우드 공급자: **Google Cloud** (무료)
+4. 리전: **asia-northeast3** (서울)
+5. 플랜: **Free** 선택
+6. 서비스 이름 설정 후 생성
 
-```powershell
-cd e:\?�스\?�학
-
-# Git ?�정 (처음 ??번만)
-git config --global user.name "Your Name"
-git config --global user.email "your@email.com"
-
-# GitHub ?�?�소 ?�결
-git remote add origin https://github.com/YOUR_USERNAME/medical-diagnosis.git
-
-# 브랜�??�름 변�?(main?�로)
-git branch -M main
-
-# ?�시
-git push -u origin main
-```
-
-**주의**: `YOUR_USERNAME`???�제 GitHub ?�용?�명?�로 변�?
+### 1-3. 접속 정보 확인
+서비스 대시보드 → **Connection information**에서:
+- Host, Port, User, Password, Database Name 복사
 
 ---
 
-## 3️⃣ Render.com 배포
+## 2️⃣ Render.com 배포
 
-### 3-1. Render 계정 ?�성
-1. https://render.com ?�속
-2. **Get Started** ?�릭
-3. **GitHub**�?로그??
+### 2-1. Render 계정 생성
+1. https://render.com 접속
+2. GitHub 계정으로 로그인
 
-### 3-2. Blueprint�?배포
-1. Dashboard?�서 **New +** ?�릭
-2. **Blueprint** ?�택
-3. GitHub ?�?�소 ?�결:
-   - **Connect GitHub** ?�릭
-   - `medical-diagnosis` ?�?�소 ?�택
-4. `render.yaml` ?�동 감�???
-5. **Blueprint Name**: `medical-diagnosis` ?�력
+### 2-2. Web Service 생성
+1. **New** → **Web Service** 클릭
+2. GitHub 저장소 연결: `medical-diagnosis-platform`
+3. 설정:
+   - **Name**: medical-diagnosis-platform
+   - **Region**: Singapore
+   - **Build Command**: `render.yaml` 참조
+   - **Start Command**: `npm --prefix backend start`
+   - **Plan**: Free
 
-### 3-3. ?�경 변???�정
-Aiven?�서 복사???�보�??�력:
+### 2-3. 환경 변수 설정
+Render Dashboard → Environment 에서 다음 변수 추가:
 
-| ?�경 변??| �?|
-|---------|-----|
-| `DB_HOST` | Aiven Host (?? medical-diagnosis-db-xxx.aivencloud.com) |
-| `DB_PORT` | 25060 |
-| `DB_USER` | avnadmin |
-| `DB_PASSWORD` | Aiven?�서 복사??비�?번호 |
-| `DB_NAME` | medical_diagnosis (?�는 defaultdb) |
-| `GEMINI_API_KEY` | YOUR_GEMINI_API_KEY |
-
-### 3-4. 배포 ?�작
-1. **Apply** ?�릭
-2. 배포 진행 (5-10�??�요)
-3. ?�료?�면 URL ?�인: `https://medical-diagnosis-platform.onrender.com`
-
----
-
-## 4️⃣ 배포 ?�인
-
-### 4-1. 백엔??API ?�스??
-브라?��??�서 ?�속:
-```
-https://medical-diagnosis-platform.onrender.com/api/auth/health
-```
-
-?�상 ?�답:
-```json
-{"status": "ok", "database": "connected"}
-```
-
-### 4-2. ?�이?�베?�스 ?�결 ?�인
-Aiven 콘솔:
-1. **Current Queries** ??��???�성 ?�결 ?�인
-2. **Metrics** ??��??CPU/메모�??�용???�인
+| 변수명 | 값 |
+|--------|-----|
+| `DB_HOST` | Aiven MySQL 호스트 |
+| `DB_PORT` | Aiven MySQL 포트 |
+| `DB_USER` | Aiven MySQL 사용자 |
+| `DB_PASSWORD` | Aiven MySQL 비밀번호 |
+| `DB_NAME` | Aiven MySQL 데이터베이스명 |
+| `DB_SSL` | `true` |
+| `JWT_SECRET` | 자동 생성 (또는 직접 입력) |
+| `GEMINI_API_KEY` | Google AI Studio API 키 |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary 클라우드명 |
+| `CLOUDINARY_API_KEY` | Cloudinary API 키 |
+| `CLOUDINARY_API_SECRET` | Cloudinary API 시크릿 |
 
 ---
 
-## 5️⃣ APK ?�데?�트 (?�택?�항)
+## 3️⃣ 배포 확인
 
-### ?�재 APK???�스??IP�??�정??
-배포??백엔?��? ?�용?�려�?
+배포 완료 후 접속:
+- **환자 포털**: `https://[서비스명].onrender.com/patient`
+- **관리자 대시보드**: `https://[서비스명].onrender.com/admin`
 
-1. `E:\medical\webview-apps\patient-webview\app\src\main\java\com\medicalapp\patient\MainActivity.java` ?�정:
-```java
-private static final String APP_URL = "https://medical-diagnosis-platform.onrender.com/patient";
-```
-
-2. APK ?�빌??
-```powershell
-cd E:\medical\webview-apps
-.\build-all.ps1
-```
-
----
-
-## ?�� ?�약
-
-??**?�료???�업**:
-- Aiven MySQL 무료 ?�이?�베?�스 ?�정
-- GitHub ?�?�소 ?�성 �?코드 ?�로??
-- Render.com 무료 ???�비??배포
-- ?�경 변???�정
-
-?�� **배포 URL**:
-- 백엔??API: `https://medical-diagnosis-platform.onrender.com`
-- ?�론?�엔?? APK ?�일 (로컬 ?�는 ?�데?�트 ?�요)
-
-?�� **비용**: ?�전 무료!
-- Aiven MySQL: 무료 ?�어 (5GB ?�토리�?)
-- Render.com: 무료 ?�어 (750?�간/??
-
----
-
-## ?�️ 주의?�항
-
-### Render 무료 ?�어 ?�한
-- **?�동 ?�립**: 15�?비활?????�버 ?��?
-- **처음 ?�청 ???�시??*: 30�?1�??�요
-- **??750?�간 ?�한**: ??31??(충분??
-
-### Aiven 무료 ?�어 ?�한
-- **?�토리�?**: 최�? 5GB
-- **백업**: ?�동 백업 2??보�?
-- **?�결 ??*: 최�? 25�??�시 ?�결
-
-### ?�결 방법
-- ?�버가 ?�주 ?�립?�면 UptimeRobot (https://uptimerobot.com) ?�로 5분마????
-- APK?�서 로딩 ?�디케?�터 추�??�여 ?�용??경험 개선
-
----
-
-## ?�� 문제 ?�결
-
-### 1. ?�이?�베?�스 ?�결 ?�패
-- Aiven 콘솔?�서 ?�비???�태 ?�인
-- Render ?�경 변???�시 ?�인
-- Aiven IP ?�이?�리?�트 ?�인 (**불필??* - Render???�동 ?�용??
-
-### 2. Render 배포 ?�패
-- GitHub ?�?�소가 Public?��? ?�인
-- `render.yaml` ?�일??루트 ?�렉?�리???�는지 ?�인
-- Render 로그?�서 ?�러 메시지 ?�인
-
-### 3. API ?�청 ?�패
-- 백엔??URL???�확?��? ?�인
-- HTTPS ?�용 ?�인 (HTTP ??
-- 브라?��? 콘솔?�서 CORS ?�러 ?�인
-
----
-
-## ?�� 지??
-
-문제가 ?�다�?
-1. Render Dashboard ??Logs ?�인
-2. Aiven Console ??Logs ?�인
-3. GitHub Issues??문의
+> ⚠️ 무료 플랜은 15분 비활성 시 서버가 슬립 모드에 진입합니다.
+> 첫 접속 시 30초~1분 정도 로딩이 걸릴 수 있습니다.
