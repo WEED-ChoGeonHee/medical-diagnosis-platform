@@ -1,76 +1,80 @@
 .diagnosis-list {
-  padding: 40px 20px;
-  min-height: calc(100vh - 80px);
+  padding: 32px 20px;
+  min-height: calc(100vh - 68px);
 }
 
 .diagnosis-list h2 {
-  margin-bottom: 30px;
-  color: white;
-  font-size: 2.5rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-@media (max-width: 768px) {
-  .diagnosis-list h2 {
-    font-size: 2rem;
-  }
+  margin-bottom: 28px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .filters {
   display: flex;
-  gap: 25px;
-  margin-bottom: 30px;
+  gap: 20px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
-  background: rgba(255, 255, 255, 0.98);
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(20px);
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
-  min-width: 180px;
+  min-width: 160px;
 }
 
 .filter-group label {
-  font-weight: 700;
-  color: #2c3e50;
-  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .filter-group select {
   padding: 12px 16px;
-  border: 2px solid #e0e6ed;
-  border-radius: 12px;
-  font-size: 15px;
-  min-width: 180px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  min-width: 160px;
   cursor: pointer;
-  background: white;
+  background: var(--glass-bg);
+  color: var(--text-primary);
   transition: all 0.3s ease;
   font-weight: 500;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .filter-group select:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.15);
 }
 
-.filter-group select:hover {
-  border-color: #3498db;
+.filter-group select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 @media (max-width: 768px) {
   .filters {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
-  
+
   .filter-group {
     min-width: 100%;
   }
@@ -78,57 +82,53 @@
 
 .filter-buttons {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .filter-btn {
-  padding: 12px 24px;
-  border: 2px solid #e0e6ed;
-  background: white;
-  border-radius: 25px;
+  padding: 10px 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.3s ease;
-  font-weight: 700;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
 }
 
 .filter-btn:hover {
-  border-color: #3498db;
-  color: #3498db;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(79, 140, 255, 0.08);
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  background: linear-gradient(135deg, var(--accent-blue), #6366f1);
   color: white;
-  border-color: #3498db;
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
-}
-
-.btn-sm {
-  padding: 8px 18px;
-  font-size: 0.9rem;
+  border-color: var(--accent-blue);
+  box-shadow: 0 4px 15px rgba(79, 140, 255, 0.3);
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 25px;
-  margin-top: 30px;
-  padding: 25px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  gap: 20px;
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(20px);
 }
 
 .pagination span {
-  font-weight: 700;
-  color: #2c3e50;
-  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .pagination .btn {
@@ -138,9 +138,9 @@
 @media (max-width: 480px) {
   .pagination {
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
   }
-  
+
   .pagination .btn {
     width: 100%;
   }

@@ -26,7 +26,7 @@ function Login({ onLogin }) {
 
     try {
       const response = await api.post('/auth/login', formData);
-      
+
       if (response.data.user.role !== 'doctor') {
         setError('의사 계정만 접근할 수 있습니다.');
         setLoading(false);
@@ -45,14 +45,18 @@ function Login({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h2>의사 관리자 로그인</h2>
-        <p className="subtitle">의료 진단 플랫폼 관리</p>
+        <div className="login-brand">
+          <div className="login-brand-icon">🏥</div>
+          <h2>MediDash Pro</h2>
+          <p className="subtitle">의사 전용 관리 플랫폼</p>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>이메일</label>
             <input
               type="email"
               name="email"
+              placeholder="doctor@hospital.com"
               value={formData.email}
               onChange={handleChange}
               required
@@ -63,6 +67,7 @@ function Login({ onLogin }) {
             <input
               type="password"
               name="password"
+              placeholder="비밀번호를 입력하세요"
               value={formData.password}
               onChange={handleChange}
               required
@@ -70,9 +75,12 @@ function Login({ onLogin }) {
           </div>
           {error && <div className="error">{error}</div>}
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? '로그인 중...' : '로그인'}
+            {loading ? '인증 중...' : '로그인'}
           </button>
         </form>
+        <div className="login-footer">
+          © 2026 MediDash Pro · 의료 진단 AI 플랫폼
+        </div>
       </div>
     </div>
   );

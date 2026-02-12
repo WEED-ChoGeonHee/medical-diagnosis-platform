@@ -45,7 +45,7 @@ function App() {
   }
 
   return (
-    <Router basename="/admin">
+    <Router basename={process.env.NODE_ENV === 'production' ? '/admin' : ''}>
       <div className="App">
         {user && <Header user={user} onLogout={handleLogout} />}
         <Routes>

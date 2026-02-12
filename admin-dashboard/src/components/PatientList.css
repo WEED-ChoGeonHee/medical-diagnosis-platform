@@ -1,65 +1,72 @@
 .patient-list {
-  padding: 40px 20px;
-  min-height: calc(100vh - 80px);
+  padding: 32px 20px;
+  min-height: calc(100vh - 68px);
 }
 
 .patient-list h2 {
-  margin-bottom: 35px;
-  color: white;
-  font-size: 2.5rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  margin-bottom: 28px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .patients-table {
   overflow-x: auto;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
 }
 
 .patients-table table {
   width: 100%;
-  border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 20px;
-  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .patients-table th {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  padding: 18px 15px;
+  padding: 16px;
   text-align: left;
-  font-weight: 700;
-  color: white;
-  border-bottom: none;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.9rem;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .patients-table td {
-  padding: 16px 15px;
-  border-bottom: 1px solid #e9ecef;
-  color: #2c3e50;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 14px;
   font-weight: 500;
 }
 
-.patients-table tr:hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  transition: all 0.3s ease;
+.patients-table tbody tr {
+  transition: all 0.2s ease;
 }
 
-.patients-table tr:last-child td {
+.patients-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.patients-table tbody tr:last-child td {
   border-bottom: none;
 }
 
 @media (max-width: 768px) {
   .patient-list h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
-  
+
   .patients-table th,
   .patients-table td {
-    padding: 12px 10px;
-    font-size: 0.9rem;
+    padding: 12px;
+    font-size: 13px;
   }
 }

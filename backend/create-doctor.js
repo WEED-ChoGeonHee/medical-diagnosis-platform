@@ -4,14 +4,24 @@ require('dotenv').config();
 
 async function createDoctor() {
   try {
-    const connection = await mysql.createConnection({
+    const connConfig = {
       host: process.env.DB_HOST,
       port: process.env.DB_PORT,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       charset: 'utf8mb4'
-    });
+    };
+
+    // Aiven SSL 설정
+    if (process.env.DB_SSL === 'true') {
+      connConfig.ssl = {
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
+      };
+    }
+
+    const connection = await mysql.createConnection(connConfig);
 
     console.log('MySQL 연결 성공\n');
 
@@ -23,6 +33,9 @@ async function createDoctor() {
 
     // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(doctorPassword, 10);
+
+    // 기존 의사 계정 삭제 후 재생성 (비밀번호 해시 갱신)
+    await connection.query('DELETE FROM users WHERE email = ?', [doctorEmail]);
 
     // 의사 계정 생성
     await connection.query(
@@ -41,11 +54,7 @@ async function createDoctor() {
 
     await connection.end();
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') {
-      console.error('❌ 이미 존재하는 이메일입니다.');
-    } else {
-      console.error('❌ 오류 발생:', error.message);
-    }
+    console.error('❌ 오류 발생:', error.message);
     process.exit(1);
   }
 }
