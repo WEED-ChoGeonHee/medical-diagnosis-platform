@@ -253,3 +253,44 @@ select:focus {
   outline: none;
   border-color: #007bff;
 }
+.checkbox-group {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid rgba(102, 126, 234, 0.1);
+  transition: all 0.3s ease;
+}
+
+.checkbox-group:hover {
+  border-color: rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.checkbox-label span {
+  color: #333;
+  font-size: 1.05rem;
+}
+
+.hint-text {
+  margin: 0;
+  margin-left: 32px;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}

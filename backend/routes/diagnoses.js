@@ -12,6 +12,22 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent';
 
+// 이미지를 base64로 변환하는 함수
+async function imageUrlToBase64(imageUrl) {
+  try {
+    const response = await axios.get(imageUrl, { 
+      responseType: 'arraybuffer',
+      timeout: 10000 
+    });
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    const contentType = response.headers['content-type'] || 'image/jpeg';
+    return { base64, mimeType: contentType };
+  } catch (error) {
+    console.error('이미지 변환 오류:', error.message);
+    return null;
+  }
+}
+
 // Cloudinary 설정
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -43,8 +59,9 @@ const upload = multer({
 // 진단 요청 생성
 router.post('/', protect, upload.array('images', 5), async (req, res) => {
   try {
-    const { patient_name, symptom_type, skin_type, symptoms } = req.body;
+    const { patient_name, symptom_type, skin_type, symptoms, analyze_images } = req.body;
     const images = req.files ? req.files.map(file => file.path) : [];
+    const shouldAnalyzeImages = analyze_images === 'true' && images.length > 0;
 
     if (!patient_name || !symptom_type || !skin_type || !symptoms) {
       return res.status(400).json({ message: '모든 필수 정보를 입력해주세요.' });
@@ -56,14 +73,55 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
     // Gemini API 호출 (API 키가 있는 경우에만)
     if (GEMINI_API_KEY) {
       try {
+        // 이미지 분석이 활성화되고 이미지가 있는 경우
+        const parts = [];
+        
+        if (shouldAnalyzeImages) {
+          // 텍스트 프롬프트 추가
+          parts.push({
+            text: `당신은 피부과 전문의입니다. 환자의 피부 증상과 제공된 이미지를 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 피부과 전문의와 상담이 필요함을 명시하세요.
+
+증상 종류: ${symptom_type}
+피부 타입: ${skin_type}
+증상 설명: ${symptoms}
+
+아래 이미지들도 함께 분석해주세요:`
+          });
+
+          // 이미지를 base64로 변환하여 추가 (최대 3개까지만)
+          const imagesToAnalyze = images.slice(0, 3);
+          console.log(`🖼️ ${imagesToAnalyze.length}개 이미지 분석 중...`);
+          
+          for (const imageUrl of imagesToAnalyze) {
+            const imageData = await imageUrlToBase64(imageUrl);
+            if (imageData) {
+              parts.push({
+                inline_data: {
+                  mime_type: imageData.mimeType,
+                  data: imageData.base64
+                }
+              });
+            }
+          }
+        } else {
+          // 텍스트만 분석
+          parts.push({
+            text: `당신은 피부과 전문의입니다. 환자의 피부 증상을 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 피부과 전문의와 상담이 필요함을 명시하세요.
+
+증상 종류: ${symptom_type}
+피부 타입: ${skin_type}
+증상 설명: ${symptoms}
+
+위 정보를 바탕으로 가능한 피부과 진단명과 설명을 제공해주세요.`
+          });
+        }
+
         // 진단 요청
         const diagnosisResponse = await axios.post(
           `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
           {
             contents: [{
-              parts: [{
-                text: `당신은 피부과 전문의입니다. 환자의 피부 증상을 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 피부과 전문의와 상담이 필요함을 명시하세요.\n\n증상 종류: ${symptom_type}\n피부 타입: ${skin_type}\n증상 설명: ${symptoms}\n\n위 정보를 바탕으로 가능한 피부과 진단명과 설명을 제공해주세요.`
-              }]
+              parts: parts
             }]
           },
           {
@@ -72,6 +130,10 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
         );
 
         gptDiagnosis = diagnosisResponse.data.candidates[0].content.parts[0].text;
+        
+        if (shouldAnalyzeImages) {
+          gptDiagnosis = `✨ AI 이미지 분석 포함\n\n${gptDiagnosis}`;
+        }
 
         // 의학 논문 검색
         const papersResponse = await axios.post(

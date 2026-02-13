@@ -10,6 +10,7 @@ function NewDiagnosis() {
   const [symptoms, setSymptoms] = useState('');
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
+  const [analyzeImages, setAnalyzeImages] = useState(true); // AI 이미지 분석 옵션
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -81,6 +82,7 @@ function NewDiagnosis() {
     formData.append('symptom_type', symptomType);
     formData.append('skin_type', skinType);
     formData.append('symptoms', symptoms);
+    formData.append('analyze_images', analyzeImages); // AI 이미지 분석 옵션 추가
     images.forEach(image => {
       formData.append('images', image);
     });
@@ -190,6 +192,24 @@ function NewDiagnosis() {
                   </button>
                 </div>
               ))}
+            </div>
+          )}
+
+          {images.length > 0 && (
+            <div className="form-group checkbox-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={analyzeImages}
+                  onChange={(e) => setAnalyzeImages(e.target.checked)}
+                />
+                <span>✨ AI 이미지 분석 포함 (Gemini Vision)</span>
+              </label>
+              <p className="hint-text">
+                {analyzeImages 
+                  ? '이미지를 AI가 분석하여 더 정확한 진단을 제공합니다. (최대 3개)' 
+                  : '이미지는 의사 검토용으로만 저장됩니다.'}
+              </p>
             </div>
           )}
 
