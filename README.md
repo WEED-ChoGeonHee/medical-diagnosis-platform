@@ -98,6 +98,97 @@ PORT=3001 npm start
 
 ---
 
+## 🔄 개발 워크플로우 (수정 후 자동 테스트 및 배포)
+
+### 변경사항 테스트 및 배포 자동화
+
+코드 수정 후 다음 명령으로 자동 테스트 + 배포:
+
+```powershell
+# 1단계: 프론트엔드 빌드 (테스트)
+cd patient-portal
+npm run build
+
+# 빌드 확인
+if (Test-Path build\index.html) { Write-Host "✅ 환자 포털 빌드 성공" } else { Write-Host "❌ 빌드 실패"; exit 1 }
+
+# 2단계: 관리자 대시보드 빌드
+cd ..\admin-dashboard
+npm run build
+
+# 빌드 확인
+if (Test-Path build\index.html) { Write-Host "✅ 관리자 대시보드 빌드 성공" } else { Write-Host "❌ 빌드 실패"; exit 1 }
+
+# 3단계: Git 커밋 및 푸시 (자동 배포 트리거)
+cd ..
+git add .
+git commit -m "feat: your changes description"
+git push origin master
+
+# ✨ Render가 자동으로 배포 시작!
+```
+
+### 간편 스크립트 (PowerShell)
+
+워크스페이스 루트에 `deploy.ps1` 생성:
+
+```powershell
+# deploy.ps1
+Write-Host "🔨 빌드 시작..." -ForegroundColor Cyan
+
+# 환자 포털 빌드
+Set-Location patient-portal
+npm run build 2>&1 | Out-Null
+if (Test-Path build\index.html) {
+    Write-Host "✅ 환자 포털 빌드 완료" -ForegroundColor Green
+} else {
+    Write-Host "❌ 환자 포털 빌드 실패" -ForegroundColor Red
+    exit 1
+}
+
+# 관리자 대시보드 빌드
+Set-Location ..\admin-dashboard
+npm run build 2>&1 | Out-Null
+if (Test-Path build\index.html) {
+    Write-Host "✅ 관리자 대시보드 빌드 완료" -ForegroundColor Green
+} else {
+    Write-Host "❌ 관리자 대시보드 빌드 실패" -ForegroundColor Red
+    exit 1
+}
+
+# Git 푸시
+Set-Location ..
+Write-Host "📦 변경사항 커밋 및 배포..." -ForegroundColor Cyan
+
+$commitMsg = Read-Host "커밋 메시지를 입력하세요"
+git add .
+git commit -m "$commitMsg"
+git push origin master
+
+Write-Host "🚀 배포 완료! Render에서 자동 배포가 시작됩니다." -ForegroundColor Green
+Write-Host "배포 상태 확인: https://dashboard.render.com" -ForegroundColor Yellow
+```
+
+**사용법**:
+```powershell
+.\deploy.ps1
+```
+
+### Render 자동 배포 설정 (이미 완료됨)
+
+`render.yaml` 파일에 정의된 대로:
+- ✅ `master` 브랜치에 푸시하면 **자동 배포**
+- ✅ 빌드 명령: `npm install --prefix backend && npm install --prefix patient-portal && npm run build --prefix patient-portal && npm install --prefix admin-dashboard && npm run build --prefix admin-dashboard`
+- ✅ 시작 명령: `node backend/server.js`
+
+**배포 확인**:
+1. https://dashboard.render.com 접속
+2. "medical-diagnosis-platform" 서비스 클릭
+3. "Logs" 탭에서 배포 진행 상황 확인
+4. 2-3분 후 프로덕션 URL에서 변경사항 확인
+
+---
+
 ## 🌐 배포 URL (프로덕션)
 
 | 서비스 | URL |
