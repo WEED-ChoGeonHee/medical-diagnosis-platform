@@ -8,16 +8,13 @@ const crypto = require('crypto');
 // 환경변수 먼저 로드
 dotenv.config();
 
-// JWT_SECRET 강제 설정 (환경변수 없으면 자동 생성)
+// JWT_SECRET 자동 생성 (환경변수 없는 경우)
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === '' || process.env.JWT_SECRET === 'undefined') {
-  const generatedSecret = crypto.randomBytes(64).toString('hex');
-  process.env.JWT_SECRET = generatedSecret;
-  console.log('⚠️ JWT_SECRET이 설정되지 않아 자동 생성되었습니다.');
-  console.log('   생성된 키 (처음 16자):', generatedSecret.substring(0, 16) + '...');
-  console.log('⚠️ 프로덕션 환경에서는 환경 변수로 고정값을 설정하세요!');
+  process.env.JWT_SECRET = crypto.randomBytes(64).toString('hex');
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('⚠️ JWT_SECRET 자동 생성됨 (프로덕션에서는 환경변수 설정 권장)');
+  }
 }
-
-console.log('✅ JWT_SECRET 확인:', process.env.JWT_SECRET ? '설정됨 (' + process.env.JWT_SECRET.length + '자)' : '❌ 없음');
 
 const { initDatabase } = require('./config/database');
 
@@ -94,32 +91,26 @@ const startServer = async () => {
 
     // 환자 포털 정적 파일 서빙
     const patientBuildPath = path.join(__dirname, '../patient-portal/build');
-    console.log('환자 포털 빌드 경로:', patientBuildPath);
-    console.log('환자 포털 빌드 존재 여부:', fs.existsSync(patientBuildPath));
-
     if (fs.existsSync(patientBuildPath)) {
       app.use('/patient', express.static(patientBuildPath));
       app.get('/patient/*', (req, res) => {
         res.sendFile(path.join(patientBuildPath, 'index.html'));
       });
-      console.log('✅ 환자 포털 정적 파일 서빙 설정 완료');
+      console.log('✅ 환자 포털: /patient');
     } else {
-      console.warn('⚠️ 환자 포털 빌드 폴더를 찾을 수 없습니다:', patientBuildPath);
+      console.warn('⚠️ 환자 포털 빌드 폴더 없음');
     }
 
     // 관리자 대시보드 정적 파일 서빙
     const adminBuildPath = path.join(__dirname, '../admin-dashboard/build');
-    console.log('관리자 대시보드 빌드 경로:', adminBuildPath);
-    console.log('관리자 대시보드 빌드 존재 여부:', fs.existsSync(adminBuildPath));
-
     if (fs.existsSync(adminBuildPath)) {
       app.use('/admin', express.static(adminBuildPath));
       app.get('/admin/*', (req, res) => {
         res.sendFile(path.join(adminBuildPath, 'index.html'));
       });
-      console.log('✅ 관리자 대시보드 정적 파일 서빙 설정 완료');
+      console.log('✅ 관리자 대시보드: /admin');
     } else {
-      console.warn('⚠️ 관리자 대시보드 빌드 폴더를 찾을 수 없습니다:', adminBuildPath);
+      console.warn('⚠️ 관리자 대시보드 빌드 폴더 없음');
     }
 
     // 루트 경로 - 환자 포털로 리다이렉트
@@ -144,10 +135,12 @@ const startServer = async () => {
     });
 
     const PORT = process.env.PORT || 5000;
-    const HOST = '0.0.0.0'; // 모든 네트워크 인터페이스에서 접근 가능
+    const HOST = '0.0.0.0';
     app.listen(PORT, HOST, () => {
-      console.log(`서버가 ${HOST}:${PORT}에서 실행 중입니다.`);
-      console.log(`네트워크 접속: http://10.10.30.175:${PORT}`);
+      console.log(`\n🚀 서버 실행 중: ${HOST}:${PORT}`);
+      console.log(`📱 환자 포털: http://localhost:${PORT}/patient`);
+      console.log(`👨‍⚕️ 관리자: http://localhost:${PORT}/admin`);
+      console.log(`🔌 API: http://localhost:${PORT}/api\n`);
     });
   } catch (error) {
     console.error('서버 시작 실패:', error);

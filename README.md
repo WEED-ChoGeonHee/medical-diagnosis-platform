@@ -163,12 +163,31 @@ medical-diagnosis-platform/
 
 ---
 
-## 📱 Android APK 빌드
+## � 문서
 
-자세한 내용은 [APK-BUILD-GUIDE.md](APK-BUILD-GUIDE.md) 참조
+상세한 문서는 [docs](docs/) 폴더를 참조하세요:
+
+### 🏗️ 시스템 이해하기
+- 📖 [메인 가이드](docs/README.md) - 프로젝트 전체 개요
+- 🏗️ **[시스템 아키텍처](docs/ARCHITECTURE.md)** ⭐ - **전체 시스템 흐름 및 데이터 플로우**
+- 🚀 [빠른 시작](docs/QUICK-START.md) - 로컬 개발 환경 설정
+- 🌐 [웹사이트 접속](docs/START-WEB.md) - 접속 URL 및 계정 정보
+
+### 배포 및 설정
+- 🚢 [배포 가이드](docs/DEPLOY_GUIDE.md) - Render.com 배포 방법
+- 🔑 [환경 변수 설정](docs/ENVIRONMENT_VARIABLES.md) - 필수 환경 변수
+- 🗄️ [Aiven MySQL 설정](docs/AIVEN_MYSQL.md) - 데이터베이스 설정
+- ☁️ [Cloudinary 설정](docs/CLOUDINARY_SETUP.md) - 이미지 스토리지 설정
+
+### 모바일 앱
+- 📱 [APK 빌드 가이드](docs/APK_BUILD.md) - Android 앱 빌드 방법
+
+### 테스트 및 문제 해결
+- 🧪 [이미지 업로드 테스트](docs/이미지_업로드_테스트_가이드.md)
+- 🔧 [Render 문제 해결](docs/RENDER_TROUBLESHOOTING.md) - 배포 오류 해결
 
 ---
 
 ## 📄 라이선스
 
-MIT License
+이 프로젝트는 교육 및 개인 프로젝트 용도입니다.

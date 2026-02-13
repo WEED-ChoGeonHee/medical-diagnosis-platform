@@ -7,17 +7,13 @@ services:
     region: singapore
     plan: free
     buildCommand: |
-      echo "=== Installing Backend Dependencies ==="
-      cd backend && npm install && cd ..
-      echo "=== Installing Patient Portal Dependencies ==="
-      cd patient-portal && npm install && cd ..
-      echo "=== Installing Admin Dashboard Dependencies ==="
-      cd admin-dashboard && npm install && cd ..
-      echo "=== Building Patient Portal ==="
-      cd patient-portal && npm run build && cd ..
-      echo "=== Building Admin Dashboard ==="
-      cd admin-dashboard && npm run build && cd ..
-      echo "=== Build Complete ==="
+      echo "=== Backend 의존성 설치 ==="
+      cd backend && npm ci --production=false && cd ..
+      echo "=== Patient Portal 빌드 ==="
+      cd patient-portal && npm ci --production=false && npm run build && cd ..
+      echo "=== Admin Dashboard 빌드 ==="
+      cd admin-dashboard && npm ci --production=false && npm run build && cd ..
+      echo "=== 빌드 완료 ✅ ==="
     startCommand: npm --prefix backend start
     envVars:
       - key: NODE_ENV

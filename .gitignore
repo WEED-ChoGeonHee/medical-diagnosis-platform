@@ -53,13 +53,14 @@ backend/uploads/*
 # APK files
 *.apk
 
-# Text files (디버그용)
+# Text files (?�버그용)
 *.txt
 
-# Mobile projects (사용하지 않음)
+# Mobile projects (?�용?��? ?�음)
 patient-portal-mobile/
 admin-dashboard-mobile/
 .npm
 
 # Optional eslint cache
 .eslintcache
+backend/tests/
