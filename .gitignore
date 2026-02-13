@@ -64,3 +64,6 @@ admin-dashboard-mobile/
 # Optional eslint cache
 .eslintcache
 backend/tests/
+*.log
+*.tmp
+build_*.txt
