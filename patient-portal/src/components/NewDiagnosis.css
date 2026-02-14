@@ -1,87 +1,236 @@
 .new-diagnosis {
   padding: 40px 20px;
-  max-width: 900px;
+  max-width: 1000px;
   min-height: calc(100vh - 80px);
   margin: 0 auto;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .new-diagnosis .card {
-  padding: 40px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
-  backdrop-filter: blur(15px);
-  border-radius: 25px;
-  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+  padding: 50px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  box-shadow: 
+    0 20px 60px rgba(102, 126, 234, 0.12),
+    0 0 0 1px rgba(102, 126, 234, 0.05);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.new-diagnosis .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .new-diagnosis .card:hover {
-  box-shadow: 0 15px 60px rgba(102, 126, 234, 0.25);
-  transform: translateY(-5px);
+  box-shadow: 
+    0 25px 80px rgba(102, 126, 234, 0.2),
+    0 0 0 1px rgba(102, 126, 234, 0.1);
+  transform: translateY(-8px);
 }
 
 .new-diagnosis h2 {
-  margin-bottom: 35px;
-  font-size: 2.2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-align: center;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.new-diagnosis h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 2px;
 }
 
 .new-diagnosis .section-title {
-  margin: 30px 0 20px;
-  font-size: 1.4rem;
-  font-weight: 600;
+  margin: 40px 0 25px;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: #667eea;
-  border-bottom: 2px solid #667eea;
-  padding-bottom: 10px;
+  position: relative;
+  padding-left: 20px;
+  padding-bottom: 15px;
+}
+
+.new-diagnosis .section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 70%;
+  background: linear-gradient(180deg, #667eea, #764ba2);
+  border-radius: 3px;
+}
+
+.new-diagnosis .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, transparent);
+  border-radius: 2px;
 }
 
 .radio-group, .checkbox-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
 }
 
 .checkbox-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
 }
 
 .radio-label, .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
-  padding: 8px 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  transition: all 0.2s;
+  padding: 12px 18px;
+  border: 2px solid #e8ecf1;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+}
+
+.radio-label::before, .checkbox-label::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .radio-label:hover, .checkbox-label:hover {
-  background-color: #f5f5f5;
   border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.radio-label:hover::before, .checkbox-label:hover::before {
+  opacity: 1;
 }
 
 .radio-label input[type="radio"], .checkbox-label input[type="checkbox"] {
   cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+  position: relative;
+  z-index: 1;
+}
+
+.radio-label input[type="radio"]:checked + span,
+.checkbox-label input[type="checkbox"]:checked + span {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.radio-label:has(input:checked),
+.checkbox-label:has(input:checked) {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
 }
 
 .pain-slider {
   width: 100%;
-  margin: 15px 0;
+  margin: 20px 0;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, #48bb78 0%, #f6ad55 50%, #f56565 100%);
+  border-radius: 10px;
+  outline: none;
+  transition: opacity 0.2s;
+}
+
+.pain-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  border: 3px solid white;
+  transition: all 0.3s;
+}
+
+.pain-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.pain-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  border: 3px solid white;
+  transition: all 0.3s;
+}
+
+.pain-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .pain-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #666;
+  font-weight: 500;
+  margin-top: 10px;
 }
 
 @media (max-width: 768px) {

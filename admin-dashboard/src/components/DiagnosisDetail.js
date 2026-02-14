@@ -275,12 +275,25 @@ function DiagnosisDetail() {
         <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>환자 진료 히스토리 (등록번호: {diagnosis.patientRegistrationNumber})</h3>
-              <button onClick={() => setShowHistoryModal(false)} className="close-btn">✕</button>
+              <h3>환자 진료 히스토리</h3>
+              <button 
+                onClick={() => setShowHistoryModal(false)} 
+                className="close-btn"
+                aria-label="닫기"
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
+              {diagnosis.patientRegistrationNumber && (
+                <p style={{ marginBottom: '20px', color: '#667eea', fontWeight: '600' }}>
+                  환자 등록번호: {diagnosis.patientRegistrationNumber}
+                </p>
+              )}
               {patientHistory.length === 0 ? (
-                <p>이전 진료 기록이 없습니다.</p>
+                <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>
+                  이전 진료 기록이 없습니다.
+                </p>
               ) : (
                 <div className="history-list">
                   {patientHistory.map((item) => (
@@ -300,6 +313,7 @@ function DiagnosisDetail() {
                         <button 
                           onClick={() => navigate(`/diagnosis/${item._id}`)} 
                           className="btn btn-sm btn-secondary"
+                          style={{ marginTop: '12px' }}
                         >
                           상세 보기
                         </button>
@@ -319,11 +333,19 @@ function DiagnosisDetail() {
           <div className="modal-content large" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>피부과 진단 상세 정보</h3>
-              <button onClick={() => setShowDermatologyModal(false)} className="close-btn">✕</button>
+              <button 
+                onClick={() => setShowDermatologyModal(false)} 
+                className="close-btn"
+                aria-label="닫기"
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               {dermatologyInfo.length === 0 ? (
-                <p>검색 결과가 없습니다.</p>
+                <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>
+                  검색 결과가 없습니다.
+                </p>
               ) : (
                 <div className="dermatology-list">
                   {dermatologyInfo.map((item) => (
