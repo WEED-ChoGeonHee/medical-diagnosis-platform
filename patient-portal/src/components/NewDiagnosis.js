@@ -5,38 +5,49 @@ import './NewDiagnosis.css';
 
 function NewDiagnosis() {
   const [patientName, setPatientName] = useState('');
-  const [symptomType, setSymptomType] = useState('');
-  const [skinType, setSkinType] = useState('');
+  const [patientRegistrationNumber, setPatientRegistrationNumber] = useState('');
+  const [gender, setGender] = useState('male');
+  const [treatmentType, setTreatmentType] = useState([]);
+  const [bodyParts, setBodyParts] = useState([]);
+  const [skinSymptoms, setSkinSymptoms] = useState([]);
+  const [painVas, setPainVas] = useState(0);
+  const [duration, setDuration] = useState('');
+  const [skinFeatures, setSkinFeatures] = useState([]);
   const [symptoms, setSymptoms] = useState('');
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
-  const [analyzeImages, setAnalyzeImages] = useState(true); // AI 이미지 분석 옵션
+  const [analyzeImages, setAnalyzeImages] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // 피부과 증상 종류
-  const symptomTypes = [
-    '여드름/뾰루지',
-    '아토피/습진',
-    '건선',
-    '두드러기',
-    '사마귀',
-    '무좀',
-    '백반/색소침착',
-    '탈모',
-    '피부염/발진',
-    '기타'
+  // 진료 종류
+  const treatmentTypes = ['보험진료', '색소진료', '부작용 진료'];
+
+  // 부위
+  const bodyPartsList = ['얼굴', '목', '가슴', '배', '등', '팔', '다리', '손', '발'];
+
+  // 피부 증상
+  const skinSymptomsList = [
+    { value: 'fever', label: 'fever (열)' },
+    { value: 'cough', label: 'cough (기침)' },
+    { value: 'itching', label: 'itching (가려움)' },
+    { value: 'burning', label: 'burning (열감)' }
   ];
 
-  // 피부 타입
-  const skinTypes = [
-    '지성',
-    '건성',
-    '복합성',
-    '민감성',
-    '정상'
-  ];
+  // 기간
+  const durationOptions = ['1일', '2~5일', '1주일이상', '1달 이상'];
+
+  // 피부 질환 특징
+  const skinFeaturesList = ['군집', '수포', '과녁모양', '인설', '발적', '검은색', '갈색'];
+
+  const handleCheckboxChange = (value, array, setter) => {
+    if (array.includes(value)) {
+      setter(array.filter(item => item !== value));
+    } else {
+      setter([...array, value]);
+    }
+  };
 
 
 
@@ -69,8 +80,8 @@ function NewDiagnosis() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!patientName.trim() || !symptomType || !skinType || !symptoms.trim()) {
-      setError('모든 필수 정보를 입력해주세요.');
+    if (!patientName.trim() || !symptoms.trim()) {
+      setError('환자 이름과 증상 설명은 필수입니다.');
       return;
     }
 
@@ -79,10 +90,16 @@ function NewDiagnosis() {
 
     const formData = new FormData();
     formData.append('patient_name', patientName);
-    formData.append('symptom_type', symptomType);
-    formData.append('skin_type', skinType);
+    formData.append('patient_registration_number', patientRegistrationNumber);
+    formData.append('gender', gender);
+    formData.append('treatment_type', treatmentType.join(', '));
+    formData.append('body_parts', bodyParts.join(', '));
+    formData.append('skin_symptoms', skinSymptoms.join(', '));
+    formData.append('pain_vas', painVas);
+    formData.append('duration', duration);
+    formData.append('skin_features', skinFeatures.join(', '));
     formData.append('symptoms', symptoms);
-    formData.append('analyze_images', analyzeImages); // AI 이미지 분석 옵션 추가
+    formData.append('analyze_images', analyzeImages);
     images.forEach(image => {
       formData.append('images', image);
     });
@@ -107,6 +124,9 @@ function NewDiagnosis() {
       <div className="card">
         <h2>환자 진단 등록</h2>
         <form onSubmit={handleSubmit}>
+          {/* 환자 정보 */}
+          <h3 className="section-title">환자 정보</h3>
+          
           <div className="form-group">
             <label>환자 이름 *</label>
             <input
@@ -119,31 +139,145 @@ function NewDiagnosis() {
           </div>
 
           <div className="form-group">
-            <label>증상 종류 *</label>
+            <label>환자 등록번호</label>
+            <input
+              type="text"
+              value={patientRegistrationNumber}
+              onChange={(e) => setPatientRegistrationNumber(e.target.value)}
+              placeholder="환자 등록번호 (선택사항)"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>성별 *</label>
+            <div className="radio-group">
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  value="male"
+                  checked={gender === 'male'}
+                  onChange={(e) => setGender(e.target.value)}
+                />
+                남성
+              </label>
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  value="female"
+                  checked={gender === 'female'}
+                  onChange={(e) => setGender(e.target.value)}
+                />
+                여성
+              </label>
+            </div>
+          </div>
+
+          {/* 진료 정보 */}
+          <h3 className="section-title">진료 정보</h3>
+
+          <div className="form-group">
+            <label>진료 종류</label>
+            <div className="checkbox-group">
+              {treatmentTypes.map(type => (
+                <label key={type} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={treatmentType.includes(type)}
+                    onChange={() => handleCheckboxChange(type, treatmentType, setTreatmentType)}
+                  />
+                  {type}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* 부위 */}
+          <h3 className="section-title">부위</h3>
+
+          <div className="form-group">
+            <div className="checkbox-grid">
+              {bodyPartsList.map(part => (
+                <label key={part} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={bodyParts.includes(part)}
+                    onChange={() => handleCheckboxChange(part, bodyParts, setBodyParts)}
+                  />
+                  {part}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* 피부 증상 */}
+          <h3 className="section-title">피부 증상</h3>
+
+          <div className="form-group">
+            <div className="checkbox-group">
+              {skinSymptomsList.map(symptom => (
+                <label key={symptom.value} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={skinSymptoms.includes(symptom.value)}
+                    onChange={() => handleCheckboxChange(symptom.value, skinSymptoms, setSkinSymptoms)}
+                  />
+                  {symptom.label}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* 통증 */}
+          <h3 className="section-title">통증 정도 (VAS)</h3>
+
+          <div className="form-group">
+            <label>통증 점수: {painVas}/10</label>
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              value={painVas}
+              onChange={(e) => setPainVas(parseInt(e.target.value))}
+              className="pain-slider"
+            />
+            <div className="pain-labels">
+              <span>통증 없음 (0)</span>
+              <span>최고 통증 (10)</span>
+            </div>
+          </div>
+
+          {/* 기간 */}
+          <h3 className="section-title">증상 기간</h3>
+
+          <div className="form-group">
             <select
-              value={symptomType}
-              onChange={(e) => setSymptomType(e.target.value)}
-              required
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
             >
               <option value="">선택해주세요</option>
-              {symptomTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
+              {durationOptions.map(d => (
+                <option key={d} value={d}>{d}</option>
               ))}
             </select>
           </div>
 
+          {/* 피부 질환 특징 */}
+          <h3 className="section-title">피부 질환 특징</h3>
+
           <div className="form-group">
-            <label>피부 타입 *</label>
-            <select
-              value={skinType}
-              onChange={(e) => setSkinType(e.target.value)}
-              required
-            >
-              <option value="">선택해주세요</option>
-              {skinTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
+            <div className="checkbox-grid">
+              {skinFeaturesList.map(feature => (
+                <label key={feature} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={skinFeatures.includes(feature)}
+                    onChange={() => handleCheckboxChange(feature, skinFeatures, setSkinFeatures)}
+                  />
+                  {feature}
+                </label>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="form-group">

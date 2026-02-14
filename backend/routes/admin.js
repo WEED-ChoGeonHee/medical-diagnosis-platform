@@ -7,14 +7,65 @@ const { protect, authorize } = require('../middleware/auth');
 // 모든 진단 목록 조회 (의사 전용)
 router.get('/diagnoses', protect, authorize('doctor'), async (req, res) => {
   try {
-    const { status, symptom_type, skin_type, page = 1, limit = 10 } = req.query;
+    const { status, treatment_type, patient_registration_number, page = 1, limit = 10 } = req.query;
 
-    const result = await Diagnosis.findAll({ status, symptom_type, skin_type, page, limit });
+    const result = await Diagnosis.findAll({ status, treatment_type, patient_registration_number, page, limit });
 
     res.json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: '진단 목록 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+// 환자 등록번호로 진단 히스토리 조회
+router.get('/patient-history/:registrationNumber', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const diagnoses = await Diagnosis.findByPatientRegistrationNumber(req.params.registrationNumber);
+    res.json(diagnoses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: '환자 진단 히스토리 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+// 피부과 진단 상세 정보 검색
+router.get('/dermatology-diagnoses/search', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ message: '검색어를 입력해주세요.' });
+    }
+    const results = await Diagnosis.searchDermatologyDiagnosis(q);
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: '피부과 진단 검색 중 오류가 발생했습니다.' });
+  }
+});
+
+// 모든 피부과 진단 상세 정보 조회
+router.get('/dermatology-diagnoses', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const results = await Diagnosis.getAllDermatologyDiagnoses();
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: '피부과 진단 목록 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+// 피부과 진단 상세 정보 ID로 조회
+router.get('/dermatology-diagnoses/:id', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const result = await Diagnosis.getDermatologyDiagnosisById(req.params.id);
+    if (!result) {
+      return res.status(404).json({ message: '진단 정보를 찾을 수 없습니다.' });
+    }
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: '피부과 진단 조회 중 오류가 발생했습니다.' });
   }
 });
 

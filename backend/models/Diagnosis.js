@@ -3,14 +3,49 @@ const { pool } = require('../config/database');
 const Diagnosis = {
   // 진단 생성
   async create(diagnosisData) {
-    const { patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status = 'pending' } = diagnosisData;
+    const { 
+      patient_id, 
+      patient_name, 
+      patient_registration_number,
+      gender,
+      treatment_type,
+      body_parts,
+      skin_symptoms,
+      pain_vas,
+      duration,
+      skin_features,
+      symptoms, 
+      gpt_diagnosis, 
+      status = 'pending' 
+    } = diagnosisData;
 
     const [result] = await pool.query(
-      'INSERT INTO diagnoses (patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status]
+      `INSERT INTO diagnoses (
+        patient_id, patient_name, patient_registration_number, gender, treatment_type, 
+        body_parts, skin_symptoms, pain_vas, duration, skin_features, symptoms, gpt_diagnosis, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        patient_id, patient_name, patient_registration_number, gender, treatment_type,
+        body_parts, skin_symptoms, pain_vas || 0, duration, skin_features, symptoms, gpt_diagnosis, status
+      ]
     );
 
-    return { id: result.insertId, patient_id, patient_name, symptom_type, skin_type, symptoms, gpt_diagnosis, status };
+    return { 
+      id: result.insertId, 
+      patient_id, 
+      patient_name, 
+      patient_registration_number,
+      gender,
+      treatment_type,
+      body_parts,
+      skin_symptoms,
+      pain_vas,
+      duration,
+      skin_features,
+      symptoms, 
+      gpt_diagnosis, 
+      status 
+    };
   },
 
   // 이미지 추가
@@ -71,6 +106,12 @@ const Diagnosis = {
     diagnosis.doctorNotes = diagnosis.doctor_notes;
     diagnosis.createdAt = diagnosis.created_at;
     diagnosis.updatedAt = diagnosis.updated_at;
+    diagnosis.patientRegistrationNumber = diagnosis.patient_registration_number;
+    diagnosis.treatmentType = diagnosis.treatment_type;
+    diagnosis.bodyParts = diagnosis.body_parts;
+    diagnosis.skinSymptoms = diagnosis.skin_symptoms;
+    diagnosis.painVas = diagnosis.pain_vas;
+    diagnosis.skinFeatures = diagnosis.skin_features;
 
     return diagnosis;
   },
@@ -96,6 +137,52 @@ const Diagnosis = {
       diagnosis.doctorNotes = diagnosis.doctor_notes;
       diagnosis.createdAt = diagnosis.created_at;
       diagnosis.updatedAt = diagnosis.updated_at;
+      diagnosis.patientRegistrationNumber = diagnosis.patient_registration_number;
+      diagnosis.treatmentType = diagnosis.treatment_type;
+      diagnosis.bodyParts = diagnosis.body_parts;
+      diagnosis.skinSymptoms = diagnosis.skin_symptoms;
+      diagnosis.painVas = diagnosis.pain_vas;
+      diagnosis.skinFeatures = diagnosis.skin_features;
+    }
+
+    return diagnoses;
+  },
+
+  // 환자 등록번호로 진단 히스토리 조회
+  async findByPatientRegistrationNumber(patientRegistrationNumber) {
+    const [diagnoses] = await pool.query(
+      `SELECT d.*, u.name as user_name, u.email as patient_email, u.phone as patient_phone
+       FROM diagnoses d
+       JOIN users u ON d.patient_id = u.id
+       WHERE d.patient_registration_number = ? 
+       ORDER BY d.created_at DESC`,
+      [patientRegistrationNumber]
+    );
+
+    for (let diagnosis of diagnoses) {
+      const [images] = await pool.query(
+        'SELECT image_path FROM diagnosis_images WHERE diagnosis_id = ?',
+        [diagnosis.id]
+      );
+      diagnosis.images = images.map(img => img.image_path);
+      
+      diagnosis._id = diagnosis.id;
+      diagnosis.gptDiagnosis = diagnosis.gpt_diagnosis;
+      diagnosis.doctorNotes = diagnosis.doctor_notes;
+      diagnosis.createdAt = diagnosis.created_at;
+      diagnosis.updatedAt = diagnosis.updated_at;
+      diagnosis.patientRegistrationNumber = diagnosis.patient_registration_number;
+      diagnosis.treatmentType = diagnosis.treatment_type;
+      diagnosis.bodyParts = diagnosis.body_parts;
+      diagnosis.skinSymptoms = diagnosis.skin_symptoms;
+      diagnosis.painVas = diagnosis.pain_vas;
+      diagnosis.skinFeatures = diagnosis.skin_features;
+      diagnosis.patient = {
+        _id: diagnosis.patient_id,
+        name: diagnosis.patient_name,
+        email: diagnosis.patient_email,
+        phone: diagnosis.patient_phone
+      };
     }
 
     return diagnoses;
@@ -103,11 +190,11 @@ const Diagnosis = {
 
   // 모든 진단 조회 (관리자용)
   async findAll(options = {}) {
-    const { status, symptom_type, skin_type, page = 1, limit = 10 } = options;
+    const { status, treatment_type, patient_registration_number, page = 1, limit = 10 } = options;
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT d.*, u.name as patient_name, u.email as patient_email, u.phone as patient_phone
+      SELECT d.*, u.name as user_name, u.email as patient_email, u.phone as patient_phone
       FROM diagnoses d
       JOIN users u ON d.patient_id = u.id
     `;
@@ -120,14 +207,14 @@ const Diagnosis = {
       params.push(status);
     }
 
-    if (symptom_type) {
-      conditions.push('d.symptom_type = ?');
-      params.push(symptom_type);
+    if (treatment_type) {
+      conditions.push('d.treatment_type = ?');
+      params.push(treatment_type);
     }
 
-    if (skin_type) {
-      conditions.push('d.skin_type = ?');
-      params.push(skin_type);
+    if (patient_registration_number) {
+      conditions.push('d.patient_registration_number LIKE ?');
+      params.push(`%${patient_registration_number}%`);
     }
 
     if (conditions.length > 0) {
@@ -151,6 +238,12 @@ const Diagnosis = {
       diagnosis.doctorNotes = diagnosis.doctor_notes;
       diagnosis.createdAt = diagnosis.created_at;
       diagnosis.updatedAt = diagnosis.updated_at;
+      diagnosis.patientRegistrationNumber = diagnosis.patient_registration_number;
+      diagnosis.treatmentType = diagnosis.treatment_type;
+      diagnosis.bodyParts = diagnosis.body_parts;
+      diagnosis.skinSymptoms = diagnosis.skin_symptoms;
+      diagnosis.painVas = diagnosis.pain_vas;
+      diagnosis.skinFeatures = diagnosis.skin_features;
       diagnosis.patient = {
         _id: diagnosis.patient_id,
         name: diagnosis.patient_name,
@@ -169,14 +262,14 @@ const Diagnosis = {
       countParams.push(status);
     }
 
-    if (symptom_type) {
-      countConditions.push('symptom_type = ?');
-      countParams.push(symptom_type);
+    if (treatment_type) {
+      countConditions.push('treatment_type = ?');
+      countParams.push(treatment_type);
     }
 
-    if (skin_type) {
-      countConditions.push('skin_type = ?');
-      countParams.push(skin_type);
+    if (patient_registration_number) {
+      countConditions.push('patient_registration_number LIKE ?');
+      countParams.push(`%${patient_registration_number}%`);
     }
 
     if (countConditions.length > 0) {
@@ -225,14 +318,14 @@ const Diagnosis = {
       ['reviewed']
     );
 
-    // 증상 종류별 통계
-    const [symptomStats] = await pool.query(
-      'SELECT symptom_type, COUNT(*) as count FROM diagnoses GROUP BY symptom_type'
+    // 진료 종류별 통계
+    const [treatmentStats] = await pool.query(
+      'SELECT treatment_type, COUNT(*) as count FROM diagnoses WHERE treatment_type IS NOT NULL GROUP BY treatment_type'
     );
 
-    // 피부 타입별 통계
-    const [skinTypeStats] = await pool.query(
-      'SELECT skin_type, COUNT(*) as count FROM diagnoses GROUP BY skin_type'
+    // 부위별 통계
+    const [bodyPartStats] = await pool.query(
+      'SELECT body_parts, COUNT(*) as count FROM diagnoses WHERE body_parts IS NOT NULL GROUP BY body_parts'
     );
 
     return {
@@ -240,9 +333,34 @@ const Diagnosis = {
       totalDiagnoses: totalDiagnoses[0].count,
       pendingDiagnoses: pendingDiagnoses[0].count,
       reviewedDiagnoses: reviewedDiagnoses[0].count,
-      symptomStats: symptomStats,
-      skinTypeStats: skinTypeStats
+      treatmentStats: treatmentStats,
+      bodyPartStats: bodyPartStats
     };
+  },
+
+  // 피부과 진단 상세 정보 조회 (진단명 검색)
+  async searchDermatologyDiagnosis(searchTerm) {
+    const [results] = await pool.query(
+      `SELECT * FROM dermatology_diagnoses 
+       WHERE diagnosis_name LIKE ? OR diagnosis_name_kr LIKE ? OR icd_code LIKE ?`,
+      [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]
+    );
+    return results;
+  },
+
+  // 피부과 진단 상세 정보 ID로 조회
+  async getDermatologyDiagnosisById(id) {
+    const [results] = await pool.query(
+      'SELECT * FROM dermatology_diagnoses WHERE id = ?',
+      [id]
+    );
+    return results[0] || null;
+  },
+
+  // 모든 피부과 진단 상세 정보 조회
+  async getAllDermatologyDiagnoses() {
+    const [results] = await pool.query('SELECT * FROM dermatology_diagnoses ORDER BY diagnosis_name_kr');
+    return results;
   }
 };
 

@@ -60,8 +60,14 @@ const initDatabase = async () => {
         id INT AUTO_INCREMENT PRIMARY KEY,
         patient_id INT NOT NULL,
         patient_name VARCHAR(255),
-        symptom_type VARCHAR(100) NOT NULL,
-        skin_type VARCHAR(100) NOT NULL,
+        patient_registration_number VARCHAR(50),
+        gender ENUM('male', 'female') DEFAULT 'male',
+        treatment_type VARCHAR(100),
+        body_parts TEXT,
+        skin_symptoms TEXT,
+        pain_vas INT DEFAULT 0,
+        duration VARCHAR(50),
+        skin_features TEXT,
         symptoms TEXT NOT NULL,
         gpt_diagnosis TEXT,
         status ENUM('pending', 'reviewed', 'completed') DEFAULT 'pending',
@@ -69,6 +75,24 @@ const initDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    // 피부과 진단 상세 정보 테이블 (ICD 코드, 보험 수가, 치료 가이드라인, SOAP)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS dermatology_diagnoses (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        diagnosis_name VARCHAR(255) NOT NULL,
+        diagnosis_name_kr VARCHAR(255) NOT NULL,
+        icd_code VARCHAR(50) NOT NULL,
+        insurance_code VARCHAR(100),
+        treatment_guideline TEXT,
+        soap_s TEXT,
+        soap_o TEXT,
+        soap_a TEXT,
+        soap_p TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
@@ -105,6 +129,16 @@ const initDatabase = async () => {
       `ALTER TABLE diagnoses ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`,
       `ALTER TABLE diagnoses ADD COLUMN patient_name VARCHAR(255)`,
       `ALTER TABLE diagnoses MODIFY COLUMN status ENUM('pending', 'reviewed', 'completed') DEFAULT 'pending'`,
+      // 새 컬럼 추가 (환자 등록번호, 성별, 진료 정보 등)
+      `ALTER TABLE diagnoses ADD COLUMN patient_registration_number VARCHAR(50)`,
+      `ALTER TABLE diagnoses ADD COLUMN gender ENUM('male', 'female') DEFAULT 'male'`,
+      `ALTER TABLE diagnoses ADD COLUMN treatment_type VARCHAR(100)`,
+      `ALTER TABLE diagnoses ADD COLUMN body_parts TEXT`,
+      `ALTER TABLE diagnoses ADD COLUMN skin_symptoms TEXT`,
+      `ALTER TABLE diagnoses ADD COLUMN pain_vas INT DEFAULT 0`,
+      `ALTER TABLE diagnoses ADD COLUMN duration VARCHAR(50)`,
+      `ALTER TABLE diagnoses ADD COLUMN skin_features TEXT`,
+      // symptom_type, skin_type 컬럼 삭제 (기존 데이터가 있으면 유지하지만 새로운 데이터에서는 사용 안함)
     ];
 
     for (const sql of migrations) {

@@ -59,12 +59,24 @@ const upload = multer({
 // 진단 요청 생성
 router.post('/', protect, upload.array('images', 5), async (req, res) => {
   try {
-    const { patient_name, symptom_type, skin_type, symptoms, analyze_images } = req.body;
+    const { 
+      patient_name, 
+      patient_registration_number,
+      gender,
+      treatment_type,
+      body_parts,
+      skin_symptoms,
+      pain_vas,
+      duration,
+      skin_features,
+      symptoms, 
+      analyze_images 
+    } = req.body;
     const images = req.files ? req.files.map(file => file.path) : [];
     const shouldAnalyzeImages = analyze_images === 'true' && images.length > 0;
 
-    if (!patient_name || !symptom_type || !skin_type || !symptoms) {
-      return res.status(400).json({ message: '모든 필수 정보를 입력해주세요.' });
+    if (!patient_name || !symptoms) {
+      return res.status(400).json({ message: '환자 이름과 증상 설명은 필수입니다.' });
     }
 
     let gptDiagnosis = '';
@@ -76,14 +88,22 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
         // 이미지 분석이 활성화되고 이미지가 있는 경우
         const parts = [];
         
+        // 상세 증상 정보 구성
+        const detailedInfo = `
+진료 종류: ${treatment_type || '미지정'}
+부위: ${body_parts || '미지정'}
+피부 증상: ${skin_symptoms || '미지정'}
+통증(VAS): ${pain_vas || 0}/10
+기간: ${duration || '미지정'}
+피부 질환 특징: ${skin_features || '미지정'}
+증상 설명: ${symptoms}`;
+
         if (shouldAnalyzeImages) {
           // 텍스트 프롬프트 추가
           parts.push({
             text: `당신은 피부과 전문의입니다. 환자의 피부 증상과 제공된 이미지를 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 피부과 전문의와 상담이 필요함을 명시하세요.
 
-증상 종류: ${symptom_type}
-피부 타입: ${skin_type}
-증상 설명: ${symptoms}
+${detailedInfo}
 
 아래 이미지들도 함께 분석해주세요:`
           });
@@ -108,9 +128,7 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
           parts.push({
             text: `당신은 피부과 전문의입니다. 환자의 피부 증상을 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 피부과 전문의와 상담이 필요함을 명시하세요.
 
-증상 종류: ${symptom_type}
-피부 타입: ${skin_type}
-증상 설명: ${symptoms}
+${detailedInfo}
 
 위 정보를 바탕으로 가능한 피부과 진단명과 설명을 제공해주세요.`
           });
@@ -187,8 +205,14 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
     const diagnosis = await Diagnosis.create({
       patient_id: req.user.id,
       patient_name,
-      symptom_type,
-      skin_type,
+      patient_registration_number,
+      gender,
+      treatment_type,
+      body_parts,
+      skin_symptoms,
+      pain_vas: parseInt(pain_vas) || 0,
+      duration,
+      skin_features,
       symptoms,
       gpt_diagnosis: gptDiagnosis,
       status: 'pending'

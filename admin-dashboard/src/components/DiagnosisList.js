@@ -7,44 +7,24 @@ function DiagnosisList() {
   const [diagnoses, setDiagnoses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [symptomTypeFilter, setSymptomTypeFilter] = useState('all');
-  const [skinTypeFilter, setSkinTypeFilter] = useState('all');
+  const [treatmentTypeFilter, setTreatmentTypeFilter] = useState('all');
+  const [patientRegistrationNumber, setPatientRegistrationNumber] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // 피부과 증상 종류
-  const symptomTypes = [
-    '여드름/뾰루지',
-    '아토피/습진',
-    '건선',
-    '두드러기',
-    '사마귀',
-    '무좀',
-    '백반/색소침착',
-    '탈모',
-    '피부염/발진',
-    '기타'
-  ];
-
-  // 피부 타입
-  const skinTypes = [
-    '지성',
-    '건성',
-    '복합성',
-    '민감성',
-    '정상'
-  ];
+  // 진료 종류
+  const treatmentTypes = ['보험진료', '색소진료', '부작용 진료'];
 
   useEffect(() => {
     fetchDiagnoses();
-  }, [filter, symptomTypeFilter, skinTypeFilter, currentPage]);
+  }, [filter, treatmentTypeFilter, patientRegistrationNumber, currentPage]);
 
   const fetchDiagnoses = async () => {
     try {
       const statusParam = filter !== 'all' ? `&status=${filter}` : '';
-      const symptomParam = symptomTypeFilter !== 'all' ? `&symptom_type=${encodeURIComponent(symptomTypeFilter)}` : '';
-      const skinParam = skinTypeFilter !== 'all' ? `&skin_type=${encodeURIComponent(skinTypeFilter)}` : '';
-      const response = await api.get(`/admin/diagnoses?page=${currentPage}${statusParam}${symptomParam}${skinParam}`);
+      const treatmentParam = treatmentTypeFilter !== 'all' ? `&treatment_type=${encodeURIComponent(treatmentTypeFilter)}` : '';
+      const registrationParam = patientRegistrationNumber ? `&patient_registration_number=${encodeURIComponent(patientRegistrationNumber)}` : '';
+      const response = await api.get(`/admin/diagnoses?page=${currentPage}${statusParam}${treatmentParam}${registrationParam}`);
       setDiagnoses(response.data.diagnoses);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -103,29 +83,26 @@ function DiagnosisList() {
         </div>
 
         <div className="filter-group">
-          <label>증상 종류</label>
+          <label>진료 종류</label>
           <select 
-            value={symptomTypeFilter} 
-            onChange={(e) => { setSymptomTypeFilter(e.target.value); setCurrentPage(1); }}
+            value={treatmentTypeFilter} 
+            onChange={(e) => { setTreatmentTypeFilter(e.target.value); setCurrentPage(1); }}
           >
             <option value="all">전체</option>
-            {symptomTypes.map(type => (
+            {treatmentTypes.map(type => (
               <option key={type} value={type}>{type}</option>
             ))}
           </select>
         </div>
 
         <div className="filter-group">
-          <label>피부 타입</label>
-          <select 
-            value={skinTypeFilter} 
-            onChange={(e) => { setSkinTypeFilter(e.target.value); setCurrentPage(1); }}
-          >
-            <option value="all">전체</option>
-            {skinTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
+          <label>환자 등록번호</label>
+          <input 
+            type="text"
+            placeholder="등록번호 검색"
+            value={patientRegistrationNumber} 
+            onChange={(e) => { setPatientRegistrationNumber(e.target.value); setCurrentPage(1); }}
+          />
         </div>
       </div>
 
@@ -139,10 +116,11 @@ function DiagnosisList() {
                 <thead>
                   <tr>
                     <th>환자명</th>
-                    <th>이메일</th>
-                    <th>증상 종류</th>
-                    <th>피부 타입</th>
-                    <th>증상 설명</th>
+                    <th>등록번호</th>
+                    <th>성별</th>
+                    <th>진료종류</th>
+                    <th>부위</th>
+                    <th>증상</th>
                     <th>이미지</th>
                     <th>상태</th>
                     <th>작성일</th>
@@ -153,9 +131,10 @@ function DiagnosisList() {
                   {diagnoses.map((diagnosis) => (
                     <tr key={diagnosis._id}>
                       <td>{diagnosis.patient?.name}</td>
-                      <td>{diagnosis.patient?.email}</td>
-                      <td>{diagnosis.symptom_type}</td>
-                      <td>{diagnosis.skin_type}</td>
+                      <td>{diagnosis.patientRegistrationNumber || '-'}</td>
+                      <td>{diagnosis.gender === 'male' ? '남성' : '여성'}</td>
+                      <td>{diagnosis.treatmentType || '-'}</td>
+                      <td>{diagnosis.bodyParts || '-'}</td>
                       <td className="symptoms-cell">
                         {diagnosis.symptoms.substring(0, 40)}...
                       </td>
