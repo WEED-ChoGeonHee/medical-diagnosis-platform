@@ -166,7 +166,7 @@ ${detailedInfo}
 - url은 실제 접근 가능한 PubMed 또는 학술 논문 링크를 제공해주세요
 - 링크가 없으면 null로 설정해주세요
 
-다음 피부 증상과 관련된 논문: ${symptom_type} - ${symptoms}`
+다음 피부 증상과 관련된 논문: ${skin_symptoms || body_parts || '피부 질환'} - ${symptoms}`
               }]
             }]
           },
