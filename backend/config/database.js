@@ -138,7 +138,9 @@ const initDatabase = async () => {
       `ALTER TABLE diagnoses ADD COLUMN pain_vas INT DEFAULT 0`,
       `ALTER TABLE diagnoses ADD COLUMN duration VARCHAR(50)`,
       `ALTER TABLE diagnoses ADD COLUMN skin_features TEXT`,
-      // symptom_type, skin_type 컬럼 삭제 (기존 데이터가 있으면 유지하지만 새로운 데이터에서는 사용 안함)
+      // 기존 컬럼을 NULL 허용으로 변경 (하위 호환성)
+      `ALTER TABLE diagnoses MODIFY COLUMN symptom_type VARCHAR(100) NULL DEFAULT NULL`,
+      `ALTER TABLE diagnoses MODIFY COLUMN skin_type VARCHAR(100) NULL DEFAULT NULL`,
     ];
 
     for (const sql of migrations) {
