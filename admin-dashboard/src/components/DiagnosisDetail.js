@@ -361,22 +361,22 @@ function DiagnosisDetail() {
                       
                       <div className="soap-section">
                         <h5>SOAP 차팅</h5>
-                        <div className="soap-grid">
+                        <div className="soap-notes">
                           <div className="soap-item">
-                            <strong>S (Subjective):</strong>
-                            <p>{item.soap_s}</p>
+                            <strong>S (Subjective - 주관적 증상):</strong>
+                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_s}</p>
                           </div>
                           <div className="soap-item">
-                            <strong>O (Objective):</strong>
-                            <p>{item.soap_o}</p>
+                            <strong>O (Objective - 객관적 소견):</strong>
+                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_o}</p>
                           </div>
                           <div className="soap-item">
-                            <strong>A (Assessment):</strong>
-                            <p>{item.soap_a}</p>
+                            <strong>A (Assessment - 진단평가):</strong>
+                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_a}</p>
                           </div>
                           <div className="soap-item">
-                            <strong>P (Plan):</strong>
-                            <p>{item.soap_p}</p>
+                            <strong>P (Plan - 치료계획):</strong>
+                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_p}</p>
                           </div>
                         </div>
                       </div>

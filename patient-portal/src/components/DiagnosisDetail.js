@@ -63,16 +63,63 @@ function DiagnosisDetail() {
           </span>
         </div>
 
+        {/* 환자 정보 */}
         <div className="detail-section">
+          <h3>환자 정보</h3>
           <div className="info-grid">
+            {diagnosis.patientRegistrationNumber && (
+              <div className="info-item">
+                <span className="info-label">환자 등록번호</span>
+                <span className="info-value">{diagnosis.patientRegistrationNumber}</span>
+              </div>
+            )}
             <div className="info-item">
-              <span className="info-label">증상 종류</span>
-              <span className="info-value">{diagnosis.symptom_type}</span>
+              <span className="info-label">성별</span>
+              <span className="info-value">{diagnosis.gender === 'male' ? '남성' : '여성'}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">피부 타입</span>
-              <span className="info-value">{diagnosis.skin_type}</span>
-            </div>
+          </div>
+        </div>
+
+        {/* 진료 정보 */}
+        <div className="detail-section">
+          <h3>진료 정보</h3>
+          <div className="info-grid">
+            {diagnosis.treatmentType && (
+              <div className="info-item">
+                <span className="info-label">진료 종류</span>
+                <span className="info-value">{diagnosis.treatmentType}</span>
+              </div>
+            )}
+            {diagnosis.bodyParts && (
+              <div className="info-item">
+                <span className="info-label">부위</span>
+                <span className="info-value">{diagnosis.bodyParts}</span>
+              </div>
+            )}
+            {diagnosis.skinSymptoms && (
+              <div className="info-item">
+                <span className="info-label">피부 증상</span>
+                <span className="info-value">{diagnosis.skinSymptoms}</span>
+              </div>
+            )}
+            {diagnosis.painVas !== null && diagnosis.painVas !== undefined && (
+              <div className="info-item">
+                <span className="info-label">통증 정도 (VAS)</span>
+                <span className="info-value">{diagnosis.painVas}/10</span>
+              </div>
+            )}
+            {diagnosis.duration && (
+              <div className="info-item">
+                <span className="info-label">증상 기간</span>
+                <span className="info-value">{diagnosis.duration}</span>
+              </div>
+            )}
+            {diagnosis.skinFeatures && (
+              <div className="info-item">
+                <span className="info-label">피부 질환 특징</span>
+                <span className="info-value">{diagnosis.skinFeatures}</span>
+              </div>
+            )}
           </div>
         </div>
 
