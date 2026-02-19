@@ -284,8 +284,8 @@ function Dashboard() {
               <thead>
                 <tr>
                   <th>환자명</th>
-                  <th>증상 종류</th>
-                  <th>피부 타입</th>
+                  <th>등록번호</th>
+                  <th>진료종류</th>
                   <th>상태</th>
                   <th>작성일</th>
                   <th>동작</th>
@@ -303,10 +303,10 @@ function Dashboard() {
                       </div>
                     </td>
                     <td>
-                      <span className="tag tag-symptom">{diagnosis.symptom_type}</span>
+                      <span className="tag tag-registration">{diagnosis.patient_registration_number || diagnosis.patientRegistrationNumber || '-'}</span>
                     </td>
                     <td>
-                      <span className="tag tag-skin">{diagnosis.skin_type}</span>
+                      <span className="tag tag-treatment">{diagnosis.treatment_type || diagnosis.treatmentType || '-'}</span>
                     </td>
                     <td>
                       <span className={`status-badge status-${diagnosis.status}`}>
