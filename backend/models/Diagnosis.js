@@ -194,7 +194,7 @@ const Diagnosis = {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT d.*, u.name as user_name, u.email as patient_email, u.phone as patient_phone
+      SELECT d.*, u.name as patient_name, u.email as patient_email, u.phone as patient_phone
       FROM diagnoses d
       JOIN users u ON d.patient_id = u.id
     `;
