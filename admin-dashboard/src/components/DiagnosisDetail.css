@@ -31,10 +31,10 @@
   border-radius: 14px;
   font-weight: 700;
   transition: all 0.3s;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 1) !important;
   color: #667eea !important;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   z-index: 10;
   position: relative;
@@ -56,10 +56,10 @@
 }
 
 .main-content .card {
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 1) !important;
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 24px;
   padding: 32px;
 }
@@ -97,12 +97,12 @@
 }
 
 .patient-info {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
   padding: 32px;
   border-radius: 24px;
   margin-bottom: 28px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(20px);
@@ -163,12 +163,12 @@
 
 .detail-section {
   margin-bottom: 32px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 1);
   padding: 28px;
   border-radius: 20px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(102, 126, 234, 0.3);
   transition: all 0.3s;
 }
 
@@ -205,9 +205,10 @@
 
 .detail-section p {
   line-height: 2;
-  color: #555;
+  color: #333;
   font-size: 15px;
   margin: 0;
+  font-weight: 500;
 }
 
 .info-grid {
@@ -219,10 +220,12 @@
 .info-grid p {
   margin: 0;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.12));
   border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 2px solid rgba(102, 126, 234, 0.25);
   transition: all 0.3s;
+  color: #222;
+  font-weight: 500;
 }
 
 .info-grid p:hover {
@@ -370,10 +373,10 @@
 .sidebar .card {
   position: sticky;
   top: 88px;
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 1) !important;
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 24px;
   padding: 28px;
 }

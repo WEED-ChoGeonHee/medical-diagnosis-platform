@@ -120,7 +120,9 @@ function DiagnosisList() {
                     <th>성별</th>
                     <th>진료종류</th>
                     <th>부위</th>
+                    <th>증상 설명</th>
                     <th>피부 증상</th>
+                    <th>기간</th>
                     <th>통증(VAS)</th>
                     <th>이미지</th>
                     <th>상태</th>
@@ -137,7 +139,13 @@ function DiagnosisList() {
                       <td>{diagnosis.treatmentType || '-'}</td>
                       <td>{diagnosis.bodyParts || '-'}</td>
                       <td className="symptoms-cell">
+                        {diagnosis.symptoms ? diagnosis.symptoms.substring(0, 50) + '...' : '-'}
+                      </td>
+                      <td>
                         {diagnosis.skinSymptoms || diagnosis.skinFeatures || '-'}
+                      </td>
+                      <td>
+                        {diagnosis.duration || '-'}
                       </td>
                       <td>
                         {diagnosis.painVas !== null && diagnosis.painVas !== undefined ? `${diagnosis.painVas}/10` : '-'}
