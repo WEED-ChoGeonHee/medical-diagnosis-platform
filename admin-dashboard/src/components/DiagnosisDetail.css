@@ -1,7 +1,7 @@
 .diagnosis-detail {
   padding: 32px 20px;
   min-height: calc(100vh - 68px);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a0a0a;
   position: relative;
   animation: fadeIn 0.5s ease;
 }
@@ -14,8 +14,8 @@
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(30, 30, 30, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(20, 20, 20, 0.5) 0%, transparent 50%);
   z-index: 0;
   pointer-events: none;
 }
@@ -31,10 +31,10 @@
   border-radius: 14px;
   font-weight: 700;
   transition: all 0.3s;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  background: rgba(255, 255, 255, 1) !important;
-  color: #667eea !important;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  background: #1a1a1a !important;
+  color: #8fb3ff !important;
+  border: 2px solid rgba(102, 126, 234, 0.5);
   backdrop-filter: blur(10px);
   z-index: 10;
   position: relative;
@@ -42,9 +42,9 @@
 
 .back-btn:hover {
   transform: translateX(-6px) scale(1.05);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
-  background: rgba(255, 255, 255, 1) !important;
-  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+  background: #1a1a1a !important;
+  border-color: rgba(102, 126, 234, 0.8);
 }
 
 .detail-grid {
@@ -56,10 +56,10 @@
 }
 
 .main-content .card {
-  background: rgba(255, 255, 255, 1) !important;
+  background: #1a1a1a !important;
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 32px;
 }
@@ -76,7 +76,7 @@
   align-items: center;
   margin-bottom: 28px;
   padding-bottom: 24px;
-  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 3px solid rgba(102, 126, 234, 0.5);
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -87,7 +87,7 @@
   font-weight: 900;
   letter-spacing: -0.5px;
   color: #ffffff;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {
@@ -97,12 +97,12 @@
 }
 
 .patient-info {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #151515 100%);
   padding: 32px;
   border-radius: 24px;
   margin-bottom: 28px;
-  border: 2px solid rgba(102, 126, 234, 0.3);
-  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(102, 126, 234, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(20px);
@@ -128,7 +128,7 @@
   margin-top: 0;
   margin-bottom: 22px;
   font-size: 1.5rem;
-  color: #667eea;
+  color: #8fb3ff;
   font-weight: 900;
   display: flex;
   align-items: center;
@@ -148,14 +148,14 @@
 
 .patient-info p {
   margin: 12px 0;
-  color: #333;
+  color: #e0e0e0;
   font-size: 15px;
   line-height: 1.8;
   padding: 8px 0;
 }
 
 .patient-info p strong {
-  color: #667eea;
+  color: #8fb3ff;
   font-weight: 700;
   min-width: 120px;
   display: inline-block;
@@ -163,10 +163,10 @@
 
 .detail-section {
   margin-bottom: 32px;
-  background: rgba(255, 255, 255, 1);
+  background: #1a1a1a;
   padding: 28px;
   border-radius: 20px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(102, 126, 234, 0.3);
   transition: all 0.3s;
@@ -174,11 +174,11 @@
 
 .detail-section:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.3);
 }
 
 .detail-section h3 {
-  color: #667eea;
+  color: #8fb3ff;
   margin-bottom: 20px;
   margin-top: 0;
   font-size: 1.35rem;
@@ -205,7 +205,7 @@
 
 .detail-section p {
   line-height: 2;
-  color: #333;
+  color: #e0e0e0;
   font-size: 15px;
   margin: 0;
   font-weight: 500;
@@ -220,22 +220,22 @@
 .info-grid p {
   margin: 0;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.12));
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
   border-radius: 12px;
-  border: 2px solid rgba(102, 126, 234, 0.25);
+  border: 2px solid rgba(102, 126, 234, 0.35);
   transition: all 0.3s;
-  color: #222;
+  color: #e0e0e0;
   font-weight: 500;
 }
 
 .info-grid p:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.25));
   transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .info-grid p strong {
-  color: #667eea;
+  color: #8fb3ff;
   font-weight: 700;
   display: block;
   margin-bottom: 6px;
@@ -255,14 +255,14 @@
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 3px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .image-gallery img:hover {
   transform: scale(1.08) rotate(2deg);
-  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.4);
-  border-color: #667eea;
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.6);
+  border-color: #8fb3ff;
   z-index: 10;
   position: relative;
 }
@@ -278,11 +278,11 @@
 }
 
 .gpt-section {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.2)) !important;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.20), rgba(118, 75, 162, 0.20)) !important;
   padding: 32px !important;
   border-radius: 24px !important;
   border: 3px solid rgba(102, 126, 234, 0.5) !important;
-  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.3) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7) !important;
   position: relative;
   overflow: hidden;
 }
@@ -340,25 +340,25 @@
 }
 
 .paper-item {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
   padding: 20px;
   border-radius: 14px;
-  border-left: 5px solid #667eea;
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  border-left: 5px solid #667eea;
+  border-left: 5px solid #8fb3ff;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-left: 5px solid #8fb3ff;
   transition: all 0.3s;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .paper-item:hover {
   transform: translateX(6px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
-  border-color: #667eea;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  border-color: #8fb3ff;
 }
 
 .paper-item h4 {
   margin: 0 0 10px 0;
-  color: #667eea;
+  color: #8fb3ff;
   font-size: 16px;
   font-weight: 800;
 }
@@ -366,24 +366,24 @@
 .paper-item p {
   margin: 0;
   font-size: 14px;
-  color: #555;
+  color: #e0e0e0;
   line-height: 1.8;
 }
 
 .sidebar .card {
   position: sticky;
   top: 88px;
-  background: rgba(255, 255, 255, 1) !important;
+  background: #1a1a1a !important;
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 28px;
 }
 
 .sidebar h3 {
   margin-top: 0;
-  color: #667eea;
+  color: #8fb3ff;
   font-size: 1.3rem;
   font-weight: 800;
   margin-bottom: 20px;
@@ -400,23 +400,23 @@
 .sidebar textarea {
   width: 100%;
   padding: 16px;
-  border: 2px solid rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(102, 126, 234, 0.5);
   border-radius: 14px;
   font-size: 15px;
   font-family: 'Inter', sans-serif;
   resize: vertical;
   margin-bottom: 20px;
-  background: rgba(102, 126, 234, 0.05);
-  color: #333;
+  background: rgba(30, 30, 30, 0.8);
+  color: #ffffff;
   transition: all 0.3s;
   min-height: 200px;
 }
 
 .sidebar textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-  background: rgba(255, 255, 255, 0.9);
+  border-color: #8fb3ff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+  background: rgba(30, 30, 30, 0.95);
 }
 
 .action-buttons {
@@ -446,20 +446,20 @@
 
 .meta-info {
   padding-top: 20px;
-  border-top: 2px solid rgba(102, 126, 234, 0.2);
+  border-top: 2px solid rgba(102, 126, 234, 0.3);
 }
 
 .meta-info p {
-  color: #666;
+  color: #e0e0e0;
   font-size: 14px;
   margin: 12px 0;
   padding: 10px;
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(102, 126, 234, 0.15);
   border-radius: 8px;
 }
 
 .meta-info p strong {
-  color: #667eea;
+  color: #8fb3ff;
   font-weight: 700;
 }
 
@@ -473,24 +473,24 @@
 .search-box input {
   flex: 1;
   padding: 16px 20px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 14px;
   font-size: 15px;
   transition: all 0.3s;
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
+  background: rgba(30, 30, 30, 0.8);
+  color: #ffffff;
   font-weight: 500;
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-  background: rgba(255, 255, 255, 1);
+  border-color: #8fb3ff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+  background: rgba(30, 30, 30, 0.95);
 }
 
 .search-box input::placeholder {
-  color: #999;
+  color: #888;
 }
 
 .search-box button {
@@ -539,15 +539,15 @@
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border: 3px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  border: 3px solid rgba(102, 126, 234, 0.5);
   border-radius: 28px;
   max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 
-    0 30px 100px rgba(0, 0, 0, 0.35),
-    0 0 2px rgba(102, 126, 234, 0.5);
+    0 30px 100px rgba(0, 0, 0, 0.8),
+    0 0 2px rgba(102, 126, 234, 0.7);
   animation: slideUpScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   width: 90%;
   position: relative;
