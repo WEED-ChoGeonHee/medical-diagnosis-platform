@@ -2,6 +2,8 @@
 .dashboard {
   padding: 32px 20px;
   min-height: calc(100vh - 68px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
 }
 
 /* Welcome Section */
@@ -53,8 +55,8 @@
 }
 
 .kpi-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid transparent;
   border-radius: var(--radius-lg);
   padding: 24px;
   display: flex;
@@ -65,22 +67,27 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(20px);
   animation: fadeInUp 0.5s ease backwards;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 4px rgba(118, 75, 162, 0.05);
 }
 
 .kpi-card:nth-child(1) {
   animation-delay: 0.05s;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(102, 126, 234, 0.03) 100%);
 }
 
 .kpi-card:nth-child(2) {
   animation-delay: 0.1s;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(168, 85, 247, 0.03) 100%);
 }
 
 .kpi-card:nth-child(3) {
   animation-delay: 0.15s;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(251, 146, 60, 0.03) 100%);
 }
 
 .kpi-card:nth-child(4) {
   animation-delay: 0.2s;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(52, 211, 153, 0.03) 100%);
 }
 
 .kpi-card::before {
@@ -231,15 +238,63 @@
   margin-bottom: 28px;
 }
 
+.middle-row > * {
+  background: rgba(255, 255, 255, 1);
+  border-radius: 20px;
+  padding: 26px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.12), 0 2px 8px rgba(118, 75, 162, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.middle-row > *::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.middle-row > *:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.18), 0 4px 12px rgba(118, 75, 162, 0.12);
+}
+
+.middle-row > *:hover::before {
+  opacity: 1;
+}
+
 /* Card Common */
 .card-title {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #1a1a1a;
   margin-bottom: 24px;
   padding-bottom: 14px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 0;
   letter-spacing: -0.3px;
+  position: relative;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
 }
 
 /* Progress Ring */
@@ -502,9 +557,19 @@
 }
 
 /* Table */
+.table-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+}
+
 .diagnoses-table {
   overflow-x: auto;
   margin-top: 20px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: inset 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 
 .diagnoses-table table {
@@ -514,100 +579,125 @@
 }
 
 .diagnoses-table th {
-  padding: 14px 16px;
+  padding: 16px 18px;
   text-align: left;
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.diagnoses-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.diagnoses-table th:last-child {
+  border-top-right-radius: 12px;
 }
 
 .diagnoses-table td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 18px;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #333;
   white-space: nowrap;
+  font-weight: 500;
+  background: #ffffff;
 }
 
 .diagnoses-table tr {
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .diagnoses-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)) !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.diagnoses-table tbody tr:hover td {
+  background: transparent;
+  border-bottom-color: rgba(102, 126, 234, 0.2);
 }
 
 .patient-cell {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .patient-avatar {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   color: white;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .tag {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.3px;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tag-registration {
-  background: rgba(79, 140, 255, 0.12);
-  color: var(--accent-blue);
-  border: 1px solid rgba(79, 140, 255, 0.2);
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.15), rgba(79, 140, 255, 0.2));
+  color: #4f8cff;
+  border: 2px solid rgba(79, 140, 255, 0.3);
 }
 
 .tag-treatment {
-  background: rgba(168, 85, 247, 0.12);
-  color: var(--accent-purple);
-  border: 1px solid rgba(168, 85, 247, 0.2);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.2));
+  color: #a855f7;
+  border: 2px solid rgba(168, 85, 247, 0.3);
 }
 
 .status-badge {
-  padding: 6px 14px;
-  border-radius: 20px;
+  padding: 8px 16px;
+  border-radius: 24px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
 }
 
 .status-pending {
-  background: rgba(251, 146, 60, 0.12);
-  color: var(--accent-orange);
-  border: 1px solid rgba(251, 146, 60, 0.2);
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.15), rgba(251, 146, 60, 0.2));
+  color: #fb923c;
+  border: 2px solid rgba(251, 146, 60, 0.3);
 }
 
 .status-reviewed {
-  background: rgba(79, 140, 255, 0.12);
-  color: var(--accent-blue);
-  border: 1px solid rgba(79, 140, 255, 0.2);
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.15), rgba(79, 140, 255, 0.2));
+  color: #4f8cff;
+  border: 2px solid rgba(79, 140, 255, 0.3);
 }
 
 .status-completed {
-  background: rgba(52, 211, 153, 0.12);
-  color: var(--accent-green);
-  border: 1px solid rgba(52, 211, 153, 0.2);
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.2));
+  color: #34d399;
+  border: 2px solid rgba(52, 211, 153, 0.3);
 }
 
 .date-cell {
@@ -616,17 +706,22 @@
 }
 
 .action-link {
-  color: var(--accent-blue);
+  color: #667eea;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
-  transition: all 0.2s;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  transition: all 0.3s;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(102, 126, 234, 0.12));
+  border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .action-link:hover {
-  background: rgba(79, 140, 255, 0.1);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
 }
 
 /* Empty State */
@@ -685,6 +780,12 @@
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .middle-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
   .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -693,41 +794,177 @@
   .middle-row {
     grid-template-columns: 1fr;
   }
+
+  .diagnoses-table {
+    font-size: 13px;
+  }
+
+  .diagnoses-table th,
+  .diagnoses-table td {
+    padding: 12px 14px;
+  }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .dashboard {
-    padding: 20px 12px;
+    padding: 20px 16px;
   }
 
   .welcome-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    margin-bottom: 24px;
   }
 
   .welcome-text h2 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+  }
+
+  .welcome-text p {
+    font-size: 0.9rem;
+  }
+
+  .date-text {
+    font-size: 12px;
+    padding: 8px 14px;
   }
 
   .kpi-grid {
-    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .kpi-card {
-    padding: 20px;
+    padding: 18px;
   }
 
   .kpi-value {
     font-size: 1.6rem;
   }
 
-  .donut-chart-container {
-    flex-direction: column;
+  .kpi-icon-wrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .kpi-icon {
+    font-size: 22px;
+  }
+
+  .middle-row {
+    gap: 16px;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+  }
+
+  .progress-ring-container {
+    width: 120px;
+    height: 120px;
+  }
+
+  .ring-number {
+    font-size: 1.8rem;
   }
 
   .progress-legend {
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .legend-item {
+    font-size: 12px;
+  }
+
+  .bar-label {
+    min-width: 70px;
+    font-size: 12px;
+  }
+
+  .bar-count {
+    font-size: 13px;
+  }
+
+  .diagnoses-table {
+    font-size: 12px;
+  }
+
+  .diagnoses-table th,
+  .diagnoses-table td {
+    padding: 10px 12px;
+  }
+
+  .patient-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .tag {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .status-badge {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .action-link {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    padding: 16px 12px;
+  }
+
+  .welcome-text h2 {
+    font-size: 1.4rem;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .kpi-card {
+    padding: 16px;
+  }
+
+  .kpi-value {
+    font-size: 1.4rem;
+  }
+
+  .kpi-label {
+    font-size: 12px;
+  }
+
+  .donut-chart-container {
+    flex-direction: column;
+  }
+
+  .diagnoses-table th,
+  .diagnoses-table td {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .card-header-row {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .btn-sm {
+    width: 100%;
+    text-align: center;
   }
 }
