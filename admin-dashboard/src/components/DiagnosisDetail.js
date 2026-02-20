@@ -13,14 +13,28 @@ function DiagnosisDetail() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [patientHistory, setPatientHistory] = useState([]);
+  const [selectedHistoryImage, setSelectedHistoryImage] = useState(null);
+  const [selectedHistoryDate, setSelectedHistoryDate] = useState(null);
   const [dermatologyInfo, setDermatologyInfo] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showDermatologyModal, setShowDermatologyModal] = useState(false);
+  
+  // AI 추천 증상 관련 상태
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [selectedAiDiagnosis, setSelectedAiDiagnosis] = useState(null);
+  const [loadingAi, setLoadingAi] = useState(false);
 
   useEffect(() => {
     fetchDiagnosis();
   }, [id]);
+
+  // 진단 정보가 로드되면 AI 증상 추천 자동 fetch
+  useEffect(() => {
+    if (diagnosis && diagnosis.symptoms) {
+      fetchAiSuggestions();
+    }
+  }, [diagnosis]);
 
   const fetchDiagnosis = async () => {
     try {
@@ -46,6 +60,32 @@ function DiagnosisDetail() {
     } catch (err) {
       console.error('히스토리 조회 오류:', err);
     }
+  };
+
+  // AI 증상 추천 fetch (상위 3개)
+  const fetchAiSuggestions = async () => {
+    if (!diagnosis || !diagnosis.symptoms) return;
+    
+    setLoadingAi(true);
+    try {
+      const response = await api.post('/admin/ai-suggest-symptoms', {
+        symptoms: diagnosis.symptoms,
+        bodyParts: diagnosis.bodyParts,
+        skinSymptoms: diagnosis.skinSymptoms,
+        images: diagnosis.images
+      });
+      setAiSuggestions(response.data.suggestions || []);
+    } catch (err) {
+      console.error('AI 증상 추천 오류:', err);
+      setAiSuggestions([]);
+    } finally {
+      setLoadingAi(false);
+    }
+  };
+
+  // AI 진단 정보 상세 버튼 클릭
+  const handleAiDiagnosisClick = (suggestion) => {
+    setSelectedAiDiagnosis(suggestion);
   };
 
   const searchDermatologyDiagnosis = async () => {
@@ -116,6 +156,15 @@ function DiagnosisDetail() {
       <div className="detail-grid">
         <div className="main-content">
           <div className="card">
+            {/* 히스토리에서 선택된 이미지와 등록일 표시 */}
+            {selectedHistoryImage && (
+              <div className="history-image-main">
+                <img src={selectedHistoryImage} alt="히스토리 이미지" style={{maxWidth:'100%', maxHeight:'300px'}} />
+                <div style={{marginTop:'8px', color:'#555'}}>
+                  등록일: {selectedHistoryDate}
+                </div>
+              </div>
+            )}
             <div className="detail-header">
               <h2>피부과 진단 상세 정보</h2>
               <span className={`status-badge status-${diagnosis.status}`}>
@@ -174,6 +223,38 @@ function DiagnosisDetail() {
             <div className="detail-section">
               <h3>증상 설명</h3>
               <p>{diagnosis.symptoms}</p>
+            </div>
+
+            {/* AI 추천 증상 3개 및 진단 정보 */}
+            <div className="detail-section">
+              <h3>AI 추천 진단 (상위 3개)</h3>
+              {loadingAi ? (
+                <p style={{color:'#aaa'}}>AI 추천 조회 중...</p>
+              ) : aiSuggestions.length === 0 ? (
+                <p style={{color:'#bbb'}}>추천 진단이 없습니다.</p>
+              ) : (
+                <div className="ai-suggestion-list">
+                  {aiSuggestions.map((suggestion, idx) => (
+                    <div key={idx} style={{marginBottom:'12px'}}>
+                      <button
+                        className="btn btn-outline-primary"
+                        style={{width:'100%',textAlign:'left',display:'flex',justifyContent:'space-between',alignItems:'center'}}
+                        onClick={() => handleAiDiagnosisClick(suggestion)}
+                      >
+                        <span>{suggestion.diagnosis}</span>
+                        <span style={{fontSize:'12px',color:'#888'}}>신뢰도: {suggestion.confidence}%</span>
+                      </button>
+                      {selectedAiDiagnosis && selectedAiDiagnosis.diagnosis === suggestion.diagnosis && (
+                        <div className="ai-diagnosis-detail" style={{marginTop:'8px',background:'#f9f9f9',padding:'12px',borderRadius:'8px',border:'1px solid #ddd'}}>
+                          <p><strong>진단명:</strong> {suggestion.diagnosis}</p>
+                          <p><strong>신뢰도:</strong> {suggestion.confidence}%</p>
+                          <p><strong>설명:</strong> {suggestion.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {diagnosis.images && diagnosis.images.length > 0 && (
@@ -275,7 +356,7 @@ function DiagnosisDetail() {
         <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>환자 진료 히스토리</h3>
+              <h3>환자 진료 히스토리 (사진만 표시)</h3>
               <button 
                 onClick={() => setShowHistoryModal(false)} 
                 className="close-btn"
@@ -306,17 +387,26 @@ function DiagnosisDetail() {
                           {item.status}
                         </span>
                       </div>
-                      <p><strong>진료 종류:</strong> {item.treatmentType || '-'}</p>
-                      <p><strong>부위:</strong> {item.bodyParts || '-'}</p>
-                      <p><strong>증상:</strong> {item.symptoms.substring(0, 100)}...</p>
-                      {item._id !== diagnosis._id && (
-                        <button 
-                          onClick={() => navigate(`/diagnosis/${item._id}`)} 
-                          className="btn btn-sm btn-secondary"
-                          style={{ marginTop: '12px' }}
-                        >
-                          상세 보기
-                        </button>
+                      {/* 사진만 표시, 사진 클릭 시 상단에 표시 */}
+                      {item.images && item.images.length > 0 ? (
+                        <div className="history-images">
+                          {item.images.map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={img.image_path || img}
+                              alt="히스토리 이미지"
+                              style={{width:'80px',height:'80px',objectFit:'cover',margin:'4px',cursor:'pointer'}}
+                              onClick={() => {
+                                setSelectedHistoryImage(img.image_path || img);
+                                setSelectedHistoryDate(new Date(item.createdAt).toLocaleDateString('ko-KR'));
+                                setShowHistoryModal(false);
+                              }}
+                              onError={(e) => {e.target.style.display='none';}}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{color:'#bbb',textAlign:'center',padding:'16px'}}>이미지가 없습니다.</div>
                       )}
                     </div>
                   ))}

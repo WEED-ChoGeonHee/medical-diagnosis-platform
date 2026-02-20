@@ -134,4 +134,83 @@ router.get('/stats', protect, authorize('doctor'), async (req, res) => {
   }
 });
 
+// AI 증상 추천 (상위 3개)
+router.post('/ai-suggest-symptoms', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const { symptoms, bodyParts, skinSymptoms, images } = req.body;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent';
+
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ message: 'AI 서비스가 설정되지 않았습니다.' });
+    }
+
+    if (!symptoms) {
+      return res.status(400).json({ message: '증상 정보가 필요합니다.' });
+    }
+
+    const axios = require('axios');
+
+    const prompt = `당신은 피부과 전문의입니다. 아래 환자 정보를 바탕으로 가능성이 높은 피부과 진단명 3개만 추천해주세요.
+
+부위: ${bodyParts || '미지정'}
+피부 증상: ${skinSymptoms || '미지정'}
+증상 설명: ${symptoms}
+
+응답은 반드시 아래 JSON 형식으로만 답변해주세요:
+[
+  {
+    "diagnosis": "진단명1 (한글)",
+    "confidence": 85,
+    "description": "간단한 설명 (1-2줄)"
+  },
+  {
+    "diagnosis": "진단명2 (한글)",
+    "confidence": 70,
+    "description": "간단한 설명 (1-2줄)"
+  },
+  {
+    "diagnosis": "진단명3 (한글)",
+    "confidence": 60,
+    "description": "간단한 설명 (1-2줄)"
+  }
+]`;
+
+    const response = await axios.post(
+      `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
+      {
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      },
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+
+    const aiResponse = response.data.candidates[0].content.parts[0].text;
+    
+    // JSON 추출 (코드 블록 제거)
+    const jsonMatch = aiResponse.match(/\[.*\]/s);
+    let suggestions = [];
+    
+    if (jsonMatch) {
+      suggestions = JSON.parse(jsonMatch[0]);
+    } else {
+      // JSON 파싱 실패 시 기본값
+      suggestions = [
+        { diagnosis: "진단 오류", confidence: 0, description: "AI 응답을 처리할 수 없습니다." }
+      ];
+    }
+
+    // 최대 3개만 반환
+    suggestions = suggestions.slice(0, 3);
+
+    res.json({ suggestions });
+  } catch (error) {
+    console.error('AI 증상 추천 오류:', error.response?.data || error.message);
+    res.status(500).json({ message: 'AI 증상 추천 중 오류가 발생했습니다.' });
+  }
+});
+
 module.exports = router;

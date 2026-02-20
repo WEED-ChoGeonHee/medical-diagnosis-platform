@@ -58,8 +58,8 @@ git commit -m "$commitMsg"
 Write-Host "`n🚀 Render에 배포 중..." -ForegroundColor Cyan
 git push origin master
 
-Write-Host "`n✨ 배포 완료!`n" -ForegroundColor Green
-Write-Host "📊 배포 상태 확인: https://dashboard.render.com" -ForegroundColor Yellow
-Write-Host "🌐 환자 포털: https://medical-diagnosis-platform.onrender.com/patient" -ForegroundColor Cyan
-Write-Host "🔐 관리자 대시보드: https://medical-diagnosis-platform.onrender.com/admin" -ForegroundColor Cyan
-Write-Host "`n⏱️  배포 완료까지 약 2-3분 소요됩니다.`n" -ForegroundColor Gray
+Write-Host "`n배포 완료!`n" -ForegroundColor Green
+Write-Host "배포 상태 확인: https://dashboard.render.com" -ForegroundColor Yellow
+Write-Host "환자 포털: https://medical-diagnosis-platform.onrender.com/patient" -ForegroundColor Cyan
+Write-Host "관리자 대시보드: https://medical-diagnosis-platform.onrender.com/admin" -ForegroundColor Cyan
+Write-Host "`n배포 완료까지 약 2-3분 소요됩니다.`n" -ForegroundColor Gray
