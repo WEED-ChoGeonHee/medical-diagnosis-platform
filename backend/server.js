@@ -84,6 +84,10 @@ const startServer = async () => {
     });
 
     // API Routes
+        // 헬스체크 엔드포인트
+        app.get('/api/health', (req, res) => {
+          res.json({ status: 'ok', message: '서버 정상 작동 중', timestamp: new Date().toISOString() });
+        });
     app.use('/api/auth', require('./routes/auth'));
     app.use('/api/patients', require('./routes/patients'));
     app.use('/api/diagnoses', require('./routes/diagnoses'));

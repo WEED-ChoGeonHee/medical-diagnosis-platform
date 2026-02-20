@@ -1,0 +1,13 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+
+jobs:
+  health-check:
+    runs-on: self-hosted
+    steps:
+      - name: Call health check endpoint (prod)
+        run: |
+          curl -sS https://medical-diagnosis-platform.onrender.com/api/health || echo "Health check failed"
