@@ -15,6 +15,7 @@ function DiagnosisDetail() {
   const [patientHistory, setPatientHistory] = useState([]);
   const [selectedHistoryImage, setSelectedHistoryImage] = useState(null);
   const [selectedHistoryDate, setSelectedHistoryDate] = useState(null);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
   const [dermatologyInfo, setDermatologyInfo] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -178,19 +179,75 @@ function DiagnosisDetail() {
               {diagnosis.patientRegistrationNumber && (
                 <p>
                   <strong>환자 등록번호:</strong> {diagnosis.patientRegistrationNumber}
-                  <button 
-                    onClick={() => setShowHistoryModal(true)} 
-                    className="btn btn-secondary btn-sm"
-                    style={{ marginLeft: '10px' }}
-                  >
-                    진료 히스토리 보기
-                  </button>
                 </p>
               )}
               <p><strong>성별:</strong> {diagnosis.gender === 'male' ? '남성' : '여성'}</p>
               <p><strong>이메일:</strong> {diagnosis.patient?.email}</p>
               <p><strong>전화번호:</strong> {diagnosis.patient?.phone || '-'}</p>
             </div>
+
+            {/* 진료 히스토리 이미지 슬라이더 */}
+            {patientHistory.length > 0 && (() => {
+              const historyWithImages = patientHistory.filter(item => item.images && item.images.length > 0);
+              if (historyWithImages.length === 0) return null;
+              
+              const safeIndex = Math.min(currentHistoryIndex, historyWithImages.length - 1);
+              const currentItem = historyWithImages[safeIndex];
+              const currentImage = currentItem.images[0];
+              
+              return (
+                <div className="detail-section">
+                  <h3>진료 히스토리 (이미지)</h3>
+                  <div className="history-slider">
+                    <div className="slider-main">
+                      <div className="slider-item">
+                        <img 
+                          src={currentImage.image_path || currentImage} 
+                          alt="히스토리 이미지" 
+                          style={{maxWidth:'100%', maxHeight:'400px', objectFit:'contain', cursor:'pointer'}}
+                          onClick={() => {
+                            setSelectedHistoryImage(currentImage.image_path || currentImage);
+                            setSelectedHistoryDate(new Date(currentItem.createdAt).toLocaleDateString('ko-KR'));
+                          }}
+                          onError={(e) => {e.target.style.display='none';}}
+                        />
+                        <div style={{marginTop:'12px', color:'#667eea', fontWeight:'600'}}>
+                          등록일: {new Date(currentItem.createdAt).toLocaleDateString('ko-KR')}
+                        </div>
+                        {currentItem.images.length > 1 && (
+                          <div style={{marginTop:'8px', color:'#888', fontSize:'14px'}}>
+                            ({currentItem.images.length}개 이미지)
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {historyWithImages.length > 1 && (
+                      <div className="slider-controls" style={{marginTop:'16px', display:'flex', justifyContent:'center', gap:'12px'}}>
+                        <button 
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => {
+                            setCurrentHistoryIndex(prev => prev > 0 ? prev - 1 : historyWithImages.length - 1);
+                          }}
+                        >
+                          ← 이전
+                        </button>
+                        <span style={{display:'flex', alignItems:'center', color:'#555'}}>
+                          {safeIndex + 1} / {historyWithImages.length}
+                        </span>
+                        <button 
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => {
+                            setCurrentHistoryIndex(prev => (prev + 1) % historyWithImages.length);
+                          }}
+                        >
+                          다음 →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="detail-section">
               <h3>진단 정보</h3>
@@ -279,10 +336,8 @@ function DiagnosisDetail() {
             {diagnosis.gptDiagnosis && (
               <div className="detail-section gpt-section">
                 <h3>AI 진단 결과</h3>
-                <div className="gpt-content">
-                  {diagnosis.gptDiagnosis.split('\n').map((line, index) => (
-                    <p key={index}>{line}</p>
-                  ))}
+                <div className="gpt-content" style={{whiteSpace: 'pre-wrap'}}>
+                  {diagnosis.gptDiagnosis}
                 </div>
               </div>
             )}
