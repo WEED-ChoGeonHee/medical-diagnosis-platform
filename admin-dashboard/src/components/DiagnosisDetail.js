@@ -192,69 +192,62 @@ function DiagnosisDetail() {
               <p><strong>전화번호:</strong> {diagnosis.patient?.phone || '-'}</p>
             </div>
 
-            {/* 진료 히스토리 이미지 슬라이더 (4개씩) */}
+            {/* 진료 히스토리 이미지 슬라이더 (1장씩 가로 슬라이드) */}
             {patientHistory.length > 0 && (() => {
               const historyWithImages = patientHistory.filter(item => item.images && item.images.length > 0);
               if (historyWithImages.length === 0) return null;
               
-              const itemsPerPage = 4;
-              const totalPages = Math.ceil(historyWithImages.length / itemsPerPage);
-              const safePage = Math.min(currentHistoryPage, totalPages - 1);
-              const startIdx = safePage * itemsPerPage;
-              const endIdx = startIdx + itemsPerPage;
-              const currentPageItems = historyWithImages.slice(startIdx, endIdx);
+              const safePage = Math.min(currentHistoryPage, historyWithImages.length - 1);
+              const currentItem = historyWithImages[safePage];
+              const currentImage = currentItem.images[0];
               
               return (
                 <div className="detail-section">
                   <h3>진료 히스토리 (이미지) <span style={{fontSize:'14px', color:'#888', fontWeight:'normal'}}>총 {historyWithImages.length}개</span></h3>
                   <div className="history-slider">
-                    <div className="history-grid" style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:'16px', marginBottom:'16px'}}>
-                      {currentPageItems.map((item, idx) => {
-                        const image = item.images[0];
-                        return (
-                          <div key={item._id || idx} className="history-card" style={{border:'1px solid #ddd', borderRadius:'8px', overflow:'hidden', cursor:'pointer', transition:'transform 0.2s'}} 
-                            onMouseEnter={(e) => e.currentTarget.style.transform='scale(1.05)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform='scale(1)'}
-                            onClick={() => {
-                              setSelectedHistoryImage(image.image_path || image);
-                              setSelectedHistoryDate(new Date(item.createdAt).toLocaleDateString('ko-KR'));
-                            }}>
-                            <img 
-                              src={image.image_path || image} 
-                              alt="히스토리 이미지" 
-                              style={{width:'100%', height:'180px', objectFit:'cover'}}
-                              onError={(e) => {e.target.style.display='none';}}
-                            />
-                            <div style={{padding:'8px', background:'#f9f9f9'}}>
-                              <div style={{fontSize:'12px', color:'#667eea', fontWeight:'600'}}>
-                                {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                              </div>
-                              {item.images.length > 1 && (
-                                <div style={{fontSize:'11px', color:'#888', marginTop:'4px'}}>
-                                  📷 {item.images.length}개
-                                </div>
-                              )}
-                            </div>
+                    <div className="slider-main" style={{position:'relative', width:'100%', maxWidth:'800px', margin:'0 auto'}}>
+                      <div className="slider-item" style={{textAlign:'center'}}>
+                        <img 
+                          src={currentImage.image_path || currentImage} 
+                          alt="히스토리 이미지" 
+                          style={{maxWidth:'100%', maxHeight:'500px', objectFit:'contain', borderRadius:'8px', boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}
+                          onError={(e) => {e.target.style.display='none';}}
+                        />
+                        <div style={{marginTop:'16px', padding:'12px', background:'#f9f9f9', borderRadius:'8px', display:'inline-block'}}>
+                          <div style={{fontSize:'14px', color:'#667eea', fontWeight:'600'}}>
+                            등록일: {new Date(currentItem.createdAt).toLocaleDateString('ko-KR')}
                           </div>
-                        );
-                      })}
+                          {currentItem.images.length > 1 && (
+                            <div style={{fontSize:'12px', color:'#888', marginTop:'4px'}}>
+                              📷 {currentItem.images.length}개 이미지
+                            </div>
+                          )}
+                          {currentItem.symptoms && (
+                            <div style={{fontSize:'12px', color:'#666', marginTop:'8px', maxWidth:'600px'}}>
+                              {currentItem.symptoms.length > 100 ? currentItem.symptoms.substring(0, 100) + '...' : currentItem.symptoms}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    {totalPages > 1 && (
-                      <div className="slider-controls" style={{marginTop:'16px', display:'flex', justifyContent:'center', alignItems:'center', gap:'12px'}}>
+                    {historyWithImages.length > 1 && (
+                      <div className="slider-controls" style={{marginTop:'20px', display:'flex', justifyContent:'center', alignItems:'center', gap:'20px'}}>
                         <button 
-                          className="btn btn-secondary btn-sm"
+                          className="btn btn-secondary"
                           onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
                           disabled={safePage === 0}
+                          style={{minWidth:'80px'}}
                         >
                           ← 이전
                         </button>
-                        <span style={{display:'flex', alignItems:'center', color:'#555', fontSize:'14px'}}>
-                          {safePage + 1} / {totalPages}
+                        <span style={{display:'flex', alignItems:'center', color:'#333', fontSize:'16px', fontWeight:'600'}}>
+                          {safePage + 1} / {historyWithImages.length}
                         </span>
                         <button 
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => setCurrentHistoryPage(prev => Math.min(totalPages - 1, prev + 1))}
-                          disabled={safePage === totalPages - 1}
+                          className="btn btn-secondary"
+                          onClick={() => setCurrentHistoryPage(prev => Math.min(historyWithImages.length - 1, prev + 1))}
+                          disabled={safePage === historyWithImages.length - 1}
+                          style={{minWidth:'80px'}}
                         >
                           다음 →
                         </button>
@@ -276,12 +269,12 @@ function DiagnosisDetail() {
               </h3>
               {expandedSections.diagnosis && (
                 <div className="info-grid" style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'12px', marginTop:'12px'}}>
-                  {diagnosis.treatmentType && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>진료 종류:</strong> {diagnosis.treatmentType}</div>}
-                  {diagnosis.bodyParts && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>부위:</strong> {diagnosis.bodyParts}</div>}
-                  {diagnosis.skinSymptoms && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>피부 증상:</strong> {diagnosis.skinSymptoms}</div>}
-                  {diagnosis.painVas !== null && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>통증(VAS):</strong> {diagnosis.painVas}/10</div>}
-                  {diagnosis.duration && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>기간:</strong> {diagnosis.duration}</div>}
-                  {diagnosis.skinFeatures && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>피부 질환 특징:</strong> {diagnosis.skinFeatures}</div>}
+                  {diagnosis.treatmentType && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>진료 종류:</strong> {diagnosis.treatmentType}</div>}
+                  {diagnosis.bodyParts && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>부위:</strong> {diagnosis.bodyParts}</div>}
+                  {diagnosis.skinSymptoms && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>피부 증상:</strong> {diagnosis.skinSymptoms}</div>}
+                  {diagnosis.painVas !== null && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>통증(VAS):</strong> {diagnosis.painVas}/10</div>}
+                  {diagnosis.duration && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>기간:</strong> {diagnosis.duration}</div>}
+                  {diagnosis.skinFeatures && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>피부 질환 특징:</strong> {diagnosis.skinFeatures}</div>}
                 </div>
               )}
             </div>
@@ -296,7 +289,7 @@ function DiagnosisDetail() {
                 <span style={{fontSize:'18px'}}>{expandedSections.symptoms ? '▼' : '▶'}</span>
               </h3>
               {expandedSections.symptoms && (
-                <p style={{marginTop:'12px', padding:'12px', background:'#f9f9f9', borderRadius:'8px', lineHeight:'1.6'}}>{diagnosis.symptoms}</p>
+                <p style={{marginTop:'12px', padding:'12px', background:'#f9f9f9', borderRadius:'8px', lineHeight:'1.6', color:'#333'}}>{diagnosis.symptoms}</p>
               )}
             </div>
 
