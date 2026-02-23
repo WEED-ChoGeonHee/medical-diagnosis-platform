@@ -16,6 +16,7 @@ function DiagnosisDetail() {
   const [chartSuccess, setChartSuccess] = useState('');
   const [patientHistory, setPatientHistory] = useState([]);
   const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
 
   // AI 추천 증상 관련 상태
   const [aiSuggestions, setAiSuggestions] = useState([]);
@@ -296,6 +297,8 @@ function DiagnosisDetail() {
                     src={image.image_path || image} 
                     alt={`진단 이미지 ${index + 1}`}
                     className="patient-photo"
+                    style={{ cursor: 'zoom-in' }}
+                    onClick={() => setLightboxSrc(image.image_path || image)}
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 ))}
@@ -341,8 +344,8 @@ function DiagnosisDetail() {
                       <div
                         key={itemId || idx}
                         className="history-grid-item"
-                        onClick={() => navigate(`/diagnoses/${itemId}`)}
-                        title={`${new Date(item.createdAt).toLocaleDateString('ko-KR')} 편 클릭하여 상세 보기`}
+                        onClick={() => window.open(`/diagnoses/${itemId}`, '_blank')}
+                        title={`${new Date(item.createdAt).toLocaleDateString('ko-KR')} 클릭하여 새 탭에서 상세 보기`}
                       >
                         <div className="history-thumb-wrap">
                           {imgSrc ? (
@@ -358,7 +361,7 @@ function DiagnosisDetail() {
                             </div>
                           )}
                           <div className="history-thumb-overlay">
-                            <span>상세봐기 →</span>
+                            <span>새 탭으로 →</span>
                           </div>
                         </div>
                         <div className="history-item-meta">
@@ -651,6 +654,24 @@ function DiagnosisDetail() {
         </div>
       </div>
 
+      {/* ============ Lightbox ============ */}
+      {lightboxSrc && (
+        <div className="lightbox-overlay" onClick={() => setLightboxSrc(null)}>
+          <button className="lightbox-close" onClick={() => setLightboxSrc(null)}>✕</button>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={lightboxSrc} alt="확대 이미지" className="lightbox-img" />
+          </div>
+        </div>
+      )}
+      {/* ============ Lightbox ============ */}
+      {lightboxSrc && (
+        <div className="lightbox-overlay" onClick={() => setLightboxSrc(null)}>
+          <button className="lightbox-close" onClick={() => setLightboxSrc(null)}>✕</button>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={lightboxSrc} alt="확대 이미지" className="lightbox-img" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
