@@ -89,7 +89,7 @@ AI 기반 피부 질환 진단 서비스
 ├── backend/                 # Express API 서버
 │   ├── server.js           # 메인 서버 파일
 │   ├── config/             # 설정 (DB, JWT 등)
-│   ├── models/             # Mongoose 모델
+│   ├── models/             # MySQL 모델
 │   ├── routes/             # API 라우트
 │   └── middleware/         # 인증 미들웨어
 │
