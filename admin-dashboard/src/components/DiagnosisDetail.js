@@ -165,10 +165,39 @@ function DiagnosisDetail() {
           <div className="card">
             {/* 히스토리에서 선택된 이미지와 등록일 표시 */}
             {selectedHistoryImage && (
-              <div className="history-image-main">
-                <img src={selectedHistoryImage} alt="히스토리 이미지" style={{maxWidth:'100%', maxHeight:'300px'}} />
-                <div style={{marginTop:'8px', color:'#555'}}>
-                  등록일: {selectedHistoryDate}
+              <div className="history-image-main" style={{marginBottom:'20px', padding:'20px', background:'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius:'12px', boxShadow:'0 8px 24px rgba(102, 126, 234, 0.3)'}}>
+                <div style={{position:'relative'}}>
+                  <img src={selectedHistoryImage} alt="히스토리 이미지" style={{maxWidth:'100%', maxHeight:'400px', width:'100%', objectFit:'contain', borderRadius:'8px', background:'#fff'}} />
+                  <button 
+                    onClick={() => setSelectedHistoryImage(null)}
+                    style={{
+                      position:'absolute',
+                      top:'10px',
+                      right:'10px',
+                      background:'rgba(0,0,0,0.6)',
+                      color:'#fff',
+                      border:'none',
+                      borderRadius:'50%',
+                      width:'36px',
+                      height:'36px',
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'center',
+                      cursor:'pointer',
+                      fontSize:'20px',
+                      fontWeight:'bold',
+                      transition:'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background='rgba(255,0,0,0.8)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background='rgba(0,0,0,0.6)'}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div style={{marginTop:'12px', color:'#fff', textAlign:'center'}}>
+                  <div style={{fontSize:'16px', fontWeight:'600'}}>
+                    📅 등록일: {selectedHistoryDate}
+                  </div>
                 </div>
               </div>
             )}
@@ -204,7 +233,7 @@ function DiagnosisDetail() {
                   <h3>진료 히스토리 (이미지) <span style={{fontSize:'14px', color:'#888', fontWeight:'normal'}}>총 {historyWithImages.length}개</span></h3>
                   <div className="history-slider" style={{position:'relative', width:'100%', maxWidth:'900px', margin:'0 auto'}}>
                     {/* 슬라이더 컨테이너 */}
-                    <div style={{position:'relative', overflow:'hidden', borderRadius:'12px', background:'#f5f5f5', padding:'20px'}}>
+                    <div style={{position:'relative', overflow:'hidden', borderRadius:'12px', padding:'20px 0'}}>
                       {/* 슬라이드 래퍼 */}
                       <div style={{
                         display:'flex',
@@ -219,7 +248,8 @@ function DiagnosisDetail() {
                               display:'flex',
                               flexDirection:'column',
                               alignItems:'center',
-                              justifyContent:'center'
+                              justifyContent:'center',
+                              padding:'0 10px'
                             }}>
                               <img 
                                 src={image.image_path || image} 
@@ -228,23 +258,31 @@ function DiagnosisDetail() {
                                   maxWidth:'100%',
                                   maxHeight:'500px',
                                   objectFit:'contain',
-                                  borderRadius:'8px',
-                                  boxShadow:'0 4px 12px rgba(0,0,0,0.15)',
-                                  background:'#fff'
+                                  borderRadius:'12px',
+                                  boxShadow:'0 8px 24px rgba(102, 126, 234, 0.15)',
+                                  cursor:'pointer',
+                                  transition:'transform 0.3s ease'
                                 }}
+                                onClick={() => {
+                                  setSelectedHistoryImage(image.image_path || image);
+                                  setSelectedHistoryDate(new Date(item.createdAt).toLocaleDateString('ko-KR'));
+                                  window.scrollTo({top: 0, behavior: 'smooth'});
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform='scale(1.02)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform='scale(1)'}
                                 onError={(e) => {e.target.style.display='none';}}
                               />
-                              <div style={{marginTop:'16px', padding:'12px', background:'#fff', borderRadius:'8px', boxShadow:'0 2px 6px rgba(0,0,0,0.1)'}}>
+                              <div style={{marginTop:'16px', padding:'12px 20px', background:'rgba(102, 126, 234, 0.08)', borderRadius:'8px', border:'1px solid rgba(102, 126, 234, 0.2)'}}>
                                 <div style={{fontSize:'14px', color:'#667eea', fontWeight:'600'}}>
-                                  등록일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                                  📅 등록일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
                                 </div>
                                 {item.images.length > 1 && (
-                                  <div style={{fontSize:'12px', color:'#888', marginTop:'4px'}}>
+                                  <div style={{fontSize:'12px', color:'#667eea', marginTop:'4px'}}>
                                     📷 {item.images.length}개 이미지
                                   </div>
                                 )}
                                 {item.symptoms && (
-                                  <div style={{fontSize:'12px', color:'#666', marginTop:'8px', maxWidth:'600px', textAlign:'left'}}>
+                                  <div style={{fontSize:'12px', color:'#555', marginTop:'8px', maxWidth:'600px', lineHeight:'1.5'}}>
                                     {item.symptoms.length > 100 ? item.symptoms.substring(0, 100) + '...' : item.symptoms}
                                   </div>
                                 )}
@@ -260,33 +298,32 @@ function DiagnosisDetail() {
                           onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
                           style={{
                             position:'absolute',
-                            left:'10px',
+                            left:'0',
                             top:'50%',
                             transform:'translateY(-50%)',
-                            background:'rgba(255,255,255,0.9)',
-                            border:'2px solid #667eea',
-                            borderRadius:'50%',
+                            background:'rgba(102, 126, 234, 0.9)',
+                            border:'none',
+                            borderRadius:'0 50% 50% 0',
                             width:'50px',
-                            height:'50px',
+                            height:'80px',
                             display:'flex',
                             alignItems:'center',
                             justifyContent:'center',
                             cursor:'pointer',
-                            fontSize:'24px',
-                            color:'#667eea',
-                            boxShadow:'0 2px 8px rgba(0,0,0,0.2)',
+                            fontSize:'28px',
+                            fontWeight:'bold',
+                            color:'#fff',
+                            boxShadow:'2px 0 12px rgba(102, 126, 234, 0.3)',
                             transition:'all 0.3s ease',
                             zIndex:10
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background='#667eea';
-                            e.currentTarget.style.color='#fff';
-                            e.currentTarget.style.transform='translateY(-50%) scale(1.1)';
+                            e.currentTarget.style.background='rgba(102, 126, 234, 1)';
+                            e.currentTarget.style.width='60px';
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background='rgba(255,255,255,0.9)';
-                            e.currentTarget.style.color='#667eea';
-                            e.currentTarget.style.transform='translateY(-50%) scale(1)';
+                            e.currentTarget.style.background='rgba(102, 126, 234, 0.9)';
+                            e.currentTarget.style.width='50px';
                           }}
                         >
                           ‹
@@ -299,33 +336,32 @@ function DiagnosisDetail() {
                           onClick={() => setCurrentHistoryPage(prev => Math.min(historyWithImages.length - 1, prev + 1))}
                           style={{
                             position:'absolute',
-                            right:'10px',
+                            right:'0',
                             top:'50%',
                             transform:'translateY(-50%)',
-                            background:'rgba(255,255,255,0.9)',
-                            border:'2px solid #667eea',
-                            borderRadius:'50%',
+                            background:'rgba(102, 126, 234, 0.9)',
+                            border:'none',
+                            borderRadius:'50% 0 0 50%',
                             width:'50px',
-                            height:'50px',
+                            height:'80px',
                             display:'flex',
                             alignItems:'center',
                             justifyContent:'center',
                             cursor:'pointer',
-                            fontSize:'24px',
-                            color:'#667eea',
-                            boxShadow:'0 2px 8px rgba(0,0,0,0.2)',
+                            fontSize:'28px',
+                            fontWeight:'bold',
+                            color:'#fff',
+                            boxShadow:'-2px 0 12px rgba(102, 126, 234, 0.3)',
                             transition:'all 0.3s ease',
                             zIndex:10
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background='#667eea';
-                            e.currentTarget.style.color='#fff';
-                            e.currentTarget.style.transform='translateY(-50%) scale(1.1)';
+                            e.currentTarget.style.background='rgba(102, 126, 234, 1)';
+                            e.currentTarget.style.width='60px';
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background='rgba(255,255,255,0.9)';
-                            e.currentTarget.style.color='#667eea';
-                            e.currentTarget.style.transform='translateY(-50%) scale(1)';
+                            e.currentTarget.style.background='rgba(102, 126, 234, 0.9)';
+                            e.currentTarget.style.width='50px';
                           }}
                         >
                           ›
