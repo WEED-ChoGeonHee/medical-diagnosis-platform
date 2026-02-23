@@ -13,8 +13,7 @@ function DiagnosisDetail() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [patientHistory, setPatientHistory] = useState([]);
-  const [selectedHistoryImage, setSelectedHistoryImage] = useState(null);
-  const [selectedHistoryDate, setSelectedHistoryDate] = useState(null);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
   const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
   const [dermatologyInfo, setDermatologyInfo] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -163,44 +162,7 @@ function DiagnosisDetail() {
       <div className="detail-grid">
         <div className="main-content">
           <div className="card">
-            {/* 히스토리에서 선택된 이미지와 등록일 표시 */}
-            {selectedHistoryImage && (
-              <div className="history-image-main" style={{marginBottom:'20px', padding:'20px', background:'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius:'12px', boxShadow:'0 8px 24px rgba(102, 126, 234, 0.3)'}}>
-                <div style={{position:'relative'}}>
-                  <img src={selectedHistoryImage} alt="히스토리 이미지" style={{maxWidth:'100%', maxHeight:'400px', width:'100%', objectFit:'contain', borderRadius:'8px', background:'#fff'}} />
-                  <button 
-                    onClick={() => setSelectedHistoryImage(null)}
-                    style={{
-                      position:'absolute',
-                      top:'10px',
-                      right:'10px',
-                      background:'rgba(0,0,0,0.6)',
-                      color:'#fff',
-                      border:'none',
-                      borderRadius:'50%',
-                      width:'36px',
-                      height:'36px',
-                      display:'flex',
-                      alignItems:'center',
-                      justifyContent:'center',
-                      cursor:'pointer',
-                      fontSize:'20px',
-                      fontWeight:'bold',
-                      transition:'all 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background='rgba(255,0,0,0.8)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background='rgba(0,0,0,0.6)'}
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div style={{marginTop:'12px', color:'#fff', textAlign:'center'}}>
-                  <div style={{fontSize:'16px', fontWeight:'600'}}>
-                    📅 등록일: {selectedHistoryDate}
-                  </div>
-                </div>
-              </div>
-            )}
+
             <div className="detail-header">
               <h2>피부과 진단 상세 정보</h2>
               <span className={`status-badge status-${diagnosis.status}`}>
@@ -263,11 +225,7 @@ function DiagnosisDetail() {
                                   cursor:'pointer',
                                   transition:'transform 0.3s ease'
                                 }}
-                                onClick={() => {
-                                  setSelectedHistoryImage(image.image_path || image);
-                                  setSelectedHistoryDate(new Date(item.createdAt).toLocaleDateString('ko-KR'));
-                                  window.scrollTo({top: 0, behavior: 'smooth'});
-                                }}
+                                onClick={() => setSelectedHistoryItem(item)}
                                 onMouseEnter={(e) => e.currentTarget.style.transform='scale(1.02)'}
                                 onMouseLeave={(e) => e.currentTarget.style.transform='scale(1)'}
                                 onError={(e) => {e.target.style.display='none';}}
@@ -642,8 +600,7 @@ function DiagnosisDetail() {
                               alt="히스토리 이미지"
                               style={{width:'80px',height:'80px',objectFit:'cover',margin:'4px',cursor:'pointer'}}
                               onClick={() => {
-                                setSelectedHistoryImage(img.image_path || img);
-                                setSelectedHistoryDate(new Date(item.createdAt).toLocaleDateString('ko-KR'));
+                                setSelectedHistoryItem(item);
                                 setShowHistoryModal(false);
                               }}
                               onError={(e) => {e.target.style.display='none';}}
@@ -655,6 +612,100 @@ function DiagnosisDetail() {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 히스토리 진단 상세 팝업 */}
+      {selectedHistoryItem && (
+        <div className="modal-overlay" onClick={() => setSelectedHistoryItem(null)}>
+          <div className="modal-content large" onClick={(e) => e.stopPropagation()} style={{maxWidth:'700px', maxHeight:'90vh', overflow:'auto'}}>
+            <div className="modal-header">
+              <h3>📋 진단 상세 정보</h3>
+              <button onClick={() => setSelectedHistoryItem(null)} className="close-btn" aria-label="닫기">✕</button>
+            </div>
+            <div className="modal-body" style={{padding:'20px'}}>
+              {/* 이미지 */}
+              {selectedHistoryItem.images && selectedHistoryItem.images.length > 0 && (
+                <div style={{marginBottom:'20px'}}>
+                  <div style={{display:'flex', gap:'8px', flexWrap:'wrap', justifyContent:'center'}}>
+                    {selectedHistoryItem.images.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img.image_path || img}
+                        alt={`이미지 ${idx + 1}`}
+                        style={{maxWidth:'100%', maxHeight:'300px', objectFit:'contain', borderRadius:'8px', background:'#f5f5f5'}}
+                        onError={(e) => {e.target.style.display='none';}}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 기본 정보 */}
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px', marginBottom:'16px'}}>
+                <div style={{padding:'12px', background:'#f0f4ff', borderRadius:'8px', border:'1px solid #dde3ff'}}>
+                  <div style={{fontSize:'12px', color:'#667eea', fontWeight:'600', marginBottom:'4px'}}>📅 등록일</div>
+                  <div style={{fontSize:'15px', color:'#333', fontWeight:'500'}}>{new Date(selectedHistoryItem.createdAt).toLocaleString('ko-KR')}</div>
+                </div>
+                <div style={{padding:'12px', background:'#f0f4ff', borderRadius:'8px', border:'1px solid #dde3ff'}}>
+                  <div style={{fontSize:'12px', color:'#667eea', fontWeight:'600', marginBottom:'4px'}}>상태</div>
+                  <div style={{fontSize:'15px', color:'#333', fontWeight:'500'}}>{getStatusText(selectedHistoryItem.status)}</div>
+                </div>
+              </div>
+
+              {/* 진단 정보 그리드 */}
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginBottom:'16px'}}>
+                {selectedHistoryItem.treatmentType && (
+                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
+                    <strong style={{color:'#555', fontSize:'12px'}}>진료 종류</strong>
+                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.treatmentType}</div>
+                  </div>
+                )}
+                {selectedHistoryItem.bodyParts && (
+                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
+                    <strong style={{color:'#555', fontSize:'12px'}}>부위</strong>
+                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.bodyParts}</div>
+                  </div>
+                )}
+                {selectedHistoryItem.skinSymptoms && (
+                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
+                    <strong style={{color:'#555', fontSize:'12px'}}>피부 증상</strong>
+                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.skinSymptoms}</div>
+                  </div>
+                )}
+                {selectedHistoryItem.duration && (
+                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
+                    <strong style={{color:'#555', fontSize:'12px'}}>기간</strong>
+                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.duration}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* 증상 설명 */}
+              {selectedHistoryItem.symptoms && (
+                <div style={{marginBottom:'16px', padding:'14px', background:'#f9f9f9', borderRadius:'8px', border:'1px solid #eee'}}>
+                  <strong style={{color:'#555', fontSize:'13px', display:'block', marginBottom:'6px'}}>증상 설명</strong>
+                  <div style={{color:'#333', lineHeight:'1.7', whiteSpace:'pre-wrap'}}>{selectedHistoryItem.symptoms}</div>
+                </div>
+              )}
+
+              {/* AI 진단 결과 */}
+              {selectedHistoryItem.gptDiagnosis && (
+                <div style={{marginBottom:'16px', padding:'14px', background:'linear-gradient(135deg, #f0f4ff 0%, #faf0ff 100%)', borderRadius:'8px', border:'1px solid #dde3ff'}}>
+                  <strong style={{color:'#667eea', fontSize:'13px', display:'block', marginBottom:'6px'}}>🤖 AI 진단 결과</strong>
+                  <div style={{color:'#333', lineHeight:'1.7', whiteSpace:'pre-wrap', fontSize:'14px'}}>{selectedHistoryItem.gptDiagnosis}</div>
+                </div>
+              )}
+
+              {/* 의사 소견 */}
+              {selectedHistoryItem.doctorNotes && (
+                <div style={{padding:'14px', background:'#f0fff4', borderRadius:'8px', border:'1px solid #c6f6d5'}}>
+                  <strong style={{color:'#38a169', fontSize:'13px', display:'block', marginBottom:'6px'}}>👨‍⚕️ 의사 소견</strong>
+                  <div style={{color:'#333', lineHeight:'1.7', whiteSpace:'pre-wrap'}}>{selectedHistoryItem.doctorNotes}</div>
                 </div>
               )}
             </div>
