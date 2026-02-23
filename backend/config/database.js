@@ -141,6 +141,15 @@ const initDatabase = async () => {
       // 기존 컬럼을 NULL 허용으로 변경 (하위 호환성)
       `ALTER TABLE diagnoses MODIFY COLUMN symptom_type VARCHAR(100) NULL DEFAULT NULL`,
       `ALTER TABLE diagnoses MODIFY COLUMN skin_type VARCHAR(100) NULL DEFAULT NULL`,
+      // 차팅 관련 컬럼 추가
+      `ALTER TABLE diagnoses ADD COLUMN chart_diagnosis_name VARCHAR(255)`,
+      `ALTER TABLE diagnoses ADD COLUMN chart_icd_code VARCHAR(50)`,
+      `ALTER TABLE diagnoses ADD COLUMN chart_insurance_code VARCHAR(100)`,
+      `ALTER TABLE diagnoses ADD COLUMN chart_treatment_guideline TEXT`,
+      `ALTER TABLE diagnoses ADD COLUMN chart_soap_s TEXT`,
+      `ALTER TABLE diagnoses ADD COLUMN chart_soap_o TEXT`,
+      `ALTER TABLE diagnoses ADD COLUMN chart_soap_a TEXT`,
+      `ALTER TABLE diagnoses ADD COLUMN chart_soap_p TEXT`,
     ];
 
     for (const sql of migrations) {

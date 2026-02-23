@@ -112,6 +112,15 @@ const Diagnosis = {
     diagnosis.skinSymptoms = diagnosis.skin_symptoms;
     diagnosis.painVas = diagnosis.pain_vas;
     diagnosis.skinFeatures = diagnosis.skin_features;
+    // 차팅 관련 camelCase
+    diagnosis.chartDiagnosisName = diagnosis.chart_diagnosis_name;
+    diagnosis.chartIcdCode = diagnosis.chart_icd_code;
+    diagnosis.chartInsuranceCode = diagnosis.chart_insurance_code;
+    diagnosis.chartTreatmentGuideline = diagnosis.chart_treatment_guideline;
+    diagnosis.chartSoapS = diagnosis.chart_soap_s;
+    diagnosis.chartSoapO = diagnosis.chart_soap_o;
+    diagnosis.chartSoapA = diagnosis.chart_soap_a;
+    diagnosis.chartSoapP = diagnosis.chart_soap_p;
 
     return diagnosis;
   },
@@ -294,6 +303,35 @@ const Diagnosis = {
     await pool.query(
       'UPDATE diagnoses SET doctor_notes = ?, status = ? WHERE id = ?',
       [doctor_notes, status, id]
+    );
+
+    return await this.findById(id);
+  },
+
+  // 차팅 정보 업데이트
+  async updateCharting(id, chartData) {
+    const {
+      chart_diagnosis_name,
+      chart_icd_code,
+      chart_insurance_code,
+      chart_treatment_guideline,
+      chart_soap_s,
+      chart_soap_o,
+      chart_soap_a,
+      chart_soap_p
+    } = chartData;
+
+    await pool.query(
+      `UPDATE diagnoses SET 
+        chart_diagnosis_name = ?, chart_icd_code = ?, chart_insurance_code = ?,
+        chart_treatment_guideline = ?, chart_soap_s = ?, chart_soap_o = ?,
+        chart_soap_a = ?, chart_soap_p = ?
+       WHERE id = ?`,
+      [
+        chart_diagnosis_name, chart_icd_code, chart_insurance_code,
+        chart_treatment_guideline, chart_soap_s, chart_soap_o,
+        chart_soap_a, chart_soap_p, id
+      ]
     );
 
     return await this.findById(id);

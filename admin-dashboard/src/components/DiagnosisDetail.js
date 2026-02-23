@@ -10,26 +10,30 @@ function DiagnosisDetail() {
   const [doctorNotes, setDoctorNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingChart, setSavingChart] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [chartSuccess, setChartSuccess] = useState('');
   const [patientHistory, setPatientHistory] = useState([]);
   const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
   const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
-  const [dermatologyInfo, setDermatologyInfo] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [showDermatologyModal, setShowDermatologyModal] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    diagnosis: true,
-    search: false,
-    symptoms: true,
-    aiSuggestions: false
-  });
-  
+
   // AI 추천 증상 관련 상태
   const [aiSuggestions, setAiSuggestions] = useState([]);
   const [selectedAiDiagnosis, setSelectedAiDiagnosis] = useState(null);
   const [loadingAi, setLoadingAi] = useState(false);
+
+  // 차팅 관련 상태
+  const [chartData, setChartData] = useState({
+    chartDiagnosisName: '',
+    chartIcdCode: '',
+    chartInsuranceCode: '',
+    chartTreatmentGuideline: '',
+    chartSoapS: '',
+    chartSoapO: '',
+    chartSoapA: '',
+    chartSoapP: ''
+  });
 
   useEffect(() => {
     fetchDiagnosis();
@@ -40,17 +44,31 @@ function DiagnosisDetail() {
     if (diagnosis && diagnosis.symptoms) {
       fetchAiSuggestions();
     }
-  }, [diagnosis]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [diagnosis?.id]);
 
   const fetchDiagnosis = async () => {
     try {
       const response = await api.get(`/diagnoses/${id}`);
-      setDiagnosis(response.data);
-      setDoctorNotes(response.data.doctorNotes || '');
+      const data = response.data;
+      setDiagnosis(data);
+      setDoctorNotes(data.doctorNotes || '');
       
+      // 차팅 데이터 초기화
+      setChartData({
+        chartDiagnosisName: data.chartDiagnosisName || '',
+        chartIcdCode: data.chartIcdCode || '',
+        chartInsuranceCode: data.chartInsuranceCode || '',
+        chartTreatmentGuideline: data.chartTreatmentGuideline || '',
+        chartSoapS: data.chartSoapS || '',
+        chartSoapO: data.chartSoapO || '',
+        chartSoapA: data.chartSoapA || '',
+        chartSoapP: data.chartSoapP || ''
+      });
+
       // 환자 등록번호가 있으면 히스토리 로드
-      if (response.data.patientRegistrationNumber) {
-        fetchPatientHistory(response.data.patientRegistrationNumber);
+      if (data.patientRegistrationNumber) {
+        fetchPatientHistory(data.patientRegistrationNumber);
       }
     } catch (err) {
       setError('진단 정보를 불러오는데 실패했습니다.');
@@ -89,25 +107,38 @@ function DiagnosisDetail() {
     }
   };
 
-  // AI 진단 정보 상세 버튼 클릭
-  const handleAiDiagnosisClick = (suggestion) => {
+  // AI 진단 클릭 시 → 피부과 진단 DB에서 검색하여 차팅 자동입력
+  const handleAiDiagnosisClick = async (suggestion) => {
     setSelectedAiDiagnosis(suggestion);
-  };
-
-  const searchDermatologyDiagnosis = async () => {
-    if (!searchTerm.trim()) {
-      setError('검색어를 입력해주세요.');
-      return;
-    }
     
     try {
-      const response = await api.get(`/admin/dermatology-diagnoses/search?q=${encodeURIComponent(searchTerm)}`);
-      setDermatologyInfo(response.data);
-      setShowDermatologyModal(true);
-      setError('');
+      const response = await api.get(`/admin/dermatology-diagnoses/search?q=${encodeURIComponent(suggestion.diagnosis)}`);
+      if (response.data && response.data.length > 0) {
+        const info = response.data[0];
+        setChartData({
+          chartDiagnosisName: info.diagnosis_name_kr + ' (' + info.diagnosis_name + ')',
+          chartIcdCode: info.icd_code || '',
+          chartInsuranceCode: info.insurance_code || '',
+          chartTreatmentGuideline: info.treatment_guideline || '',
+          chartSoapS: info.soap_s || '',
+          chartSoapO: info.soap_o || '',
+          chartSoapA: info.soap_a || '',
+          chartSoapP: info.soap_p || ''
+        });
+      } else {
+        // DB에 없으면 AI 정보로 일부 채움
+        setChartData(prev => ({
+          ...prev,
+          chartDiagnosisName: suggestion.diagnosis,
+          chartSoapA: `진단: ${suggestion.diagnosis} (신뢰도: ${suggestion.confidence}%)\n${suggestion.description}`
+        }));
+      }
     } catch (err) {
-      setError('진단 정보 검색에 실패했습니다.');
-      setDermatologyInfo([]);
+      // 검색 실패시에도 진단명 채움
+      setChartData(prev => ({
+        ...prev,
+        chartDiagnosisName: suggestion.diagnosis
+      }));
     }
   };
 
@@ -124,11 +155,29 @@ function DiagnosisDetail() {
       
       setDiagnosis(response.data.diagnosis);
       setSuccess(`의사 소견이 저장되었습니다. (상태: ${getStatusText(status)})`);
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error('의사 소견 저장 오류:', err);
       setError(err.response?.data?.message || '저장에 실패했습니다.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveCharting = async () => {
+    setSavingChart(true);
+    setChartSuccess('');
+
+    try {
+      const response = await api.put(`/admin/diagnoses/${id}/charting`, chartData);
+      setDiagnosis(response.data.diagnosis);
+      setChartSuccess('차팅 정보가 저장되었습니다.');
+      setTimeout(() => setChartSuccess(''), 3000);
+    } catch (err) {
+      console.error('차팅 저장 오류:', err);
+      setError(err.response?.data?.message || '차팅 저장에 실패했습니다.');
+    } finally {
+      setSavingChart(false);
     }
   };
 
@@ -139,6 +188,10 @@ function DiagnosisDetail() {
       'completed': '완료'
     };
     return statusMap[status] || status;
+  };
+
+  const handleChartChange = (field, value) => {
+    setChartData(prev => ({ ...prev, [field]: value }));
   };
 
   if (loading) {
@@ -153,379 +206,374 @@ function DiagnosisDetail() {
     );
   }
 
+  const historyWithImages = patientHistory.filter(item => item.images && item.images.length > 0);
+  const safePage = Math.min(currentHistoryPage, Math.max(historyWithImages.length - 1, 0));
+
   return (
     <div className="container diagnosis-detail">
-      <button onClick={() => navigate('/diagnoses')} className="btn btn-secondary back-btn">
-        ← 목록으로
-      </button>
+      <div className="detail-top-bar">
+        <button onClick={() => navigate('/diagnoses')} className="btn btn-secondary back-btn">
+          ← 목록으로
+        </button>
+        <div className="detail-header-info">
+          <h2>피부과 진단 상세</h2>
+          <span className={`status-badge status-${diagnosis.status}`}>
+            {getStatusText(diagnosis.status)}
+          </span>
+        </div>
+      </div>
 
-      <div className="detail-grid">
-        <div className="main-content">
-          <div className="card">
+      {/* === 3-Column Layout === */}
+      <div className="three-column-grid">
 
-            <div className="detail-header">
-              <h2>피부과 진단 상세 정보</h2>
-              <span className={`status-badge status-${diagnosis.status}`}>
-                {getStatusText(diagnosis.status)}
-              </span>
-            </div>
-
-            <div className="patient-info">
-              <h3>환자 정보</h3>
-              <p><strong>이름:</strong> {diagnosis.patient?.name}</p>
+        {/* ============ Column 1: 환자 정보 ============ */}
+        <div className="column column-left">
+          {/* 환자 기본 정보 */}
+          <div className="panel patient-panel">
+            <h3><span className="panel-icon">👤</span> 환자 정보</h3>
+            <div className="patient-info-rows">
+              <div className="info-row">
+                <span className="info-label">이름</span>
+                <span className="info-value">{diagnosis.patient?.name}</span>
+              </div>
               {diagnosis.patientRegistrationNumber && (
-                <p>
-                  <strong>환자 등록번호:</strong> {diagnosis.patientRegistrationNumber}
-                </p>
-              )}
-              <p><strong>성별:</strong> {diagnosis.gender === 'male' ? '남성' : '여성'}</p>
-              <p><strong>이메일:</strong> {diagnosis.patient?.email}</p>
-              <p><strong>전화번호:</strong> {diagnosis.patient?.phone || '-'}</p>
-            </div>
-
-            {/* 진료 히스토리 이미지 슬라이더 (부드러운 슬라이드 애니메이션) */}
-            {patientHistory.length > 0 && (() => {
-              const historyWithImages = patientHistory.filter(item => item.images && item.images.length > 0);
-              if (historyWithImages.length === 0) return null;
-              
-              const safePage = Math.min(currentHistoryPage, historyWithImages.length - 1);
-              
-              return (
-                <div className="detail-section">
-                  <h3>진료 히스토리 (이미지) <span style={{fontSize:'14px', color:'#888', fontWeight:'normal'}}>총 {historyWithImages.length}개</span></h3>
-                  <div className="history-slider" style={{position:'relative', width:'100%', maxWidth:'900px', margin:'0 auto'}}>
-                    {/* 슬라이더 컨테이너 */}
-                    <div style={{position:'relative', overflow:'hidden', borderRadius:'12px', padding:'20px 0'}}>
-                      {/* 슬라이드 래퍼 */}
-                      <div style={{
-                        display:'flex',
-                        transition:'transform 0.5s ease-in-out',
-                        transform:`translateX(-${safePage * 100}%)`
-                      }}>
-                        {historyWithImages.map((item, idx) => {
-                          const image = item.images[0];
-                          return (
-                            <div key={item._id || idx} style={{
-                              minWidth:'100%',
-                              display:'flex',
-                              flexDirection:'column',
-                              alignItems:'center',
-                              justifyContent:'center',
-                              padding:'0 10px'
-                            }}>
-                              <img 
-                                src={image.image_path || image} 
-                                alt={`히스토리 이미지 ${idx + 1}`}
-                                style={{
-                                  maxWidth:'100%',
-                                  maxHeight:'500px',
-                                  objectFit:'contain',
-                                  borderRadius:'12px',
-                                  boxShadow:'0 8px 24px rgba(102, 126, 234, 0.15)',
-                                  cursor:'pointer',
-                                  transition:'transform 0.3s ease'
-                                }}
-                                onClick={() => setSelectedHistoryItem(item)}
-                                onMouseEnter={(e) => e.currentTarget.style.transform='scale(1.02)'}
-                                onMouseLeave={(e) => e.currentTarget.style.transform='scale(1)'}
-                                onError={(e) => {e.target.style.display='none';}}
-                              />
-                              <div style={{marginTop:'16px', padding:'12px 20px', background:'rgba(102, 126, 234, 0.08)', borderRadius:'8px', border:'1px solid rgba(102, 126, 234, 0.2)'}}>
-                                <div style={{fontSize:'14px', color:'#667eea', fontWeight:'600'}}>
-                                  📅 등록일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                                </div>
-                                {item.images.length > 1 && (
-                                  <div style={{fontSize:'12px', color:'#667eea', marginTop:'4px'}}>
-                                    📷 {item.images.length}개 이미지
-                                  </div>
-                                )}
-                                {item.symptoms && (
-                                  <div style={{fontSize:'12px', color:'#555', marginTop:'8px', maxWidth:'600px', lineHeight:'1.5'}}>
-                                    {item.symptoms.length > 100 ? item.symptoms.substring(0, 100) + '...' : item.symptoms}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      
-                      {/* 좌측 화살표 버튼 */}
-                      {historyWithImages.length > 1 && safePage > 0 && (
-                        <button 
-                          onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
-                          style={{
-                            position:'absolute',
-                            left:'0',
-                            top:'50%',
-                            transform:'translateY(-50%)',
-                            background:'rgba(102, 126, 234, 0.9)',
-                            border:'none',
-                            borderRadius:'0 50% 50% 0',
-                            width:'50px',
-                            height:'80px',
-                            display:'flex',
-                            alignItems:'center',
-                            justifyContent:'center',
-                            cursor:'pointer',
-                            fontSize:'28px',
-                            fontWeight:'bold',
-                            color:'#fff',
-                            boxShadow:'2px 0 12px rgba(102, 126, 234, 0.3)',
-                            transition:'all 0.3s ease',
-                            zIndex:10
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background='rgba(102, 126, 234, 1)';
-                            e.currentTarget.style.width='60px';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background='rgba(102, 126, 234, 0.9)';
-                            e.currentTarget.style.width='50px';
-                          }}
-                        >
-                          ‹
-                        </button>
-                      )}
-                      
-                      {/* 우측 화살표 버튼 */}
-                      {historyWithImages.length > 1 && safePage < historyWithImages.length - 1 && (
-                        <button 
-                          onClick={() => setCurrentHistoryPage(prev => Math.min(historyWithImages.length - 1, prev + 1))}
-                          style={{
-                            position:'absolute',
-                            right:'0',
-                            top:'50%',
-                            transform:'translateY(-50%)',
-                            background:'rgba(102, 126, 234, 0.9)',
-                            border:'none',
-                            borderRadius:'50% 0 0 50%',
-                            width:'50px',
-                            height:'80px',
-                            display:'flex',
-                            alignItems:'center',
-                            justifyContent:'center',
-                            cursor:'pointer',
-                            fontSize:'28px',
-                            fontWeight:'bold',
-                            color:'#fff',
-                            boxShadow:'-2px 0 12px rgba(102, 126, 234, 0.3)',
-                            transition:'all 0.3s ease',
-                            zIndex:10
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background='rgba(102, 126, 234, 1)';
-                            e.currentTarget.style.width='60px';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background='rgba(102, 126, 234, 0.9)';
-                            e.currentTarget.style.width='50px';
-                          }}
-                        >
-                          ›
-                        </button>
-                      )}
-                    </div>
-                    
-                    {/* 페이지 인디케이터 */}
-                    {historyWithImages.length > 1 && (
-                      <div style={{marginTop:'20px', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px'}}>
-                        {historyWithImages.map((_, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setCurrentHistoryPage(idx)}
-                            style={{
-                              width: idx === safePage ? '32px' : '12px',
-                              height:'12px',
-                              borderRadius:'6px',
-                              border:'none',
-                              background: idx === safePage ? '#667eea' : '#ddd',
-                              cursor:'pointer',
-                              transition:'all 0.3s ease'
-                            }}
-                            aria-label={`슬라이드 ${idx + 1}`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* 슬라이드 카운터 */}
-                    {historyWithImages.length > 1 && (
-                      <div style={{marginTop:'12px', textAlign:'center', color:'#333', fontSize:'16px', fontWeight:'600'}}>
-                        {safePage + 1} / {historyWithImages.length}
-                      </div>
-                    )}
-                  </div>
+                <div className="info-row">
+                  <span className="info-label">등록번호</span>
+                  <span className="info-value">{diagnosis.patientRegistrationNumber}</span>
                 </div>
-              );
-            })()}
-
-            {/* 진단 정보 - 컴팩트 뷰 */}
-            <div className="detail-section" style={{marginBottom:'12px'}}>
-              <h3 
-                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
-                onClick={() => setExpandedSections(prev => ({...prev, diagnosis: !prev.diagnosis}))}
-              >
-                <span>진단 정보</span>
-                <span style={{fontSize:'18px'}}>{expandedSections.diagnosis ? '▼' : '▶'}</span>
-              </h3>
-              {expandedSections.diagnosis && (
-                <div className="info-grid" style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'12px', marginTop:'12px'}}>
-                  {diagnosis.treatmentType && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>진료 종류:</strong> {diagnosis.treatmentType}</div>}
-                  {diagnosis.bodyParts && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>부위:</strong> {diagnosis.bodyParts}</div>}
-                  {diagnosis.skinSymptoms && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>피부 증상:</strong> {diagnosis.skinSymptoms}</div>}
-                  {diagnosis.painVas !== null && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>통증(VAS):</strong> {diagnosis.painVas}/10</div>}
-                  {diagnosis.duration && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>기간:</strong> {diagnosis.duration}</div>}
-                  {diagnosis.skinFeatures && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px', color:'#333'}}><strong style={{color:'#000'}}>피부 질환 특징:</strong> {diagnosis.skinFeatures}</div>}
+              )}
+              <div className="info-row">
+                <span className="info-label">성별</span>
+                <span className="info-value">{diagnosis.gender === 'male' ? '남성' : '여성'}</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">이메일</span>
+                <span className="info-value">{diagnosis.patient?.email}</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">전화번호</span>
+                <span className="info-value">{diagnosis.patient?.phone || '-'}</span>
+              </div>
+              {diagnosis.treatmentType && (
+                <div className="info-row">
+                  <span className="info-label">진료 종류</span>
+                  <span className="info-value">{diagnosis.treatmentType}</span>
+                </div>
+              )}
+              {diagnosis.bodyParts && (
+                <div className="info-row">
+                  <span className="info-label">부위</span>
+                  <span className="info-value">{diagnosis.bodyParts}</span>
+                </div>
+              )}
+              {diagnosis.painVas !== null && diagnosis.painVas !== undefined && (
+                <div className="info-row">
+                  <span className="info-label">통증(VAS)</span>
+                  <span className="info-value">{diagnosis.painVas}/10</span>
+                </div>
+              )}
+              {diagnosis.duration && (
+                <div className="info-row">
+                  <span className="info-label">기간</span>
+                  <span className="info-value">{diagnosis.duration}</span>
                 </div>
               )}
             </div>
+          </div>
 
-            {/* 증상 설명 */}
-            <div className="detail-section" style={{marginBottom:'12px'}}>
-              <h3 
-                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
-                onClick={() => setExpandedSections(prev => ({...prev, symptoms: !prev.symptoms}))}
-              >
-                <span>증상 설명</span>
-                <span style={{fontSize:'18px'}}>{expandedSections.symptoms ? '▼' : '▶'}</span>
-              </h3>
-              {expandedSections.symptoms && (
-                <p style={{marginTop:'12px', padding:'12px', background:'#f9f9f9', borderRadius:'8px', lineHeight:'1.6', color:'#333'}}>{diagnosis.symptoms}</p>
-              )}
-            </div>
-
-            {/* 피부과 진단 검색 */}
-            <div className="detail-section" style={{marginBottom:'12px'}}>
-              <h3 
-                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
-                onClick={() => setExpandedSections(prev => ({...prev, search: !prev.search}))}
-              >
-                <span>피부과 진단 검색</span>
-                <span style={{fontSize:'18px'}}>{expandedSections.search ? '▼' : '▶'}</span>
-              </h3>
-              {expandedSections.search && (
-                <div className="search-box" style={{marginTop:'12px'}}>
-                  <input
-                    type="text"
-                    placeholder="진단명 검색 (건선, 종기, 아토피)"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && searchDermatologyDiagnosis()}
+          {/* 환자 사진 (첨부 이미지) */}
+          {diagnosis.images && diagnosis.images.length > 0 && (
+            <div className="panel">
+              <h3><span className="panel-icon">📷</span> 환자 사진</h3>
+              <div className="patient-images">
+                {diagnosis.images.map((image, index) => (
+                  <img 
+                    key={index} 
+                    src={image.image_path || image} 
+                    alt={`진단 이미지 ${index + 1}`}
+                    className="patient-photo"
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
-                  <button onClick={searchDermatologyDiagnosis} className="btn btn-primary">
-                    검색
-                  </button>
-                </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 선택된 증상 */}
+          <div className="panel">
+            <h3><span className="panel-icon">🩺</span> 선택된 증상</h3>
+            <div className="symptom-tags">
+              {diagnosis.skinSymptoms && (
+                <div className="symptom-tag skin">{diagnosis.skinSymptoms}</div>
+              )}
+              {diagnosis.skinFeatures && (
+                <div className="symptom-tag feature">{diagnosis.skinFeatures}</div>
               )}
             </div>
-
-            {/* AI 추천 증상 3개 및 진단 정보 */}
-            <div className="detail-section" style={{marginBottom:'12px'}}>
-              <h3 
-                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
-                onClick={() => setExpandedSections(prev => ({...prev, aiSuggestions: !prev.aiSuggestions}))}
-              >
-                <span>AI 추천 진단 (상위 3개)</span>
-                <span style={{fontSize:'18px'}}>{expandedSections.aiSuggestions ? '▼' : '▶'}</span>
-              </h3>
-              {expandedSections.aiSuggestions && (
-                <div style={{marginTop:'12px'}}>
-                  {loadingAi ? (
-                    <p style={{color:'#aaa'}}>AI 추천 조회 중...</p>
-                  ) : aiSuggestions.length === 0 ? (
-                    <p style={{color:'#bbb'}}>추천 진단이 없습니다.</p>
-                  ) : (
-                    <div className="ai-suggestion-list">
-                      {aiSuggestions.map((suggestion, idx) => (
-                        <div key={idx} style={{marginBottom:'12px'}}>
-                          <button
-                            className="btn btn-outline-primary"
-                            style={{width:'100%',textAlign:'left',display:'flex',justifyContent:'space-between',alignItems:'center'}}
-                            onClick={() => handleAiDiagnosisClick(suggestion)}
-                          >
-                            <span>{suggestion.diagnosis}</span>
-                            <span style={{fontSize:'12px',color:'#888'}}>신뢰도: {suggestion.confidence}%</span>
-                          </button>
-                          {selectedAiDiagnosis && selectedAiDiagnosis.diagnosis === suggestion.diagnosis && (
-                            <div className="ai-diagnosis-detail" style={{marginTop:'8px',background:'#f9f9f9',padding:'12px',borderRadius:'8px',border:'1px solid #ddd'}}>
-                              <p><strong>진단명:</strong> {suggestion.diagnosis}</p>
-                              <p><strong>신뢰도:</strong> {suggestion.confidence}%</p>
-                              <p><strong>설명:</strong> {suggestion.description}</p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {diagnosis.images && diagnosis.images.length > 0 && (
-              <div className="detail-section">
-                <h3>첨부 이미지</h3>
-                <div className="image-gallery">
-                  {diagnosis.images.map((image, index) => (
-                    <img 
-                      key={index} 
-                      src={image.image_path || image} 
-                      alt={`진단 이미지 ${index + 1}`}
-                      onError={(e) => {
-                        console.error('이미지 로드 실패:', image);
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {diagnosis.gptDiagnosis && (
-              <div className="detail-section gpt-section">
-                <h3>AI 진단 결과</h3>
-                <div className="gpt-content" style={{whiteSpace: 'pre-wrap'}}>
-                  {diagnosis.gptDiagnosis}
-                </div>
-              </div>
-            )}
-
-            {diagnosis.medicalPapers && diagnosis.medicalPapers.length > 0 && (
-              <div className="detail-section">
-                <h3>관련 의학 정보</h3>
-                <div className="papers-list">
-                  {diagnosis.medicalPapers.map((paper, index) => (
-                    <div key={index} className="paper-item">
-                      <h4>{paper.title}</h4>
-                      {paper.url && (
-                        <p>
-                          <strong>논문 링크:</strong>{' '}
-                          <a href={paper.url} target="_blank" rel="noopener noreferrer">
-                            {paper.url}
-                          </a>
-                        </p>
-                      )}
-                      <p>{paper.summary}</p>
-                    </div>
-                  ))}
-                </div>
+            {diagnosis.symptoms && (
+              <div className="symptom-description">
+                <strong>증상 설명:</strong>
+                <p>{diagnosis.symptoms}</p>
               </div>
             )}
           </div>
+
+          {/* 사진 경과 (진료 히스토리) */}
+          {historyWithImages.length > 0 && (
+            <div className="panel">
+              <h3><span className="panel-icon">📅</span> 사진 경과 <span className="count-badge">{historyWithImages.length}건</span></h3>
+              <div className="history-slider-compact">
+                <div className="slider-viewport">
+                  <div 
+                    className="slider-track"
+                    style={{ transform: `translateX(-${safePage * 100}%)` }}
+                  >
+                    {historyWithImages.map((item, idx) => {
+                      const image = item.images[0];
+                      return (
+                        <div key={item._id || idx} className="slider-slide">
+                          <img 
+                            src={image.image_path || image} 
+                            alt={`히스토리 ${idx + 1}`}
+                            className="history-photo"
+                            onClick={() => setSelectedHistoryItem(item)}
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                          <div className="history-slide-info">
+                            <span className="history-date-label">
+                              📅 {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                            </span>
+                            {item.images.length > 1 && (
+                              <span className="history-img-count">📷 {item.images.length}장</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {historyWithImages.length > 1 && safePage > 0 && (
+                    <button 
+                      className="slider-arrow slider-arrow-left"
+                      onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
+                    >‹</button>
+                  )}
+                  {historyWithImages.length > 1 && safePage < historyWithImages.length - 1 && (
+                    <button 
+                      className="slider-arrow slider-arrow-right"
+                      onClick={() => setCurrentHistoryPage(prev => Math.min(historyWithImages.length - 1, prev + 1))}
+                    >›</button>
+                  )}
+                </div>
+
+                {historyWithImages.length > 1 && (
+                  <div className="slider-dots">
+                    {historyWithImages.map((_, idx) => (
+                      <button
+                        key={idx}
+                        className={`slider-dot ${idx === safePage ? 'active' : ''}`}
+                        onClick={() => setCurrentHistoryPage(idx)}
+                      />
+                    ))}
+                    <span className="slider-counter">{safePage + 1}/{historyWithImages.length}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="sidebar">
-          <div className="card">
-            <h3>의사 소견</h3>
+        {/* ============ Column 2: 유사 패턴 증례 ============ */}
+        <div className="column column-center">
+          <div className="panel ai-panel">
+            <h3><span className="panel-icon">🤖</span> 유사 패턴 증례</h3>
+            <p className="panel-subtitle">AI가 분석한 가능성 높은 진단명 3개</p>
+            
+            {loadingAi ? (
+              <div className="ai-loading">
+                <div className="spinner"></div>
+                <p>AI 분석 중...</p>
+              </div>
+            ) : aiSuggestions.length === 0 ? (
+              <div className="ai-empty">
+                <p>추천 진단이 없습니다.</p>
+                <button className="btn btn-sm btn-outline" onClick={fetchAiSuggestions}>
+                  다시 분석
+                </button>
+              </div>
+            ) : (
+              <div className="ai-suggestion-cards">
+                {aiSuggestions.map((suggestion, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`ai-card ${selectedAiDiagnosis?.diagnosis === suggestion.diagnosis ? 'selected' : ''}`}
+                    onClick={() => handleAiDiagnosisClick(suggestion)}
+                  >
+                    <div className="ai-card-header">
+                      <span className="ai-rank">#{idx + 1}</span>
+                      <span className="ai-confidence">{suggestion.confidence}%</span>
+                    </div>
+                    <div className="ai-card-body">
+                      <h4 className="ai-diagnosis-name">{suggestion.diagnosis}</h4>
+                      <p className="ai-diagnosis-desc">{suggestion.description}</p>
+                    </div>
+                    <div className="ai-card-footer">
+                      <span className="ai-click-hint">클릭하여 차팅에 적용 →</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* AI 진단 결과 (원본) */}
+          {diagnosis.gptDiagnosis && (
+            <div className="panel ai-result-panel">
+              <h3><span className="panel-icon">📋</span> AI 진단 결과 (상세)</h3>
+              <div className="gpt-content-text">
+                {diagnosis.gptDiagnosis}
+              </div>
+            </div>
+          )}
+
+          {/* 의학 논문 */}
+          {diagnosis.medicalPapers && diagnosis.medicalPapers.length > 0 && (
+            <div className="panel">
+              <h3><span className="panel-icon">📚</span> 관련 의학 정보</h3>
+              <div className="papers-compact">
+                {diagnosis.medicalPapers.map((paper, index) => (
+                  <div key={index} className="paper-card">
+                    <h4>{paper.title}</h4>
+                    {paper.url && (
+                      <a href={paper.url} target="_blank" rel="noopener noreferrer" className="paper-link">
+                        논문 보기 →
+                      </a>
+                    )}
+                    <p>{paper.summary}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ============ Column 3: 진단 정보 (차팅) ============ */}
+        <div className="column column-right">
+          <div className="panel chart-panel">
+            <h3><span className="panel-icon">📝</span> 진단 정보 (차팅)</h3>
+            
+            {/* 진단명 */}
+            <div className="chart-field">
+              <label>진단명</label>
+              <input
+                type="text"
+                value={chartData.chartDiagnosisName}
+                onChange={(e) => handleChartChange('chartDiagnosisName', e.target.value)}
+                placeholder="진단명을 입력하거나 유사 패턴에서 선택"
+              />
+            </div>
+
+            {/* ICD 코드 */}
+            <div className="chart-field">
+              <label>ICD 코드</label>
+              <input
+                type="text"
+                value={chartData.chartIcdCode}
+                onChange={(e) => handleChartChange('chartIcdCode', e.target.value)}
+                placeholder="예: L40.0"
+              />
+            </div>
+
+            {/* 보험 수가 코드 */}
+            <div className="chart-field">
+              <label>보험 수가 코드</label>
+              <input
+                type="text"
+                value={chartData.chartInsuranceCode}
+                onChange={(e) => handleChartChange('chartInsuranceCode', e.target.value)}
+                placeholder="예: KN071, KN072"
+              />
+            </div>
+
+            {/* 치료 가이드라인 */}
+            <div className="chart-field">
+              <label>치료 가이드라인</label>
+              <textarea
+                value={chartData.chartTreatmentGuideline}
+                onChange={(e) => handleChartChange('chartTreatmentGuideline', e.target.value)}
+                placeholder="치료 가이드라인 입력"
+                rows="3"
+              />
+            </div>
+
+            {/* SOAP 차팅 */}
+            <div className="soap-charting">
+              <h4>SOAP 차팅</h4>
+              
+              <div className="chart-field soap-field">
+                <label><span className="soap-label-tag s">S</span> Subjective (주관적 증상)</label>
+                <textarea
+                  value={chartData.chartSoapS}
+                  onChange={(e) => handleChartChange('chartSoapS', e.target.value)}
+                  placeholder="환자 호소 내용"
+                  rows="3"
+                />
+              </div>
+
+              <div className="chart-field soap-field">
+                <label><span className="soap-label-tag o">O</span> Objective (객관적 소견)</label>
+                <textarea
+                  value={chartData.chartSoapO}
+                  onChange={(e) => handleChartChange('chartSoapO', e.target.value)}
+                  placeholder="이학적 검사 소견"
+                  rows="3"
+                />
+              </div>
+
+              <div className="chart-field soap-field">
+                <label><span className="soap-label-tag a">A</span> Assessment (진단평가)</label>
+                <textarea
+                  value={chartData.chartSoapA}
+                  onChange={(e) => handleChartChange('chartSoapA', e.target.value)}
+                  placeholder="진단 평가"
+                  rows="3"
+                />
+              </div>
+
+              <div className="chart-field soap-field">
+                <label><span className="soap-label-tag p">P</span> Plan (치료계획)</label>
+                <textarea
+                  value={chartData.chartSoapP}
+                  onChange={(e) => handleChartChange('chartSoapP', e.target.value)}
+                  placeholder="치료 계획"
+                  rows="3"
+                />
+              </div>
+            </div>
+
+            <button 
+              className="btn btn-chart-save"
+              onClick={handleSaveCharting}
+              disabled={savingChart}
+            >
+              {savingChart ? '저장 중...' : '💾 차팅 저장'}
+            </button>
+            {chartSuccess && <div className="success-msg">{chartSuccess}</div>}
+          </div>
+
+          {/* 의사 소견 */}
+          <div className="panel doctor-panel">
+            <h3><span className="panel-icon">👨‍⚕️</span> 의사 소견</h3>
             <textarea
               value={doctorNotes}
               onChange={(e) => setDoctorNotes(e.target.value)}
               placeholder="환자에 대한 소견을 작성하세요..."
-              rows="10"
+              rows="6"
+              className="doctor-notes-input"
             />
             
-            {error && <div className="error">{error}</div>}
-            {success && <div className="success">{success}</div>}
+            {error && <div className="error-msg">{error}</div>}
+            {success && <div className="success-msg">{success}</div>}
 
             <div className="action-buttons">
               <button 
@@ -533,241 +581,109 @@ function DiagnosisDetail() {
                 className="btn btn-success"
                 disabled={saving}
               >
-                {saving ? '저장 중...' : '검토 완료'}
+                {saving ? '저장 중...' : '✅ 검토 완료'}
               </button>
               <button 
                 onClick={() => handleSaveNotes('completed')}
                 className="btn btn-primary"
                 disabled={saving}
               >
-                {saving ? '저장 중...' : '완료 처리'}
+                {saving ? '저장 중...' : '✔️ 완료 처리'}
               </button>
             </div>
 
             <div className="meta-info">
-              <p><strong>작성일:</strong><br/>{new Date(diagnosis.createdAt).toLocaleString('ko-KR')}</p>
+              <p><strong>작성일:</strong> {new Date(diagnosis.createdAt).toLocaleString('ko-KR')}</p>
               {diagnosis.updatedAt !== diagnosis.createdAt && (
-                <p><strong>수정일:</strong><br/>{new Date(diagnosis.updatedAt).toLocaleString('ko-KR')}</p>
+                <p><strong>수정일:</strong> {new Date(diagnosis.updatedAt).toLocaleString('ko-KR')}</p>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 환자 히스토리 모달 */}
-      {showHistoryModal && (
-        <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>환자 진료 히스토리 (사진만 표시)</h3>
-              <button 
-                onClick={() => setShowHistoryModal(false)} 
-                className="close-btn"
-                aria-label="닫기"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="modal-body">
-              {diagnosis.patientRegistrationNumber && (
-                <p style={{ marginBottom: '20px', color: '#667eea', fontWeight: '600' }}>
-                  환자 등록번호: {diagnosis.patientRegistrationNumber}
-                </p>
-              )}
-              {patientHistory.length === 0 ? (
-                <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>
-                  이전 진료 기록이 없습니다.
-                </p>
-              ) : (
-                <div className="history-list">
-                  {patientHistory.map((item) => (
-                    <div key={item._id} className="history-item">
-                      <div className="history-header">
-                        <span className="history-date">
-                          {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                        </span>
-                        <span className={`status-badge status-${item.status}`}>
-                          {item.status}
-                        </span>
-                      </div>
-                      {/* 사진만 표시, 사진 클릭 시 상단에 표시 */}
-                      {item.images && item.images.length > 0 ? (
-                        <div className="history-images">
-                          {item.images.map((img, idx) => (
-                            <img
-                              key={idx}
-                              src={img.image_path || img}
-                              alt="히스토리 이미지"
-                              style={{width:'80px',height:'80px',objectFit:'cover',margin:'4px',cursor:'pointer'}}
-                              onClick={() => {
-                                setSelectedHistoryItem(item);
-                                setShowHistoryModal(false);
-                              }}
-                              onError={(e) => {e.target.style.display='none';}}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div style={{color:'#bbb',textAlign:'center',padding:'16px'}}>이미지가 없습니다.</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 히스토리 진단 상세 팝업 */}
       {selectedHistoryItem && (
         <div className="modal-overlay" onClick={() => setSelectedHistoryItem(null)}>
-          <div className="modal-content large" onClick={(e) => e.stopPropagation()} style={{maxWidth:'700px', maxHeight:'90vh', overflow:'auto'}}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>📋 진단 상세 정보</h3>
               <button onClick={() => setSelectedHistoryItem(null)} className="close-btn" aria-label="닫기">✕</button>
             </div>
-            <div className="modal-body" style={{padding:'20px'}}>
+            <div className="modal-body">
               {/* 이미지 */}
               {selectedHistoryItem.images && selectedHistoryItem.images.length > 0 && (
-                <div style={{marginBottom:'20px'}}>
-                  <div style={{display:'flex', gap:'8px', flexWrap:'wrap', justifyContent:'center'}}>
-                    {selectedHistoryItem.images.map((img, idx) => (
-                      <img
-                        key={idx}
-                        src={img.image_path || img}
-                        alt={`이미지 ${idx + 1}`}
-                        style={{maxWidth:'100%', maxHeight:'300px', objectFit:'contain', borderRadius:'8px', background:'#f5f5f5'}}
-                        onError={(e) => {e.target.style.display='none';}}
-                      />
-                    ))}
-                  </div>
+                <div className="modal-images">
+                  {selectedHistoryItem.images.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img.image_path || img}
+                      alt={`이미지 ${idx + 1}`}
+                      className="modal-img"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  ))}
                 </div>
               )}
 
               {/* 기본 정보 */}
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px', marginBottom:'16px'}}>
-                <div style={{padding:'12px', background:'#f0f4ff', borderRadius:'8px', border:'1px solid #dde3ff'}}>
-                  <div style={{fontSize:'12px', color:'#667eea', fontWeight:'600', marginBottom:'4px'}}>📅 등록일</div>
-                  <div style={{fontSize:'15px', color:'#333', fontWeight:'500'}}>{new Date(selectedHistoryItem.createdAt).toLocaleString('ko-KR')}</div>
+              <div className="modal-info-grid">
+                <div className="modal-info-item">
+                  <div className="modal-info-label">📅 등록일</div>
+                  <div className="modal-info-value">{new Date(selectedHistoryItem.createdAt).toLocaleString('ko-KR')}</div>
                 </div>
-                <div style={{padding:'12px', background:'#f0f4ff', borderRadius:'8px', border:'1px solid #dde3ff'}}>
-                  <div style={{fontSize:'12px', color:'#667eea', fontWeight:'600', marginBottom:'4px'}}>상태</div>
-                  <div style={{fontSize:'15px', color:'#333', fontWeight:'500'}}>{getStatusText(selectedHistoryItem.status)}</div>
+                <div className="modal-info-item">
+                  <div className="modal-info-label">상태</div>
+                  <div className="modal-info-value">{getStatusText(selectedHistoryItem.status)}</div>
                 </div>
               </div>
 
-              {/* 진단 정보 그리드 */}
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginBottom:'16px'}}>
+              {/* 진단 정보 */}
+              <div className="modal-detail-grid">
                 {selectedHistoryItem.treatmentType && (
-                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
-                    <strong style={{color:'#555', fontSize:'12px'}}>진료 종류</strong>
-                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.treatmentType}</div>
+                  <div className="modal-detail-item">
+                    <strong>진료 종류</strong>
+                    <span>{selectedHistoryItem.treatmentType}</span>
                   </div>
                 )}
                 {selectedHistoryItem.bodyParts && (
-                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
-                    <strong style={{color:'#555', fontSize:'12px'}}>부위</strong>
-                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.bodyParts}</div>
+                  <div className="modal-detail-item">
+                    <strong>부위</strong>
+                    <span>{selectedHistoryItem.bodyParts}</span>
                   </div>
                 )}
                 {selectedHistoryItem.skinSymptoms && (
-                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
-                    <strong style={{color:'#555', fontSize:'12px'}}>피부 증상</strong>
-                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.skinSymptoms}</div>
+                  <div className="modal-detail-item">
+                    <strong>피부 증상</strong>
+                    <span>{selectedHistoryItem.skinSymptoms}</span>
                   </div>
                 )}
                 {selectedHistoryItem.duration && (
-                  <div style={{padding:'10px', background:'#f9f9f9', borderRadius:'6px'}}>
-                    <strong style={{color:'#555', fontSize:'12px'}}>기간</strong>
-                    <div style={{color:'#333', marginTop:'4px'}}>{selectedHistoryItem.duration}</div>
+                  <div className="modal-detail-item">
+                    <strong>기간</strong>
+                    <span>{selectedHistoryItem.duration}</span>
                   </div>
                 )}
               </div>
 
-              {/* 증상 설명 */}
               {selectedHistoryItem.symptoms && (
-                <div style={{marginBottom:'16px', padding:'14px', background:'#f9f9f9', borderRadius:'8px', border:'1px solid #eee'}}>
-                  <strong style={{color:'#555', fontSize:'13px', display:'block', marginBottom:'6px'}}>증상 설명</strong>
-                  <div style={{color:'#333', lineHeight:'1.7', whiteSpace:'pre-wrap'}}>{selectedHistoryItem.symptoms}</div>
+                <div className="modal-text-block">
+                  <strong>증상 설명</strong>
+                  <p>{selectedHistoryItem.symptoms}</p>
                 </div>
               )}
 
-              {/* AI 진단 결과 */}
               {selectedHistoryItem.gptDiagnosis && (
-                <div style={{marginBottom:'16px', padding:'14px', background:'linear-gradient(135deg, #f0f4ff 0%, #faf0ff 100%)', borderRadius:'8px', border:'1px solid #dde3ff'}}>
-                  <strong style={{color:'#667eea', fontSize:'13px', display:'block', marginBottom:'6px'}}>🤖 AI 진단 결과</strong>
-                  <div style={{color:'#333', lineHeight:'1.7', whiteSpace:'pre-wrap', fontSize:'14px'}}>{selectedHistoryItem.gptDiagnosis}</div>
+                <div className="modal-text-block ai-block">
+                  <strong>🤖 AI 진단 결과</strong>
+                  <p>{selectedHistoryItem.gptDiagnosis}</p>
                 </div>
               )}
 
-              {/* 의사 소견 */}
               {selectedHistoryItem.doctorNotes && (
-                <div style={{padding:'14px', background:'#f0fff4', borderRadius:'8px', border:'1px solid #c6f6d5'}}>
-                  <strong style={{color:'#38a169', fontSize:'13px', display:'block', marginBottom:'6px'}}>👨‍⚕️ 의사 소견</strong>
-                  <div style={{color:'#333', lineHeight:'1.7', whiteSpace:'pre-wrap'}}>{selectedHistoryItem.doctorNotes}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 피부과 진단 정보 모달 */}
-      {showDermatologyModal && (
-        <div className="modal-overlay" onClick={() => setShowDermatologyModal(false)}>
-          <div className="modal-content large" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>피부과 진단 상세 정보</h3>
-              <button 
-                onClick={() => setShowDermatologyModal(false)} 
-                className="close-btn"
-                aria-label="닫기"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="modal-body">
-              {dermatologyInfo.length === 0 ? (
-                <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>
-                  검색 결과가 없습니다.
-                </p>
-              ) : (
-                <div className="dermatology-list">
-                  {dermatologyInfo.map((item) => (
-                    <div key={item.id} className="dermatology-item">
-                      <h4>{item.diagnosis_name_kr} ({item.diagnosis_name})</h4>
-                      <p><strong>ICD 코드:</strong> {item.icd_code}</p>
-                      <p><strong>보험 수가 코드:</strong> {item.insurance_code}</p>
-                      
-                      <div className="treatment-section">
-                        <h5>치료 가이드라인</h5>
-                        <p style={{ whiteSpace: 'pre-wrap' }}>{item.treatment_guideline}</p>
-                      </div>
-                      
-                      <div className="soap-section">
-                        <h5>SOAP 차팅</h5>
-                        <div className="soap-notes">
-                          <div className="soap-item">
-                            <strong>S (Subjective - 주관적 증상):</strong>
-                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_s}</p>
-                          </div>
-                          <div className="soap-item">
-                            <strong>O (Objective - 객관적 소견):</strong>
-                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_o}</p>
-                          </div>
-                          <div className="soap-item">
-                            <strong>A (Assessment - 진단평가):</strong>
-                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_a}</p>
-                          </div>
-                          <div className="soap-item">
-                            <strong>P (Plan - 치료계획):</strong>
-                            <p style={{ whiteSpace: 'pre-wrap' }}>{item.soap_p}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="modal-text-block doctor-block">
+                  <strong>👨‍⚕️ 의사 소견</strong>
+                  <p>{selectedHistoryItem.doctorNotes}</p>
                 </div>
               )}
             </div>

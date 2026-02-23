@@ -112,6 +112,43 @@ router.put('/diagnoses/:id', protect, authorize('doctor'), async (req, res) => {
   }
 });
 
+// 차팅 정보 저장
+router.put('/diagnoses/:id/charting', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const { 
+      chartDiagnosisName, chartIcdCode, chartInsuranceCode,
+      chartTreatmentGuideline, chartSoapS, chartSoapO, chartSoapA, chartSoapP
+    } = req.body;
+
+    console.log('=== 차팅 저장 요청 ===');
+    console.log('진단 ID:', req.params.id);
+    console.log('진단명:', chartDiagnosisName);
+
+    const diagnosis = await Diagnosis.updateCharting(req.params.id, {
+      chart_diagnosis_name: chartDiagnosisName,
+      chart_icd_code: chartIcdCode,
+      chart_insurance_code: chartInsuranceCode,
+      chart_treatment_guideline: chartTreatmentGuideline,
+      chart_soap_s: chartSoapS,
+      chart_soap_o: chartSoapO,
+      chart_soap_a: chartSoapA,
+      chart_soap_p: chartSoapP
+    });
+
+    if (!diagnosis) {
+      return res.status(404).json({ message: '진단을 찾을 수 없습니다.' });
+    }
+
+    res.json({
+      message: '차팅 정보가 저장되었습니다.',
+      diagnosis: diagnosis
+    });
+  } catch (error) {
+    console.error('차팅 저장 오류:', error);
+    res.status(500).json({ message: '차팅 저장 중 오류가 발생했습니다.' });
+  }
+});
+
 // 환자 목록 조회
 router.get('/patients', protect, authorize('doctor'), async (req, res) => {
   try {
