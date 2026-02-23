@@ -192,65 +192,173 @@ function DiagnosisDetail() {
               <p><strong>전화번호:</strong> {diagnosis.patient?.phone || '-'}</p>
             </div>
 
-            {/* 진료 히스토리 이미지 슬라이더 (1장씩 가로 슬라이드) */}
+            {/* 진료 히스토리 이미지 슬라이더 (부드러운 슬라이드 애니메이션) */}
             {patientHistory.length > 0 && (() => {
               const historyWithImages = patientHistory.filter(item => item.images && item.images.length > 0);
               if (historyWithImages.length === 0) return null;
               
               const safePage = Math.min(currentHistoryPage, historyWithImages.length - 1);
-              const currentItem = historyWithImages[safePage];
-              const currentImage = currentItem.images[0];
               
               return (
                 <div className="detail-section">
                   <h3>진료 히스토리 (이미지) <span style={{fontSize:'14px', color:'#888', fontWeight:'normal'}}>총 {historyWithImages.length}개</span></h3>
-                  <div className="history-slider">
-                    <div className="slider-main" style={{position:'relative', width:'100%', maxWidth:'800px', margin:'0 auto'}}>
-                      <div className="slider-item" style={{textAlign:'center'}}>
-                        <img 
-                          src={currentImage.image_path || currentImage} 
-                          alt="히스토리 이미지" 
-                          style={{maxWidth:'100%', maxHeight:'500px', objectFit:'contain', borderRadius:'8px', boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}
-                          onError={(e) => {e.target.style.display='none';}}
-                        />
-                        <div style={{marginTop:'16px', padding:'12px', background:'#f9f9f9', borderRadius:'8px', display:'inline-block'}}>
-                          <div style={{fontSize:'14px', color:'#667eea', fontWeight:'600'}}>
-                            등록일: {new Date(currentItem.createdAt).toLocaleDateString('ko-KR')}
-                          </div>
-                          {currentItem.images.length > 1 && (
-                            <div style={{fontSize:'12px', color:'#888', marginTop:'4px'}}>
-                              📷 {currentItem.images.length}개 이미지
+                  <div className="history-slider" style={{position:'relative', width:'100%', maxWidth:'900px', margin:'0 auto'}}>
+                    {/* 슬라이더 컨테이너 */}
+                    <div style={{position:'relative', overflow:'hidden', borderRadius:'12px', background:'#f5f5f5', padding:'20px'}}>
+                      {/* 슬라이드 래퍼 */}
+                      <div style={{
+                        display:'flex',
+                        transition:'transform 0.5s ease-in-out',
+                        transform:`translateX(-${safePage * 100}%)`
+                      }}>
+                        {historyWithImages.map((item, idx) => {
+                          const image = item.images[0];
+                          return (
+                            <div key={item._id || idx} style={{
+                              minWidth:'100%',
+                              display:'flex',
+                              flexDirection:'column',
+                              alignItems:'center',
+                              justifyContent:'center'
+                            }}>
+                              <img 
+                                src={image.image_path || image} 
+                                alt={`히스토리 이미지 ${idx + 1}`}
+                                style={{
+                                  maxWidth:'100%',
+                                  maxHeight:'500px',
+                                  objectFit:'contain',
+                                  borderRadius:'8px',
+                                  boxShadow:'0 4px 12px rgba(0,0,0,0.15)',
+                                  background:'#fff'
+                                }}
+                                onError={(e) => {e.target.style.display='none';}}
+                              />
+                              <div style={{marginTop:'16px', padding:'12px', background:'#fff', borderRadius:'8px', boxShadow:'0 2px 6px rgba(0,0,0,0.1)'}}>
+                                <div style={{fontSize:'14px', color:'#667eea', fontWeight:'600'}}>
+                                  등록일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                                </div>
+                                {item.images.length > 1 && (
+                                  <div style={{fontSize:'12px', color:'#888', marginTop:'4px'}}>
+                                    📷 {item.images.length}개 이미지
+                                  </div>
+                                )}
+                                {item.symptoms && (
+                                  <div style={{fontSize:'12px', color:'#666', marginTop:'8px', maxWidth:'600px', textAlign:'left'}}>
+                                    {item.symptoms.length > 100 ? item.symptoms.substring(0, 100) + '...' : item.symptoms}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          )}
-                          {currentItem.symptoms && (
-                            <div style={{fontSize:'12px', color:'#666', marginTop:'8px', maxWidth:'600px'}}>
-                              {currentItem.symptoms.length > 100 ? currentItem.symptoms.substring(0, 100) + '...' : currentItem.symptoms}
-                            </div>
-                          )}
-                        </div>
+                          );
+                        })}
                       </div>
-                    </div>
-                    {historyWithImages.length > 1 && (
-                      <div className="slider-controls" style={{marginTop:'20px', display:'flex', justifyContent:'center', alignItems:'center', gap:'20px'}}>
+                      
+                      {/* 좌측 화살표 버튼 */}
+                      {historyWithImages.length > 1 && safePage > 0 && (
                         <button 
-                          className="btn btn-secondary"
                           onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
-                          disabled={safePage === 0}
-                          style={{minWidth:'80px'}}
+                          style={{
+                            position:'absolute',
+                            left:'10px',
+                            top:'50%',
+                            transform:'translateY(-50%)',
+                            background:'rgba(255,255,255,0.9)',
+                            border:'2px solid #667eea',
+                            borderRadius:'50%',
+                            width:'50px',
+                            height:'50px',
+                            display:'flex',
+                            alignItems:'center',
+                            justifyContent:'center',
+                            cursor:'pointer',
+                            fontSize:'24px',
+                            color:'#667eea',
+                            boxShadow:'0 2px 8px rgba(0,0,0,0.2)',
+                            transition:'all 0.3s ease',
+                            zIndex:10
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background='#667eea';
+                            e.currentTarget.style.color='#fff';
+                            e.currentTarget.style.transform='translateY(-50%) scale(1.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background='rgba(255,255,255,0.9)';
+                            e.currentTarget.style.color='#667eea';
+                            e.currentTarget.style.transform='translateY(-50%) scale(1)';
+                          }}
                         >
-                          ← 이전
+                          ‹
                         </button>
-                        <span style={{display:'flex', alignItems:'center', color:'#333', fontSize:'16px', fontWeight:'600'}}>
-                          {safePage + 1} / {historyWithImages.length}
-                        </span>
+                      )}
+                      
+                      {/* 우측 화살표 버튼 */}
+                      {historyWithImages.length > 1 && safePage < historyWithImages.length - 1 && (
                         <button 
-                          className="btn btn-secondary"
                           onClick={() => setCurrentHistoryPage(prev => Math.min(historyWithImages.length - 1, prev + 1))}
-                          disabled={safePage === historyWithImages.length - 1}
-                          style={{minWidth:'80px'}}
+                          style={{
+                            position:'absolute',
+                            right:'10px',
+                            top:'50%',
+                            transform:'translateY(-50%)',
+                            background:'rgba(255,255,255,0.9)',
+                            border:'2px solid #667eea',
+                            borderRadius:'50%',
+                            width:'50px',
+                            height:'50px',
+                            display:'flex',
+                            alignItems:'center',
+                            justifyContent:'center',
+                            cursor:'pointer',
+                            fontSize:'24px',
+                            color:'#667eea',
+                            boxShadow:'0 2px 8px rgba(0,0,0,0.2)',
+                            transition:'all 0.3s ease',
+                            zIndex:10
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background='#667eea';
+                            e.currentTarget.style.color='#fff';
+                            e.currentTarget.style.transform='translateY(-50%) scale(1.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background='rgba(255,255,255,0.9)';
+                            e.currentTarget.style.color='#667eea';
+                            e.currentTarget.style.transform='translateY(-50%) scale(1)';
+                          }}
                         >
-                          다음 →
+                          ›
                         </button>
+                      )}
+                    </div>
+                    
+                    {/* 페이지 인디케이터 */}
+                    {historyWithImages.length > 1 && (
+                      <div style={{marginTop:'20px', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px'}}>
+                        {historyWithImages.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentHistoryPage(idx)}
+                            style={{
+                              width: idx === safePage ? '32px' : '12px',
+                              height:'12px',
+                              borderRadius:'6px',
+                              border:'none',
+                              background: idx === safePage ? '#667eea' : '#ddd',
+                              cursor:'pointer',
+                              transition:'all 0.3s ease'
+                            }}
+                            aria-label={`슬라이드 ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* 슬라이드 카운터 */}
+                    {historyWithImages.length > 1 && (
+                      <div style={{marginTop:'12px', textAlign:'center', color:'#333', fontSize:'16px', fontWeight:'600'}}>
+                        {safePage + 1} / {historyWithImages.length}
                       </div>
                     )}
                   </div>
