@@ -15,11 +15,17 @@ function DiagnosisDetail() {
   const [patientHistory, setPatientHistory] = useState([]);
   const [selectedHistoryImage, setSelectedHistoryImage] = useState(null);
   const [selectedHistoryDate, setSelectedHistoryDate] = useState(null);
-  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
+  const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
   const [dermatologyInfo, setDermatologyInfo] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showDermatologyModal, setShowDermatologyModal] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    diagnosis: true,
+    search: false,
+    symptoms: true,
+    aiSuggestions: false
+  });
   
   // AI 추천 증상 관련 상태
   const [aiSuggestions, setAiSuggestions] = useState([]);
@@ -186,59 +192,69 @@ function DiagnosisDetail() {
               <p><strong>전화번호:</strong> {diagnosis.patient?.phone || '-'}</p>
             </div>
 
-            {/* 진료 히스토리 이미지 슬라이더 */}
+            {/* 진료 히스토리 이미지 슬라이더 (4개씩) */}
             {patientHistory.length > 0 && (() => {
               const historyWithImages = patientHistory.filter(item => item.images && item.images.length > 0);
               if (historyWithImages.length === 0) return null;
               
-              const safeIndex = Math.min(currentHistoryIndex, historyWithImages.length - 1);
-              const currentItem = historyWithImages[safeIndex];
-              const currentImage = currentItem.images[0];
+              const itemsPerPage = 4;
+              const totalPages = Math.ceil(historyWithImages.length / itemsPerPage);
+              const safePage = Math.min(currentHistoryPage, totalPages - 1);
+              const startIdx = safePage * itemsPerPage;
+              const endIdx = startIdx + itemsPerPage;
+              const currentPageItems = historyWithImages.slice(startIdx, endIdx);
               
               return (
                 <div className="detail-section">
-                  <h3>진료 히스토리 (이미지)</h3>
+                  <h3>진료 히스토리 (이미지) <span style={{fontSize:'14px', color:'#888', fontWeight:'normal'}}>총 {historyWithImages.length}개</span></h3>
                   <div className="history-slider">
-                    <div className="slider-main">
-                      <div className="slider-item">
-                        <img 
-                          src={currentImage.image_path || currentImage} 
-                          alt="히스토리 이미지" 
-                          style={{maxWidth:'100%', maxHeight:'400px', objectFit:'contain', cursor:'pointer'}}
-                          onClick={() => {
-                            setSelectedHistoryImage(currentImage.image_path || currentImage);
-                            setSelectedHistoryDate(new Date(currentItem.createdAt).toLocaleDateString('ko-KR'));
-                          }}
-                          onError={(e) => {e.target.style.display='none';}}
-                        />
-                        <div style={{marginTop:'12px', color:'#667eea', fontWeight:'600'}}>
-                          등록일: {new Date(currentItem.createdAt).toLocaleDateString('ko-KR')}
-                        </div>
-                        {currentItem.images.length > 1 && (
-                          <div style={{marginTop:'8px', color:'#888', fontSize:'14px'}}>
-                            ({currentItem.images.length}개 이미지)
+                    <div className="history-grid" style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:'16px', marginBottom:'16px'}}>
+                      {currentPageItems.map((item, idx) => {
+                        const image = item.images[0];
+                        return (
+                          <div key={item._id || idx} className="history-card" style={{border:'1px solid #ddd', borderRadius:'8px', overflow:'hidden', cursor:'pointer', transition:'transform 0.2s'}} 
+                            onMouseEnter={(e) => e.currentTarget.style.transform='scale(1.05)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform='scale(1)'}
+                            onClick={() => {
+                              setSelectedHistoryImage(image.image_path || image);
+                              setSelectedHistoryDate(new Date(item.createdAt).toLocaleDateString('ko-KR'));
+                            }}>
+                            <img 
+                              src={image.image_path || image} 
+                              alt="히스토리 이미지" 
+                              style={{width:'100%', height:'180px', objectFit:'cover'}}
+                              onError={(e) => {e.target.style.display='none';}}
+                            />
+                            <div style={{padding:'8px', background:'#f9f9f9'}}>
+                              <div style={{fontSize:'12px', color:'#667eea', fontWeight:'600'}}>
+                                {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                              </div>
+                              {item.images.length > 1 && (
+                                <div style={{fontSize:'11px', color:'#888', marginTop:'4px'}}>
+                                  📷 {item.images.length}개
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        )}
-                      </div>
+                        );
+                      })}
                     </div>
-                    {historyWithImages.length > 1 && (
-                      <div className="slider-controls" style={{marginTop:'16px', display:'flex', justifyContent:'center', gap:'12px'}}>
+                    {totalPages > 1 && (
+                      <div className="slider-controls" style={{marginTop:'16px', display:'flex', justifyContent:'center', alignItems:'center', gap:'12px'}}>
                         <button 
                           className="btn btn-secondary btn-sm"
-                          onClick={() => {
-                            setCurrentHistoryIndex(prev => prev > 0 ? prev - 1 : historyWithImages.length - 1);
-                          }}
+                          onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
+                          disabled={safePage === 0}
                         >
                           ← 이전
                         </button>
-                        <span style={{display:'flex', alignItems:'center', color:'#555'}}>
-                          {safeIndex + 1} / {historyWithImages.length}
+                        <span style={{display:'flex', alignItems:'center', color:'#555', fontSize:'14px'}}>
+                          {safePage + 1} / {totalPages}
                         </span>
                         <button 
                           className="btn btn-secondary btn-sm"
-                          onClick={() => {
-                            setCurrentHistoryIndex(prev => (prev + 1) % historyWithImages.length);
-                          }}
+                          onClick={() => setCurrentHistoryPage(prev => Math.min(totalPages - 1, prev + 1))}
+                          disabled={safePage === totalPages - 1}
                         >
                           다음 →
                         </button>
@@ -249,67 +265,104 @@ function DiagnosisDetail() {
               );
             })()}
 
-            <div className="detail-section">
-              <h3>진단 정보</h3>
-              <div className="info-grid">
-                {diagnosis.treatmentType && <p><strong>진료 종류:</strong> {diagnosis.treatmentType}</p>}
-                {diagnosis.bodyParts && <p><strong>부위:</strong> {diagnosis.bodyParts}</p>}
-                {diagnosis.skinSymptoms && <p><strong>피부 증상:</strong> {diagnosis.skinSymptoms}</p>}
-                {diagnosis.painVas !== null && <p><strong>통증(VAS):</strong> {diagnosis.painVas}/10</p>}
-                {diagnosis.duration && <p><strong>기간:</strong> {diagnosis.duration}</p>}
-                {diagnosis.skinFeatures && <p><strong>피부 질환 특징:</strong> {diagnosis.skinFeatures}</p>}
-              </div>
+            {/* 진단 정보 - 컴팩트 뷰 */}
+            <div className="detail-section" style={{marginBottom:'12px'}}>
+              <h3 
+                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
+                onClick={() => setExpandedSections(prev => ({...prev, diagnosis: !prev.diagnosis}))}
+              >
+                <span>진단 정보</span>
+                <span style={{fontSize:'18px'}}>{expandedSections.diagnosis ? '▼' : '▶'}</span>
+              </h3>
+              {expandedSections.diagnosis && (
+                <div className="info-grid" style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'12px', marginTop:'12px'}}>
+                  {diagnosis.treatmentType && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>진료 종류:</strong> {diagnosis.treatmentType}</div>}
+                  {diagnosis.bodyParts && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>부위:</strong> {diagnosis.bodyParts}</div>}
+                  {diagnosis.skinSymptoms && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>피부 증상:</strong> {diagnosis.skinSymptoms}</div>}
+                  {diagnosis.painVas !== null && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>통증(VAS):</strong> {diagnosis.painVas}/10</div>}
+                  {diagnosis.duration && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>기간:</strong> {diagnosis.duration}</div>}
+                  {diagnosis.skinFeatures && <div style={{padding:'8px', background:'#f5f5f5', borderRadius:'6px'}}><strong>피부 질환 특징:</strong> {diagnosis.skinFeatures}</div>}
+                </div>
+              )}
             </div>
 
-            <div className="detail-section">
-              <h3>피부과 진단 검색</h3>
-              <div className="search-box">
-                <input
-                  type="text"
-                  placeholder="진단명 검색 (건선, 종기, 아토피)"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && searchDermatologyDiagnosis()}
-                />
-                <button onClick={searchDermatologyDiagnosis} className="btn btn-primary">
-                  검색
-                </button>
-              </div>
+            {/* 증상 설명 */}
+            <div className="detail-section" style={{marginBottom:'12px'}}>
+              <h3 
+                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
+                onClick={() => setExpandedSections(prev => ({...prev, symptoms: !prev.symptoms}))}
+              >
+                <span>증상 설명</span>
+                <span style={{fontSize:'18px'}}>{expandedSections.symptoms ? '▼' : '▶'}</span>
+              </h3>
+              {expandedSections.symptoms && (
+                <p style={{marginTop:'12px', padding:'12px', background:'#f9f9f9', borderRadius:'8px', lineHeight:'1.6'}}>{diagnosis.symptoms}</p>
+              )}
             </div>
 
-            <div className="detail-section">
-              <h3>증상 설명</h3>
-              <p>{diagnosis.symptoms}</p>
+            {/* 피부과 진단 검색 */}
+            <div className="detail-section" style={{marginBottom:'12px'}}>
+              <h3 
+                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
+                onClick={() => setExpandedSections(prev => ({...prev, search: !prev.search}))}
+              >
+                <span>피부과 진단 검색</span>
+                <span style={{fontSize:'18px'}}>{expandedSections.search ? '▼' : '▶'}</span>
+              </h3>
+              {expandedSections.search && (
+                <div className="search-box" style={{marginTop:'12px'}}>
+                  <input
+                    type="text"
+                    placeholder="진단명 검색 (건선, 종기, 아토피)"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && searchDermatologyDiagnosis()}
+                  />
+                  <button onClick={searchDermatologyDiagnosis} className="btn btn-primary">
+                    검색
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* AI 추천 증상 3개 및 진단 정보 */}
-            <div className="detail-section">
-              <h3>AI 추천 진단 (상위 3개)</h3>
-              {loadingAi ? (
-                <p style={{color:'#aaa'}}>AI 추천 조회 중...</p>
-              ) : aiSuggestions.length === 0 ? (
-                <p style={{color:'#bbb'}}>추천 진단이 없습니다.</p>
-              ) : (
-                <div className="ai-suggestion-list">
-                  {aiSuggestions.map((suggestion, idx) => (
-                    <div key={idx} style={{marginBottom:'12px'}}>
-                      <button
-                        className="btn btn-outline-primary"
-                        style={{width:'100%',textAlign:'left',display:'flex',justifyContent:'space-between',alignItems:'center'}}
-                        onClick={() => handleAiDiagnosisClick(suggestion)}
-                      >
-                        <span>{suggestion.diagnosis}</span>
-                        <span style={{fontSize:'12px',color:'#888'}}>신뢰도: {suggestion.confidence}%</span>
-                      </button>
-                      {selectedAiDiagnosis && selectedAiDiagnosis.diagnosis === suggestion.diagnosis && (
-                        <div className="ai-diagnosis-detail" style={{marginTop:'8px',background:'#f9f9f9',padding:'12px',borderRadius:'8px',border:'1px solid #ddd'}}>
-                          <p><strong>진단명:</strong> {suggestion.diagnosis}</p>
-                          <p><strong>신뢰도:</strong> {suggestion.confidence}%</p>
-                          <p><strong>설명:</strong> {suggestion.description}</p>
+            <div className="detail-section" style={{marginBottom:'12px'}}>
+              <h3 
+                style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}
+                onClick={() => setExpandedSections(prev => ({...prev, aiSuggestions: !prev.aiSuggestions}))}
+              >
+                <span>AI 추천 진단 (상위 3개)</span>
+                <span style={{fontSize:'18px'}}>{expandedSections.aiSuggestions ? '▼' : '▶'}</span>
+              </h3>
+              {expandedSections.aiSuggestions && (
+                <div style={{marginTop:'12px'}}>
+                  {loadingAi ? (
+                    <p style={{color:'#aaa'}}>AI 추천 조회 중...</p>
+                  ) : aiSuggestions.length === 0 ? (
+                    <p style={{color:'#bbb'}}>추천 진단이 없습니다.</p>
+                  ) : (
+                    <div className="ai-suggestion-list">
+                      {aiSuggestions.map((suggestion, idx) => (
+                        <div key={idx} style={{marginBottom:'12px'}}>
+                          <button
+                            className="btn btn-outline-primary"
+                            style={{width:'100%',textAlign:'left',display:'flex',justifyContent:'space-between',alignItems:'center'}}
+                            onClick={() => handleAiDiagnosisClick(suggestion)}
+                          >
+                            <span>{suggestion.diagnosis}</span>
+                            <span style={{fontSize:'12px',color:'#888'}}>신뢰도: {suggestion.confidence}%</span>
+                          </button>
+                          {selectedAiDiagnosis && selectedAiDiagnosis.diagnosis === suggestion.diagnosis && (
+                            <div className="ai-diagnosis-detail" style={{marginTop:'8px',background:'#f9f9f9',padding:'12px',borderRadius:'8px',border:'1px solid #ddd'}}>
+                              <p><strong>진단명:</strong> {suggestion.diagnosis}</p>
+                              <p><strong>신뢰도:</strong> {suggestion.confidence}%</p>
+                              <p><strong>설명:</strong> {suggestion.description}</p>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
