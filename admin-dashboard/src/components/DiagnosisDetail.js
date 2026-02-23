@@ -15,7 +15,6 @@ function DiagnosisDetail() {
   const [success, setSuccess] = useState('');
   const [chartSuccess, setChartSuccess] = useState('');
   const [patientHistory, setPatientHistory] = useState([]);
-  const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
   const [currentHistoryPage, setCurrentHistoryPage] = useState(0);
 
   // AI 추천 증상 관련 상태
@@ -206,8 +205,13 @@ function DiagnosisDetail() {
     );
   }
 
-  const historyWithImages = patientHistory.filter(item => item.images && item.images.length > 0);
-  const safePage = Math.min(currentHistoryPage, Math.max(historyWithImages.length - 1, 0));
+  const HISTORY_PER_PAGE = 3;
+  const historyTotalPages = Math.ceil(patientHistory.length / HISTORY_PER_PAGE);
+  const safeHistoryPage = Math.min(currentHistoryPage, Math.max(historyTotalPages - 1, 0));
+  const historyPageItems = patientHistory.slice(
+    safeHistoryPage * HISTORY_PER_PAGE,
+    (safeHistoryPage + 1) * HISTORY_PER_PAGE
+  );
 
   return (
     <div className="container diagnosis-detail">
@@ -319,63 +323,75 @@ function DiagnosisDetail() {
           </div>
 
           {/* 사진 경과 (진료 히스토리) */}
-          {historyWithImages.length > 0 && (
+          {patientHistory.length > 0 && (
             <div className="panel">
-              <h3><span className="panel-icon">📅</span> 사진 경과 <span className="count-badge">{historyWithImages.length}건</span></h3>
-              <div className="history-slider-compact">
-                <div className="slider-viewport">
-                  <div 
-                    className="slider-track"
-                    style={{ transform: `translateX(-${safePage * 100}%)` }}
-                  >
-                    {historyWithImages.map((item, idx) => {
-                      const image = item.images[0];
-                      return (
-                        <div key={item._id || idx} className="slider-slide">
-                          <img 
-                            src={image.image_path || image} 
-                            alt={`히스토리 ${idx + 1}`}
-                            className="history-photo"
-                            onClick={() => setSelectedHistoryItem(item)}
-                            onError={(e) => { e.target.style.display = 'none'; }}
-                          />
-                          <div className="history-slide-info">
-                            <span className="history-date-label">
-                              📅 {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                            </span>
-                            {item.images.length > 1 && (
-                              <span className="history-img-count">📷 {item.images.length}장</span>
-                            )}
+              <h3>
+                <span className="panel-icon">📅</span> 사진 경과
+                <span className="count-badge">{patientHistory.length}건</span>
+              </h3>
+              <div className="history-grid-container">
+                <div className="history-grid">
+                  {historyPageItems.map((item, idx) => {
+                    const imgSrc = item.images && item.images.length > 0
+                      ? (item.images[0].image_path || item.images[0])
+                      : null;
+                    const itemId = item._id || item.id;
+                    const globalIdx = safeHistoryPage * HISTORY_PER_PAGE + idx;
+                    return (
+                      <div
+                        key={itemId || idx}
+                        className="history-grid-item"
+                        onClick={() => navigate(`/diagnoses/${itemId}`)}
+                        title={`${new Date(item.createdAt).toLocaleDateString('ko-KR')} 편 클릭하여 상세 보기`}
+                      >
+                        <div className="history-thumb-wrap">
+                          {imgSrc ? (
+                            <img
+                              src={imgSrc}
+                              alt={`히스토리 ${globalIdx + 1}`}
+                              className="history-thumb"
+                              onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                          ) : (
+                            <div className="history-thumb-none">
+                              <span>📷</span>
+                            </div>
+                          )}
+                          <div className="history-thumb-overlay">
+                            <span>상세봐기 →</span>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {historyWithImages.length > 1 && safePage > 0 && (
-                    <button 
-                      className="slider-arrow slider-arrow-left"
-                      onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
-                    >‹</button>
-                  )}
-                  {historyWithImages.length > 1 && safePage < historyWithImages.length - 1 && (
-                    <button 
-                      className="slider-arrow slider-arrow-right"
-                      onClick={() => setCurrentHistoryPage(prev => Math.min(historyWithImages.length - 1, prev + 1))}
-                    >›</button>
-                  )}
+                        <div className="history-item-meta">
+                          <span className="history-item-date">
+                            {new Date(item.createdAt).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })}
+                          </span>
+                          <span className={`history-item-badge status-${item.status}`}>
+                            {getStatusText(item.status)}
+                          </span>
+                        </div>
+                        {item.images && item.images.length > 1 && (
+                          <span className="history-img-cnt">📷{item.images.length}</span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
-                {historyWithImages.length > 1 && (
-                  <div className="slider-dots">
-                    {historyWithImages.map((_, idx) => (
-                      <button
-                        key={idx}
-                        className={`slider-dot ${idx === safePage ? 'active' : ''}`}
-                        onClick={() => setCurrentHistoryPage(idx)}
-                      />
-                    ))}
-                    <span className="slider-counter">{safePage + 1}/{historyWithImages.length}</span>
+                {historyTotalPages > 1 && (
+                  <div className="history-nav">
+                    <button
+                      className="history-nav-btn"
+                      disabled={safeHistoryPage === 0}
+                      onClick={() => setCurrentHistoryPage(prev => Math.max(0, prev - 1))}
+                    >‹</button>
+                    <span className="history-nav-info">
+                      {safeHistoryPage * HISTORY_PER_PAGE + 1}–{Math.min((safeHistoryPage + 1) * HISTORY_PER_PAGE, patientHistory.length)} / {patientHistory.length}
+                    </span>
+                    <button
+                      className="history-nav-btn"
+                      disabled={safeHistoryPage >= historyTotalPages - 1}
+                      onClick={() => setCurrentHistoryPage(prev => Math.min(historyTotalPages - 1, prev + 1))}
+                    >›</button>
                   </div>
                 )}
               </div>
@@ -461,44 +477,54 @@ function DiagnosisDetail() {
         <div className="column column-right">
           <div className="panel chart-panel">
             <h3><span className="panel-icon">📝</span> 진단 정보 (차팅)</h3>
-            
+
             {/* 진단명 */}
             <div className="chart-field">
-              <label>진단명</label>
-              <input
-                type="text"
-                value={chartData.chartDiagnosisName}
-                onChange={(e) => handleChartChange('chartDiagnosisName', e.target.value)}
-                placeholder="진단명을 입력하거나 유사 패턴에서 선택"
-              />
+              <label><span className="field-icon">🏥</span> 진단명</label>
+              <div className="input-wrapper">
+                <span className="input-prefix">Dx.</span>
+                <input
+                  type="text"
+                  value={chartData.chartDiagnosisName}
+                  onChange={(e) => handleChartChange('chartDiagnosisName', e.target.value)}
+                  placeholder="진단명 입력 또는 유사 패턴에서 선택"
+                />
+              </div>
             </div>
 
-            {/* ICD 코드 */}
-            <div className="chart-field">
-              <label>ICD 코드</label>
-              <input
-                type="text"
-                value={chartData.chartIcdCode}
-                onChange={(e) => handleChartChange('chartIcdCode', e.target.value)}
-                placeholder="예: L40.0"
-              />
-            </div>
-
-            {/* 보험 수가 코드 */}
-            <div className="chart-field">
-              <label>보험 수가 코드</label>
-              <input
-                type="text"
-                value={chartData.chartInsuranceCode}
-                onChange={(e) => handleChartChange('chartInsuranceCode', e.target.value)}
-                placeholder="예: KN071, KN072"
-              />
+            {/* ICD 코드 / 보험 수가 코드 — 2열 레이아웃 */}
+            <div className="chart-field-row">
+              <div className="chart-field">
+                <label><span className="field-icon">📊</span> ICD 코드</label>
+                <div className="input-wrapper">
+                  <span className="input-prefix icd">ICD</span>
+                  <input
+                    type="text"
+                    value={chartData.chartIcdCode}
+                    onChange={(e) => handleChartChange('chartIcdCode', e.target.value)}
+                    placeholder="예: L40.0"
+                  />
+                </div>
+              </div>
+              <div className="chart-field">
+                <label><span className="field-icon">💰</span> 보험 수가</label>
+                <div className="input-wrapper">
+                  <span className="input-prefix ins">수가</span>
+                  <input
+                    type="text"
+                    value={chartData.chartInsuranceCode}
+                    onChange={(e) => handleChartChange('chartInsuranceCode', e.target.value)}
+                    placeholder="예: KN071"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* 치료 가이드라인 */}
             <div className="chart-field">
-              <label>치료 가이드라인</label>
+              <label><span className="field-icon">💊</span> 치료 가이드라인</label>
               <textarea
+                className="chart-textarea"
                 value={chartData.chartTreatmentGuideline}
                 onChange={(e) => handleChartChange('chartTreatmentGuideline', e.target.value)}
                 placeholder="치료 가이드라인 입력"
@@ -508,11 +534,15 @@ function DiagnosisDetail() {
 
             {/* SOAP 차팅 */}
             <div className="soap-charting">
-              <h4>SOAP 차팅</h4>
-              
-              <div className="chart-field soap-field">
-                <label><span className="soap-label-tag s">S</span> Subjective (주관적 증상)</label>
+              <h4><span>📋</span> SOAP 차팅</h4>
+
+              <div className="soap-block soap-s">
+                <div className="soap-label-row">
+                  <span className="soap-badge s">S</span>
+                  <span className="soap-label-text">Subjective · 주관적 증상</span>
+                </div>
                 <textarea
+                  className="chart-textarea soap-textarea"
                   value={chartData.chartSoapS}
                   onChange={(e) => handleChartChange('chartSoapS', e.target.value)}
                   placeholder="환자 호소 내용"
@@ -520,9 +550,13 @@ function DiagnosisDetail() {
                 />
               </div>
 
-              <div className="chart-field soap-field">
-                <label><span className="soap-label-tag o">O</span> Objective (객관적 소견)</label>
+              <div className="soap-block soap-o">
+                <div className="soap-label-row">
+                  <span className="soap-badge o">O</span>
+                  <span className="soap-label-text">Objective · 객관적 소견</span>
+                </div>
                 <textarea
+                  className="chart-textarea soap-textarea"
                   value={chartData.chartSoapO}
                   onChange={(e) => handleChartChange('chartSoapO', e.target.value)}
                   placeholder="이학적 검사 소견"
@@ -530,9 +564,13 @@ function DiagnosisDetail() {
                 />
               </div>
 
-              <div className="chart-field soap-field">
-                <label><span className="soap-label-tag a">A</span> Assessment (진단평가)</label>
+              <div className="soap-block soap-a">
+                <div className="soap-label-row">
+                  <span className="soap-badge a">A</span>
+                  <span className="soap-label-text">Assessment · 진단평가</span>
+                </div>
                 <textarea
+                  className="chart-textarea soap-textarea"
                   value={chartData.chartSoapA}
                   onChange={(e) => handleChartChange('chartSoapA', e.target.value)}
                   placeholder="진단 평가"
@@ -540,9 +578,13 @@ function DiagnosisDetail() {
                 />
               </div>
 
-              <div className="chart-field soap-field">
-                <label><span className="soap-label-tag p">P</span> Plan (치료계획)</label>
+              <div className="soap-block soap-p">
+                <div className="soap-label-row">
+                  <span className="soap-badge p">P</span>
+                  <span className="soap-label-text">Plan · 치료계획</span>
+                </div>
                 <textarea
+                  className="chart-textarea soap-textarea"
                   value={chartData.chartSoapP}
                   onChange={(e) => handleChartChange('chartSoapP', e.target.value)}
                   placeholder="치료 계획"
@@ -551,12 +593,16 @@ function DiagnosisDetail() {
               </div>
             </div>
 
-            <button 
+            <button
               className="btn btn-chart-save"
               onClick={handleSaveCharting}
               disabled={savingChart}
             >
-              {savingChart ? '저장 중...' : '💾 차팅 저장'}
+              {savingChart ? (
+                <><span className="btn-spinner"></span> 저장 중...</>
+              ) : (
+                <>💾 차팅 저장</>
+              )}
             </button>
             {chartSuccess && <div className="success-msg">{chartSuccess}</div>}
           </div>
@@ -564,13 +610,16 @@ function DiagnosisDetail() {
           {/* 의사 소견 */}
           <div className="panel doctor-panel">
             <h3><span className="panel-icon">👨‍⚕️</span> 의사 소견</h3>
-            <textarea
-              value={doctorNotes}
-              onChange={(e) => setDoctorNotes(e.target.value)}
-              placeholder="환자에 대한 소견을 작성하세요..."
-              rows="6"
-              className="doctor-notes-input"
-            />
+            <div className="chart-field">
+              <label><span className="field-icon">💬</span> 소견 내용</label>
+              <textarea
+                value={doctorNotes}
+                onChange={(e) => setDoctorNotes(e.target.value)}
+                placeholder="환자에 대한 소견을 작성하세요..."
+                rows="6"
+                className="chart-textarea doctor-textarea"
+              />
+            </div>
             
             {error && <div className="error-msg">{error}</div>}
             {success && <div className="success-msg">{success}</div>}
@@ -602,94 +651,6 @@ function DiagnosisDetail() {
         </div>
       </div>
 
-      {/* 히스토리 진단 상세 팝업 */}
-      {selectedHistoryItem && (
-        <div className="modal-overlay" onClick={() => setSelectedHistoryItem(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>📋 진단 상세 정보</h3>
-              <button onClick={() => setSelectedHistoryItem(null)} className="close-btn" aria-label="닫기">✕</button>
-            </div>
-            <div className="modal-body">
-              {/* 이미지 */}
-              {selectedHistoryItem.images && selectedHistoryItem.images.length > 0 && (
-                <div className="modal-images">
-                  {selectedHistoryItem.images.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img.image_path || img}
-                      alt={`이미지 ${idx + 1}`}
-                      className="modal-img"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* 기본 정보 */}
-              <div className="modal-info-grid">
-                <div className="modal-info-item">
-                  <div className="modal-info-label">📅 등록일</div>
-                  <div className="modal-info-value">{new Date(selectedHistoryItem.createdAt).toLocaleString('ko-KR')}</div>
-                </div>
-                <div className="modal-info-item">
-                  <div className="modal-info-label">상태</div>
-                  <div className="modal-info-value">{getStatusText(selectedHistoryItem.status)}</div>
-                </div>
-              </div>
-
-              {/* 진단 정보 */}
-              <div className="modal-detail-grid">
-                {selectedHistoryItem.treatmentType && (
-                  <div className="modal-detail-item">
-                    <strong>진료 종류</strong>
-                    <span>{selectedHistoryItem.treatmentType}</span>
-                  </div>
-                )}
-                {selectedHistoryItem.bodyParts && (
-                  <div className="modal-detail-item">
-                    <strong>부위</strong>
-                    <span>{selectedHistoryItem.bodyParts}</span>
-                  </div>
-                )}
-                {selectedHistoryItem.skinSymptoms && (
-                  <div className="modal-detail-item">
-                    <strong>피부 증상</strong>
-                    <span>{selectedHistoryItem.skinSymptoms}</span>
-                  </div>
-                )}
-                {selectedHistoryItem.duration && (
-                  <div className="modal-detail-item">
-                    <strong>기간</strong>
-                    <span>{selectedHistoryItem.duration}</span>
-                  </div>
-                )}
-              </div>
-
-              {selectedHistoryItem.symptoms && (
-                <div className="modal-text-block">
-                  <strong>증상 설명</strong>
-                  <p>{selectedHistoryItem.symptoms}</p>
-                </div>
-              )}
-
-              {selectedHistoryItem.gptDiagnosis && (
-                <div className="modal-text-block ai-block">
-                  <strong>🤖 AI 진단 결과</strong>
-                  <p>{selectedHistoryItem.gptDiagnosis}</p>
-                </div>
-              )}
-
-              {selectedHistoryItem.doctorNotes && (
-                <div className="modal-text-block doctor-block">
-                  <strong>👨‍⚕️ 의사 소견</strong>
-                  <p>{selectedHistoryItem.doctorNotes}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
