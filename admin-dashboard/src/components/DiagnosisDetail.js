@@ -344,8 +344,8 @@ function DiagnosisDetail() {
                       <div
                         key={itemId || idx}
                         className="history-grid-item"
-                        onClick={() => window.open(`/diagnoses/${itemId}`, '_blank')}
-                        title={`${new Date(item.createdAt).toLocaleDateString('ko-KR')} 클릭하여 새 탭에서 상세 보기`}
+                        onClick={() => navigate(`/diagnoses/${itemId}`)}
+                        title={`${new Date(item.createdAt).toLocaleDateString('ko-KR')} 클릭하여 상세 보기`}
                       >
                         <div className="history-thumb-wrap">
                           {imgSrc ? (
@@ -361,7 +361,7 @@ function DiagnosisDetail() {
                             </div>
                           )}
                           <div className="history-thumb-overlay">
-                            <span>새 탭으로 →</span>
+                            <span>상세 보기 →</span>
                           </div>
                         </div>
                         <div className="history-item-meta">

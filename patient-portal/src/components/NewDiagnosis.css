@@ -163,8 +163,19 @@
   transition: all 0.2s;
 }
 
+
+/* 체크박스 네이티브 사각형 완전 제거, 커스텀 원형/사각형도 제거 */
 .checkbox-label::before {
-  border-radius: 5px;
+  display: none;
+}
+
+/* 체크박스 선택 시 효과만 배경색/테두리로 표시 (아이콘 없음) */
+.checkbox-label:has(input:checked) {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
+  transform: translateY(-1px);
 }
 
 /* Hover */
