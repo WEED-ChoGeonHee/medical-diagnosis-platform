@@ -1,214 +1,376 @@
-.diagnosis-detail {
-  padding: 40px 20px;
-  max-width: 950px;
+/* ========================================
+   Patient Portal - DiagnosisDetail (다크 테마)
+   ======================================== */
+
+.dd-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
   min-height: calc(100vh - 80px);
+  background: #0d0d0d;
+  animation: ddFadeIn 0.4s ease;
 }
 
-.back-btn {
-  margin-bottom: 25px;
+@keyframes ddFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.detail-header {
+/* Loading */
+.dd-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #888;
+  font-size: 15px;
+}
+.dd-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(102, 126, 234, 0.2);
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: ddSpin 0.8s linear infinite;
+}
+@keyframes ddSpin { to { transform: rotate(360deg); } }
+
+/* Error */
+.dd-error {
+  background: rgba(245, 87, 108, 0.1);
+  border: 1px solid rgba(245, 87, 108, 0.3);
+  color: #f5576c;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* ========================================
+   Top Bar
+   ======================================== */
+.dd-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.dd-back-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  background: #1a1a1a;
+  color: #8fb3ff;
+  border: 2px solid rgba(102, 126, 234, 0.4);
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.dd-back-btn:hover {
+  transform: translateX(-4px);
+  border-color: rgba(102, 126, 234, 0.8);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+}
+
+.dd-header-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+.dd-header-info h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* Status Badges */
+.dd-status-badge {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dd-status-pending  { background: rgba(255,193,7,0.15);   color: #ffc107; border: 1px solid rgba(255,193,7,0.35); }
+.dd-status-reviewed { background: rgba(40,167,69,0.15);   color: #28a745; border: 1px solid rgba(40,167,69,0.35); }
+.dd-status-completed{ background: rgba(102,126,234,0.15); color: #8fb3ff; border: 1px solid rgba(102,126,234,0.35); }
+
+/* ========================================
+   2-Column Grid
+   ======================================== */
+.dd-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .dd-two-col { grid-template-columns: 1fr; }
+}
+
+.dd-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ========================================
+   Panel (Card)
+   ======================================== */
+.dd-panel {
+  background: #1a1a1a;
+  border: 1.5px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s;
+}
+.dd-panel:hover {
+  border-color: rgba(102, 126, 234, 0.22);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.dd-panel h3 {
+  margin: 0 0 16px 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #8fb3ff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dd-icon { font-size: 1.05rem; }
+
+/* Panel accents */
+.dd-panel-patient { border-top: 3px solid #667eea; }
+.dd-panel-ai      { border-top: 3px solid #f093fb; }
+.dd-panel-doctor  { border-top: 3px solid #28a745; }
+.dd-panel-meta    { border-top: 3px solid rgba(255,255,255,0.1); }
+
+/* ========================================
+   Info Rows
+   ======================================== */
+.dd-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dd-info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 35px;
-  padding-bottom: 25px;
-  border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-image-slice: 1;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.detail-header h2 {
-  margin: 0;
-  font-size: 2.2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-@media (max-width: 768px) {
-  .detail-header h2 {
-    font-size: 1.8rem;
-  }
-}
-
-.detail-section {
-  margin-bottom: 35px;
-}
-
-.detail-section h3 {
-  color: #667eea;
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  position: relative;
-  padding-left: 20px;
-}
-
-.detail-section h3::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 5px;
-  height: 80%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 3px;
-}
-
-.detail-section p {
-  line-height: 1.8;
-  color: #4a5568;
-  font-size: 1.05rem;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 25px;
-}
-
-.info-item {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 20px;
-  border-radius: 15px;
-  border-left: 5px solid #667eea;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.info-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
-}
-
-.info-label {
-  display: block;
-  font-size: 0.9rem;
-  color: #718096;
-  margin-bottom: 8px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.info-value {
-  display: block;
-  font-size: 1.2rem;
-  color: #2d3748;
-  font-weight: 800;
-}
-
-@media (max-width: 768px) {
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.image-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.image-gallery img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.image-gallery img:hover {
-  transform: scale(1.08);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-}
-
-@media (max-width: 768px) {
-  .image-gallery {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-  
-  .image-gallery img {
-    height: 180px;
-  }
-}
-
-.gpt-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 30px;
-  border-radius: 20px;
-  color: white;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-}
-
-.gpt-section h3 {
-  color: white !important;
-}
-
-.gpt-section h3::before {
-  background: white !important;
-}
-
-.gpt-content p {
-  margin-bottom: 12px;
-  line-height: 1.8;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.papers-list {
-  display: grid;
-  gap: 15px;
-}
-
-.paper-item {
-  background: #f8f9fa;
-  padding: 15px;
+  padding: 8px 12px;
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  background: rgba(255, 255, 255, 0.025);
+  transition: background 0.2s;
+}
+.dd-info-row:hover { background: rgba(102, 126, 234, 0.07); }
+.dd-label {
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 75px;
+}
+.dd-value {
+  color: #e0e0e0;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: right;
 }
 
-.paper-item h4 {
-  margin: 0 0 10px 0;
-  color: #333;
+/* ========================================
+   Photos
+   ======================================== */
+.dd-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+.dd-photo {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  cursor: zoom-in;
+  transition: all 0.3s;
+}
+.dd-photo:hover {
+  transform: scale(1.05);
+  border-color: #667eea;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
 }
 
-.paper-item p {
-  margin: 0 0 10px 0;
-  font-size: 0.95rem;
+/* ========================================
+   Symptom Tags
+   ======================================== */
+.dd-symptom-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.dd-tag {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.dd-tag-skin    { background: rgba(245,87,108,0.13);  color: #f5576c; border: 1px solid rgba(245,87,108,0.3); }
+.dd-tag-feature { background: rgba(240,147,251,0.13); color: #f093fb; border: 1px solid rgba(240,147,251,0.3); }
+
+.dd-symptom-desc {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  border-radius: 10px;
+  border-left: 3px solid #667eea;
+}
+.dd-symptom-desc strong {
+  display: block;
+  color: #8fb3ff;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.dd-symptom-desc p {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-wrap;
 }
 
-.paper-item a {
+/* ========================================
+   AI 진단 결과
+   ======================================== */
+.dd-gpt-content {
+  background: rgba(240, 147, 251, 0.04);
+  border-radius: 10px;
+  padding: 14px;
+  border-left: 3px solid #f093fb;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.dd-gpt-content::-webkit-scrollbar { width: 5px; }
+.dd-gpt-content::-webkit-scrollbar-thumb { background: rgba(240,147,251,0.3); border-radius: 3px; }
+.dd-gpt-content p {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 8px 0;
+}
+.dd-gpt-content p:last-child { margin-bottom: 0; }
+
+/* ========================================
+   의학 정보 (Papers)
+   ======================================== */
+.dd-papers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dd-paper-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 14px;
+  border-left: 3px solid #667eea;
+}
+.dd-paper-item h4 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  color: #8fb3ff;
+  font-weight: 700;
+}
+.dd-paper-item p {
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.6;
+}
+.dd-paper-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12px;
   color: #667eea;
   text-decoration: none;
   font-weight: 600;
 }
+.dd-paper-link:hover { text-decoration: underline; }
 
-.paper-item a:hover {
-  text-decoration: underline;
+/* ========================================
+   의사 소견
+   ======================================== */
+.dd-doctor-notes {
+  background: rgba(40, 167, 69, 0.05);
+  border-radius: 10px;
+  padding: 14px;
+  border-left: 3px solid #28a745;
 }
-
-.doctor-section {
-  background: #e8f5e9;
-  padding: 20px;
-  border-radius: 8px;
-  border-left: 4px solid #4caf50;
+.dd-doctor-notes p {
+  color: #b8e6c0;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 8px 0;
 }
+.dd-doctor-notes p:last-child { margin-bottom: 0; }
 
-.detail-footer {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
+/* ========================================
+   Lightbox
+   ======================================== */
+.dd-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 9999;
   display: flex;
-  justify-content: space-between;
-  color: #999;
-  font-size: 0.9rem;
+  align-items: center;
+  justify-content: center;
+  animation: ddFadeIn 0.2s ease;
+  cursor: zoom-out;
+}
+.dd-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 10000;
+}
+.dd-lightbox-close:hover { background: rgba(255,255,255,0.2); }
+.dd-lightbox-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  cursor: default;
+}
+.dd-lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 600px) {
+  .dd-container { padding: 14px; }
+  .dd-header-info h2 { font-size: 1.2rem; }
+  .dd-images { grid-template-columns: repeat(2, 1fr); }
 }
