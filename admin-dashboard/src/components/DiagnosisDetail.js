@@ -344,7 +344,7 @@ function DiagnosisDetail() {
                       <div
                         key={itemId || idx}
                         className="history-grid-item"
-                        onClick={() => navigate(`/diagnoses/${itemId}`)}
+                        onClick={() => navigate(`/diagnosis/${itemId}`)}
                         title={`${new Date(item.createdAt).toLocaleDateString('ko-KR')} 클릭하여 상세 보기`}
                       >
                         <div className="history-thumb-wrap">
@@ -654,15 +654,6 @@ function DiagnosisDetail() {
         </div>
       </div>
 
-      {/* ============ Lightbox ============ */}
-      {lightboxSrc && (
-        <div className="lightbox-overlay" onClick={() => setLightboxSrc(null)}>
-          <button className="lightbox-close" onClick={() => setLightboxSrc(null)}>✕</button>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <img src={lightboxSrc} alt="확대 이미지" className="lightbox-img" />
-          </div>
-        </div>
-      )}
       {/* ============ Lightbox ============ */}
       {lightboxSrc && (
         <div className="lightbox-overlay" onClick={() => setLightboxSrc(null)}>
