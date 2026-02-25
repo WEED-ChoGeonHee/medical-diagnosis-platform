@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import './DiagnosisList.css';
@@ -9,8 +9,11 @@ function DiagnosisList() {
   const [filter, setFilter] = useState('all');
   const [treatmentTypeFilter, setTreatmentTypeFilter] = useState('all');
   const [patientRegistrationNumber, setPatientRegistrationNumber] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const debounceRef = useRef(null);
 
   // 진료 종류
   const treatmentTypes = ['보험진료', '색소진료', '부작용 진료'];
@@ -27,11 +30,28 @@ function DiagnosisList() {
       const response = await api.get(`/admin/diagnoses?page=${currentPage}${statusParam}${treatmentParam}${registrationParam}`);
       setDiagnoses(response.data.diagnoses);
       setTotalPages(response.data.totalPages);
+      setTotalCount(response.data.total || 0);
     } catch (error) {
       console.error('진단 목록 로드 실패:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // 등록번호 검색 - 디바운스 300ms
+  const handleSearchChange = (value) => {
+    setSearchInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setPatientRegistrationNumber(value);
+      setCurrentPage(1);
+    }, 300);
+  };
+
+  const clearSearch = () => {
+    setSearchInput('');
+    setPatientRegistrationNumber('');
+    setCurrentPage(1);
   };
 
   const getStatusText = (status) => {
@@ -49,45 +69,27 @@ function DiagnosisList() {
 
   return (
     <div className="container diagnosis-list">
-      <h2>피부과 진단 목록</h2>
+      <div className="list-header">
+        <h2>피부과 진단 목록</h2>
+        {totalCount > 0 && <span className="total-badge">{totalCount}건</span>}
+      </div>
 
       <div className="filters">
+        {/* 상태 필터 */}
         <div className="filter-group">
           <label>상태</label>
           <div className="filter-buttons">
-            <button 
-              className={filter === 'all' ? 'filter-btn active' : 'filter-btn'}
-              onClick={() => { setFilter('all'); setCurrentPage(1); }}
-            >
-              전체
-            </button>
-            <button 
-              className={filter === 'pending' ? 'filter-btn active' : 'filter-btn'}
-              onClick={() => { setFilter('pending'); setCurrentPage(1); }}
-            >
-              대기 중
-            </button>
-            <button 
-              className={filter === 'reviewed' ? 'filter-btn active' : 'filter-btn'}
-              onClick={() => { setFilter('reviewed'); setCurrentPage(1); }}
-            >
-              검토 완료
-            </button>
-            <button 
-              className={filter === 'completed' ? 'filter-btn active' : 'filter-btn'}
-              onClick={() => { setFilter('completed'); setCurrentPage(1); }}
-            >
-              완료
-            </button>
+            <button className={filter === 'all' ? 'filter-btn active' : 'filter-btn'} onClick={() => { setFilter('all'); setCurrentPage(1); }}>전체</button>
+            <button className={filter === 'pending' ? 'filter-btn active' : 'filter-btn'} onClick={() => { setFilter('pending'); setCurrentPage(1); }}>대기 중</button>
+            <button className={filter === 'reviewed' ? 'filter-btn active' : 'filter-btn'} onClick={() => { setFilter('reviewed'); setCurrentPage(1); }}>검토 완료</button>
+            <button className={filter === 'completed' ? 'filter-btn active' : 'filter-btn'} onClick={() => { setFilter('completed'); setCurrentPage(1); }}>완료</button>
           </div>
         </div>
 
-        <div className="filter-group">
+        {/* 진료 종류 필터 */}
+        <div className="filter-group filter-group-sm">
           <label>진료 종류</label>
-          <select 
-            value={treatmentTypeFilter} 
-            onChange={(e) => { setTreatmentTypeFilter(e.target.value); setCurrentPage(1); }}
-          >
+          <select value={treatmentTypeFilter} onChange={(e) => { setTreatmentTypeFilter(e.target.value); setCurrentPage(1); }}>
             <option value="all">전체</option>
             {treatmentTypes.map(type => (
               <option key={type} value={type}>{type}</option>
@@ -95,14 +97,28 @@ function DiagnosisList() {
           </select>
         </div>
 
-        <div className="filter-group">
-          <label>환자 등록번호</label>
-          <input 
-            type="text"
-            placeholder="등록번호 검색"
-            value={patientRegistrationNumber} 
-            onChange={(e) => { setPatientRegistrationNumber(e.target.value); setCurrentPage(1); }}
-          />
+        {/* 환자 등록번호 검색 */}
+        <div className="filter-group filter-group-search">
+          <label>환자 등록번호 검색</label>
+          <div className="search-box">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="등록번호 입력..."
+              value={searchInput}
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
+            {searchInput && (
+              <button className="search-clear" onClick={clearSearch} title="검색 초기화">✕</button>
+            )}
+          </div>
+          {patientRegistrationNumber && (
+            <div className="search-active-badge">
+              <span>🔎 "{patientRegistrationNumber}" 검색 중</span>
+              <button onClick={clearSearch}>✕</button>
+            </div>
+          )}
         </div>
       </div>
 

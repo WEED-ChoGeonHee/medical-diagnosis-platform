@@ -4,12 +4,134 @@
   background: #0a0a0a;
 }
 
-.diagnosis-list h2 {
+/* 리스트 헤더 */
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 28px;
+}
+
+.diagnosis-list h2 {
+  margin: 0;
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: #ffffff;
+}
+
+.total-badge {
+  background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3));
+  color: #8fb3ff;
+  border: 1px solid rgba(102,126,234,0.4);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 검색 박스 */
+.filter-group-search {
+  flex: 2 !important;
+  min-width: 220px !important;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 15px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 40px 12px 38px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  background: rgba(30,30,30,0.8);
+  color: #ffffff;
+  transition: all 0.3s;
+  box-sizing: border-box;
+  font-weight: 500;
+}
+
+.search-input::placeholder {
+  color: #666;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(79,140,255,0.25);
+  background: rgba(30,30,30,0.95);
+}
+
+.search-clear {
+  position: absolute;
+  right: 10px;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 11px;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.search-clear:hover {
+  background: rgba(245,87,108,0.3);
+  color: #f5576c;
+}
+
+.search-active-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 5px 10px;
+  background: rgba(102,126,234,0.15);
+  border: 1px solid rgba(102,126,234,0.3);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #8fb3ff;
+  font-weight: 600;
+}
+
+.search-active-badge button {
+  background: none;
+  border: none;
+  color: #8fb3ff;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 2px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.search-active-badge button:hover {
+  opacity: 1;
+  color: #f5576c;
+}
+
+/* 작은 필터 그룹 */
+.filter-group-sm {
+  flex: 0 0 auto !important;
+  min-width: 140px !important;
 }
 
 .filters {
