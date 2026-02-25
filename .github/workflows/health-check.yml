@@ -2,12 +2,27 @@ name: Health Check
 
 on:
   schedule:
+    # Render 무료 플랜은 15분 비활성 시 슬립 → 5분마다 핑으로 슬립 방지
     - cron: '*/5 * * * *'
 
 jobs:
   health-check:
     runs-on: self-hosted
     steps:
-      - name: Call health check endpoint (prod)
+      - name: Warm up server (keep-alive ping)
         run: |
-          curl -sS https://medical-diagnosis-platform.onrender.com/api/health || echo "Health check failed"
+          echo "헬스체크 시작: $(date)"
+          # --retry 5        : 최대 5회 재시도 (콜드 스타트 대기)
+          # --retry-delay 15  : 재시도 간 15초 대기
+          # --retry-all-errors: 모든 오류(타임아웃/연결 실패 포함) 시 재시도
+          # --connect-timeout 30: 연결 타임아웃 30초
+          # --max-time 120   : 전체 요청 최대 2분
+          RESPONSE=$(curl -sS \
+            --retry 5 \
+            --retry-delay 15 \
+            --retry-all-errors \
+            --connect-timeout 30 \
+            --max-time 120 \
+            https://medical-diagnosis-platform.onrender.com/api/health 2>&1) || true
+          echo "응답: $RESPONSE"
+          echo "헬스체크 완료: $(date)"
