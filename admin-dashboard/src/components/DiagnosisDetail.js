@@ -23,6 +23,17 @@ function DiagnosisDetail() {
   const [selectedAiDiagnosis, setSelectedAiDiagnosis] = useState(null);
   const [loadingAi, setLoadingAi] = useState(false);
 
+  // 증상 수정 관련 상태
+  const [editingSymptoms, setEditingSymptoms] = useState(false);
+  const [symptomData, setSymptomData] = useState({
+    skinSymptoms: '',
+    skinFeatures: '',
+    symptoms: '',
+    bodyParts: ''
+  });
+  const [savingSymptoms, setSavingSymptoms] = useState(false);
+  const [symptomSuccess, setSymptomSuccess] = useState('');
+
   // 차팅 관련 상태
   const [chartData, setChartData] = useState({
     chartDiagnosisName: '',
@@ -53,6 +64,14 @@ function DiagnosisDetail() {
       const data = response.data;
       setDiagnosis(data);
       setDoctorNotes(data.doctorNotes || '');
+
+      // 증상 데이터 초기화
+      setSymptomData({
+        skinSymptoms: data.skinSymptoms || '',
+        skinFeatures: data.skinFeatures || '',
+        symptoms: data.symptoms || '',
+        bodyParts: data.bodyParts || ''
+      });
       
       // 차팅 데이터 초기화
       setChartData({
@@ -194,6 +213,36 @@ function DiagnosisDetail() {
     setChartData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleSymptomChange = (field, value) => {
+    setSymptomData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveSymptoms = async () => {
+    setSavingSymptoms(true);
+    setSymptomSuccess('');
+    try {
+      const response = await api.put(`/admin/diagnoses/${id}/symptoms`, symptomData);
+      setDiagnosis(response.data.diagnosis);
+      setSymptomSuccess('증상이 수정되었습니다.');
+      setEditingSymptoms(false);
+      setTimeout(() => setSymptomSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || '증상 수정에 실패했습니다.');
+    } finally {
+      setSavingSymptoms(false);
+    }
+  };
+
+  const handleCancelSymptoms = () => {
+    setSymptomData({
+      skinSymptoms: diagnosis.skinSymptoms || '',
+      skinFeatures: diagnosis.skinFeatures || '',
+      symptoms: diagnosis.symptoms || '',
+      bodyParts: diagnosis.bodyParts || ''
+    });
+    setEditingSymptoms(false);
+  };
+
   if (loading) {
     return <div className="container loading">로딩 중...</div>;
   }
@@ -308,20 +357,96 @@ function DiagnosisDetail() {
 
           {/* 선택된 증상 */}
           <div className="panel">
-            <h3><span className="panel-icon">🩺</span> 선택된 증상</h3>
-            <div className="symptom-tags">
-              {diagnosis.skinSymptoms && (
-                <div className="symptom-tag skin">{diagnosis.skinSymptoms}</div>
-              )}
-              {diagnosis.skinFeatures && (
-                <div className="symptom-tag feature">{diagnosis.skinFeatures}</div>
+            <div className="panel-header-row">
+              <h3><span className="panel-icon">🩺</span> 선택된 증상</h3>
+              {!editingSymptoms && (
+                <button
+                  className="btn btn-sm btn-outline"
+                  onClick={() => setEditingSymptoms(true)}
+                >
+                  ✏️ 수정
+                </button>
               )}
             </div>
-            {diagnosis.symptoms && (
-              <div className="symptom-description">
-                <strong>증상 설명:</strong>
-                <p>{diagnosis.symptoms}</p>
+
+            {editingSymptoms ? (
+              <div className="symptom-edit-form">
+                <div className="chart-field">
+                  <label>부위</label>
+                  <input
+                    type="text"
+                    className="symptom-input"
+                    value={symptomData.bodyParts}
+                    onChange={(e) => handleSymptomChange('bodyParts', e.target.value)}
+                    placeholder="예: 얼굴, 팔, 등"
+                  />
+                </div>
+                <div className="chart-field">
+                  <label>피부 증상 유형</label>
+                  <input
+                    type="text"
+                    className="symptom-input"
+                    value={symptomData.skinSymptoms}
+                    onChange={(e) => handleSymptomChange('skinSymptoms', e.target.value)}
+                    placeholder="예: 발진, 가려움, 붓기"
+                  />
+                </div>
+                <div className="chart-field">
+                  <label>피부 특징</label>
+                  <input
+                    type="text"
+                    className="symptom-input"
+                    value={symptomData.skinFeatures}
+                    onChange={(e) => handleSymptomChange('skinFeatures', e.target.value)}
+                    placeholder="예: 붉음, 건조, 비늘"
+                  />
+                </div>
+                <div className="chart-field">
+                  <label>증상 설명</label>
+                  <textarea
+                    className="chart-textarea"
+                    rows="3"
+                    value={symptomData.symptoms}
+                    onChange={(e) => handleSymptomChange('symptoms', e.target.value)}
+                    placeholder="환자가 입력한 증상 설명"
+                  />
+                </div>
+                <div className="symptom-edit-actions">
+                  <button
+                    className="btn btn-success"
+                    onClick={handleSaveSymptoms}
+                    disabled={savingSymptoms}
+                  >
+                    {savingSymptoms ? '저장 중...' : '💾 저장'}
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={handleCancelSymptoms}
+                    disabled={savingSymptoms}
+                  >
+                    취소
+                  </button>
+                </div>
+                {symptomSuccess && <div className="success-msg">{symptomSuccess}</div>}
               </div>
+            ) : (
+              <>
+                <div className="symptom-tags">
+                  {diagnosis.skinSymptoms && (
+                    <div className="symptom-tag skin">{diagnosis.skinSymptoms}</div>
+                  )}
+                  {diagnosis.skinFeatures && (
+                    <div className="symptom-tag feature">{diagnosis.skinFeatures}</div>
+                  )}
+                </div>
+                {diagnosis.symptoms && (
+                  <div className="symptom-description">
+                    <strong>증상 설명:</strong>
+                    <p>{diagnosis.symptoms}</p>
+                  </div>
+                )}
+                {symptomSuccess && <div className="success-msg">{symptomSuccess}</div>}
+              </>
             )}
           </div>
 

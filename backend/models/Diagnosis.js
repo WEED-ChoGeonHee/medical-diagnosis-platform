@@ -308,6 +308,18 @@ const Diagnosis = {
     return await this.findById(id);
   },
 
+  // 증상 정보 업데이트 (의사가 수정)
+  async updateSymptoms(id, data) {
+    const { skin_symptoms, skin_features, symptoms, body_parts } = data;
+
+    await pool.query(
+      `UPDATE diagnoses SET skin_symptoms = ?, skin_features = ?, symptoms = ?, body_parts = ? WHERE id = ?`,
+      [skin_symptoms, skin_features, symptoms, body_parts, id]
+    );
+
+    return await this.findById(id);
+  },
+
   // 차팅 정보 업데이트
   async updateCharting(id, chartData) {
     const {

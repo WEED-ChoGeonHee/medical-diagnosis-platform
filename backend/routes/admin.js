@@ -112,6 +112,32 @@ router.put('/diagnoses/:id', protect, authorize('doctor'), async (req, res) => {
   }
 });
 
+// 증상 정보 수정 (의사가 환자 증상 수정)
+router.put('/diagnoses/:id/symptoms', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const { skinSymptoms, skinFeatures, symptoms, bodyParts } = req.body;
+
+    console.log('=== 증상 수정 요청 ===');
+    console.log('진단 ID:', req.params.id);
+
+    const diagnosis = await Diagnosis.updateSymptoms(req.params.id, {
+      skin_symptoms: skinSymptoms,
+      skin_features: skinFeatures,
+      symptoms,
+      body_parts: bodyParts
+    });
+
+    if (!diagnosis) {
+      return res.status(404).json({ message: '진단을 찾을 수 없습니다.' });
+    }
+
+    res.json({ message: '증상이 수정되었습니다.', diagnosis });
+  } catch (error) {
+    console.error('증상 수정 오류:', error);
+    res.status(500).json({ message: '증상 수정 중 오류가 발생했습니다.' });
+  }
+});
+
 // 차팅 정보 저장
 router.put('/diagnoses/:id/charting', protect, authorize('doctor'), async (req, res) => {
   try {
