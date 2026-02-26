@@ -15,8 +15,12 @@
 .dashboard-header h2 {
   margin: 0;
   font-size: 2.5rem;
-  color: white;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  font-weight: 800;
+  background: linear-gradient(135deg, #4f8cff 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
 }
 
 .diagnoses-list {
@@ -36,14 +40,15 @@
 }
 
 .diagnosis-card {
-  background: white;
+  background: rgba(17, 22, 56, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   text-decoration: none;
   color: inherit;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
@@ -54,14 +59,15 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  height: 3px;
+  background: linear-gradient(90deg, #4f8cff 0%, #a855f7 100%);
 }
 
 .diagnosis-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
-  border-color: #667eea;
+  box-shadow: 0 20px 60px rgba(79, 140, 255, 0.3);
+  border-color: rgba(79, 140, 255, 0.4);
+  background: rgba(25, 32, 72, 0.95);
 }
 
 .diagnosis-header {
@@ -74,51 +80,55 @@
 .diagnosis-header h3 {
   margin: 0;
   font-size: 1.4rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-weight: 700;
+  background: linear-gradient(135deg, #4f8cff 0%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .status-badge {
-  padding: 8px 16px;
-  border-radius: 25px;
-  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .status-pending {
-  background: linear-gradient(135deg, #ffd89b 0%, #f6a743 100%);
-  color: #8B4513;
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.35);
 }
 
 .status-reviewed {
-  background: linear-gradient(135deg, #a8edea 0%, #26c6da 100%);
-  color: #006064;
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
 }
 
 .status-completed {
-  background: linear-gradient(135deg, #72efdd 0%, #5eead4 100%);
-  color: #065f46;
+  background: rgba(79, 140, 255, 0.15);
+  color: #4f8cff;
+  border: 1px solid rgba(79, 140, 255, 0.35);
 }
 
 .diagnosis-symptoms {
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 20px;
   line-height: 1.7;
-  font-size: 1rem;
+  font-size: 14px;
 }
 
 .diagnosis-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #718096;
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
   padding-top: 18px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-weight: 500;
 }
+

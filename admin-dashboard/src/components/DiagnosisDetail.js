@@ -284,35 +284,17 @@ ${suggestion.description}`,
 
       // 수정된 증상으로 AI 3개 진단 재추청 (유사 패턴 증례 갱신)
       setSymptomSuccess('증상 수정 완료 - AI 전체 재분석 중...');
-      const newSuggestions = await fetchAiSuggestions({
+      await fetchAiSuggestions({
         symptoms: symptomData.symptoms,
         bodyParts: symptomData.bodyParts.join(', '),
         skinSymptoms: symptomData.skinSymptoms.join(', '),
         images: updatedDiagnosis.images
       });
 
-      // 1위 AI 제안을 차팅에 자동 적용
-      if (newSuggestions && newSuggestions.length > 0) {
-        await applyAiSuggestionToChart(newSuggestions[0]);
-      } else {
-        // 제안 없으면 차팅 초기화
-        setChartData({
-          chartDiagnosisName: '',
-          chartIcdCode: '',
-          chartInsuranceCode: '',
-          chartTreatmentGuideline: '',
-          chartSoapS: '',
-          chartSoapO: '',
-          chartSoapA: '',
-          chartSoapP: ''
-        });
-        setSelectedAiDiagnosis(null);
-      }
-
       // AI 진단 결과 + 관련 의학 정보 재분석 (백그라운드)
       reanalyzeAfterSymptomsUpdate();
 
-      setSymptomSuccess('증상 수정 완료 - 차팅이 자동 업데이트되었습니다.');
+      setSymptomSuccess('증상 수정 완료 - 유사 패턴 증례를 클릭하여 차팅을 업데이트하세요.');
       setTimeout(() => setSymptomSuccess(''), 4000);
     } catch (err) {
       setError(err.response?.data?.message || '증상 수정에 실패했습니다.');
