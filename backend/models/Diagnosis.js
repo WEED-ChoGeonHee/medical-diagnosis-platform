@@ -411,6 +411,22 @@ const Diagnosis = {
   async getAllDermatologyDiagnoses() {
     const [results] = await pool.query('SELECT * FROM dermatology_diagnoses ORDER BY diagnosis_name_kr');
     return results;
+  },
+
+  // AI 진단 결과 업데이트
+  async updateGptDiagnosis(id, gptDiagnosis) {
+    await pool.query(
+      'UPDATE diagnoses SET gpt_diagnosis = ? WHERE id = ?',
+      [gptDiagnosis, id]
+    );
+  },
+
+  // 의학 논문 전체 삭제 (재분석 전 초기화용)
+  async deletePapers(diagnosisId) {
+    await pool.query(
+      'DELETE FROM medical_papers WHERE diagnosis_id = ?',
+      [diagnosisId]
+    );
   }
 };
 

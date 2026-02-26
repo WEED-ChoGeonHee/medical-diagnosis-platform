@@ -276,4 +276,92 @@ router.post('/ai-suggest-symptoms', protect, authorize('doctor'), async (req, re
   }
 });
 
+// 증상 수정 후 AI 진단 결과 + 의학 논문 재분석
+router.post('/diagnoses/:id/reanalyze', protect, authorize('doctor'), async (req, res) => {
+  try {
+    const diagnosis = await Diagnosis.findById(req.params.id);
+    if (!diagnosis) {
+      return res.status(404).json({ message: '진단을 찾을 수 없습니다.' });
+    }
+
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent';
+
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ message: 'AI 서비스가 설정되지 않았습니다.' });
+    }
+
+    const axios = require('axios');
+    const { symptoms, bodyParts, skinSymptoms, skinFeatures, treatmentType, duration } = diagnosis;
+
+    const detailedInfo = `
+진료 종류: ${treatmentType || '미지정'}
+부위: ${bodyParts || '미지정'}
+피부 증상: ${skinSymptoms || '미지정'}
+기간: ${duration || '미지정'}
+피부 질환 특징: ${skinFeatures || '미지정'}
+증상 설명: ${symptoms}`;
+
+    let gptDiagnosis = '';
+    let medicalPapers = [];
+
+    try {
+      // AI 진단 재분석
+      const diagnosisResponse = await axios.post(
+        `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
+        {
+          contents: [{
+            parts: [{
+              text: `당신은 피부과 전문의입니다. 환자의 피부 증상을 바탕으로 가능한 진단명을 제시하고, 관련 의학 정보를 제공해주세요. 이것은 참고용이며 정확한 진단은 피부과 전문의와 상담이 필요함을 명시하세요.\n${detailedInfo}\n\n위 정보를 바탕으로 가능한 피부과 진단명과 설명을 제공해주세요.`
+            }]
+          }]
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      gptDiagnosis = diagnosisResponse.data.candidates[0].content.parts[0].text;
+
+      // 의학 논문 재검색
+      const papersResponse = await axios.post(
+        `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
+        {
+          contents: [{
+            parts: [{
+              text: `관련 피부과 논문 3개의 제목, URL, 간단한 요약을 JSON 배열 형식으로 제공해주세요.\n형식: [{"title": "논문 제목", "url": "https://pubmed.ncbi.nlm.nih.gov/...", "summary": "요약"}]\n\n주의사항:\n- url은 실제 접근 가능한 PubMed 또는 학술 논문 링크를 제공해주세요\n- 링크가 없으면 null로 설정해주세요\n\n다음 피부 증상과 관련된 논문: ${skinSymptoms || bodyParts || '피부 질환'} - ${symptoms}`
+            }]
+          }]
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+
+      try {
+        const papersText = papersResponse.data.candidates[0].content.parts[0].text;
+        const jsonMatch = papersText.match(/\[.*\]/s);
+        if (jsonMatch) {
+          medicalPapers = JSON.parse(jsonMatch[0]);
+        } else {
+          medicalPapers = [{ title: '관련 논문 정보', summary: papersText }];
+        }
+      } catch (e) {
+        medicalPapers = [{ title: '관련 논문 정보', summary: papersResponse.data.candidates[0].content.parts[0].text }];
+      }
+    } catch (apiError) {
+      console.error('재분석 Gemini API 오류:', apiError.response?.data || apiError.message);
+      return res.status(500).json({ message: 'AI 재분석 중 오류가 발생했습니다.' });
+    }
+
+    // DB 업데이트: AI 진단 결과 저장, 기존 논문 삭제 후 새 논문 저장
+    await Diagnosis.updateGptDiagnosis(req.params.id, gptDiagnosis);
+    await Diagnosis.deletePapers(req.params.id);
+    for (const paper of medicalPapers) {
+      await Diagnosis.addPaper(req.params.id, paper);
+    }
+
+    const updatedDiagnosis = await Diagnosis.findById(req.params.id);
+    res.json({ message: 'AI 재분석이 완료되었습니다.', diagnosis: updatedDiagnosis });
+  } catch (error) {
+    console.error('재분석 오류:', error);
+    res.status(500).json({ message: '재분석 중 오류가 발생했습니다.' });
+  }
+});
+
 module.exports = router;

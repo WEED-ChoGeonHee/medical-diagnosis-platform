@@ -278,11 +278,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 12px;
+  flex-wrap: nowrap;
 }
 
 .panel-header-row h3 {
   margin: 0;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel-header-row .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .symptom-edit-form {
@@ -365,6 +377,16 @@
 
 /* 모바일 대응 */
 @media (max-width: 768px) {
+  .panel-header-row {
+    gap: 6px;
+  }
+  .panel-header-row h3 {
+    font-size: 14px;
+  }
+  .panel-header-row .btn {
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+  }
   .symptom-chips {
     gap: 6px;
   }

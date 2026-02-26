@@ -35,6 +35,8 @@ function DiagnosisDetail() {
   const [aiSuggestions, setAiSuggestions] = useState([]);
   const [selectedAiDiagnosis, setSelectedAiDiagnosis] = useState(null);
   const [loadingAi, setLoadingAi] = useState(false);
+  const [reanalyzing, setReanalyzing] = useState(false);
+  const [reanalyzeSuccess, setReanalyzeSuccess] = useState('');
 
   // 증상 수정 관련 상태
   const [editingSymptoms, setEditingSymptoms] = useState(false);
@@ -118,17 +120,18 @@ function DiagnosisDetail() {
     }
   };
 
-  // AI 증상 추천 fetch (상위 3개)
-  const fetchAiSuggestions = async () => {
-    if (!diagnosis || !diagnosis.symptoms) return;
+  // AI 증상 추천 fetch (상위 3개) - override로 최신 증상 데이터 직접 전달 가능
+  const fetchAiSuggestions = async (overrideData = null) => {
+    const data = overrideData || diagnosis;
+    if (!data || !data.symptoms) return;
     
     setLoadingAi(true);
     try {
       const response = await api.post('/admin/ai-suggest-symptoms', {
-        symptoms: diagnosis.symptoms,
-        bodyParts: diagnosis.bodyParts,
-        skinSymptoms: diagnosis.skinSymptoms,
-        images: diagnosis.images
+        symptoms: data.symptoms,
+        bodyParts: data.bodyParts || data.bodyParts,
+        skinSymptoms: data.skinSymptoms,
+        images: data.images
       });
       setAiSuggestions(response.data.suggestions || []);
     } catch (err) {
@@ -136,6 +139,24 @@ function DiagnosisDetail() {
       setAiSuggestions([]);
     } finally {
       setLoadingAi(false);
+    }
+  };
+
+  // 증상 수정 후 AI 진단 결과 + 의학 논문 재분석
+  const reanalyzeAfterSymptomsUpdate = async () => {
+    setReanalyzing(true);
+    setReanalyzeSuccess('');
+    try {
+      const response = await api.post(`/admin/diagnoses/${id}/reanalyze`);
+      // 재분석 결과로 diagnosis 상태 갱신 (gptDiagnosis, medicalPapers 포함)
+      setDiagnosis(response.data.diagnosis);
+      setReanalyzeSuccess('AI 진단 결과 및 관련 의학 정보가 갱신되었습니다.');
+      setTimeout(() => setReanalyzeSuccess(''), 4000);
+    } catch (err) {
+      console.error('AI 재분석 오류:', err);
+      // 재분석 실패해도 사용자 경험 방해 안 함
+    } finally {
+      setReanalyzing(false);
     }
   };
 
@@ -242,15 +263,29 @@ function DiagnosisDetail() {
     setSavingSymptoms(true);
     setSymptomSuccess('');
     try {
-      const response = await api.put(`/admin/diagnoses/${id}/symptoms`, {
+      const updatedPayload = {
         skinSymptoms: symptomData.skinSymptoms.join(', '),
         skinFeatures: symptomData.skinFeatures.join(', '),
         symptoms: symptomData.symptoms,
         bodyParts: symptomData.bodyParts.join(', ')
-      });
-      setDiagnosis(response.data.diagnosis);
-      setSymptomSuccess('증상이 수정되었습니다.');
+      };
+      const response = await api.put(`/admin/diagnoses/${id}/symptoms`, updatedPayload);
+      const updatedDiagnosis = response.data.diagnosis;
+      setDiagnosis(updatedDiagnosis);
+      setSymptomSuccess('증상이 수정되었습니다. AI 분석 중...');
       setEditingSymptoms(false);
+
+      // 유사 패턴 증례 즉시 갱신 (업데이트된 증상으로)
+      fetchAiSuggestions({
+        symptoms: symptomData.symptoms,
+        bodyParts: symptomData.bodyParts.join(', '),
+        skinSymptoms: symptomData.skinSymptoms.join(', '),
+        images: updatedDiagnosis.images
+      });
+
+      // AI 진단 결과 + 관련 의학 정보 재분석
+      reanalyzeAfterSymptomsUpdate();
+
       setTimeout(() => setSymptomSuccess(''), 3000);
     } catch (err) {
       setError(err.response?.data?.message || '증상 수정에 실패했습니다.');
@@ -606,6 +641,17 @@ function DiagnosisDetail() {
           </div>
 
           {/* AI 진단 결과 (원본) */}
+          {reanalyzing && (
+            <div className="panel ai-reanalyze-panel">
+              <div className="ai-loading">
+                <div className="spinner"></div>
+                <p>수정된 증상으로 AI 재분석 중... (진단 결과·의학 정보 갱신)</p>
+              </div>
+            </div>
+          )}
+          {reanalyzeSuccess && (
+            <div className="success-msg" style={{ marginBottom: '12px' }}>{reanalyzeSuccess}</div>
+          )}
           {diagnosis.gptDiagnosis && (
             <div className="panel ai-result-panel">
               <h3><span className="panel-icon">📋</span> AI 진단 결과 (상세)</h3>
