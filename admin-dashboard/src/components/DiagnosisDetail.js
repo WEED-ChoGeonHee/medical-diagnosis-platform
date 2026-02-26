@@ -120,10 +120,10 @@ function DiagnosisDetail() {
     }
   };
 
-  // AI 증상 추천 fetch (상위 3개) - override로 최신 증상 데이터 직접 전달 가능
+  // AI 증상 추천 fetch (상위 3개) - override로 최신 증상 데이터 직접 전달 가능, 결과 반환
   const fetchAiSuggestions = async (overrideData = null) => {
     const data = overrideData || diagnosis;
-    if (!data || !data.symptoms) return;
+    if (!data || !data.symptoms) return [];
     
     setLoadingAi(true);
     try {
@@ -133,10 +133,13 @@ function DiagnosisDetail() {
         skinSymptoms: data.skinSymptoms,
         images: data.images
       });
-      setAiSuggestions(response.data.suggestions || []);
+      const suggestions = response.data.suggestions || [];
+      setAiSuggestions(suggestions);
+      return suggestions;
     } catch (err) {
       console.error('AI 증상 추천 오류:', err);
       setAiSuggestions([]);
+      return [];
     } finally {
       setLoadingAi(false);
     }
@@ -160,10 +163,9 @@ function DiagnosisDetail() {
     }
   };
 
-  // AI 진단 클릭 시 → 피부과 진단 DB에서 검색하여 차팅 자동입력
-  const handleAiDiagnosisClick = async (suggestion) => {
+  // AI 제안을 바탕으로 차팅 자동 적용 (필드 반환)
+  const applyAiSuggestionToChart = async (suggestion) => {
     setSelectedAiDiagnosis(suggestion);
-    
     try {
       const response = await api.get(`/admin/dermatology-diagnoses/search?q=${encodeURIComponent(suggestion.diagnosis)}`);
       if (response.data && response.data.length > 0) {
@@ -179,20 +181,26 @@ function DiagnosisDetail() {
           chartSoapP: info.soap_p || ''
         });
       } else {
-        // DB에 없으면 AI 정보로 일부 채움
-        setChartData(prev => ({
-          ...prev,
+        setChartData({
           chartDiagnosisName: suggestion.diagnosis,
-          chartSoapA: `진단: ${suggestion.diagnosis} (신뢰도: ${suggestion.confidence}%)\n${suggestion.description}`
-        }));
+          chartIcdCode: '',
+          chartInsuranceCode: '',
+          chartTreatmentGuideline: '',
+          chartSoapS: '',
+          chartSoapO: '',
+          chartSoapA: `진단: ${suggestion.diagnosis} (신뢰도: ${suggestion.confidence}%)
+${suggestion.description}`,
+          chartSoapP: ''
+        });
       }
     } catch (err) {
-      // 검색 실패시에도 진단명 채움
-      setChartData(prev => ({
-        ...prev,
-        chartDiagnosisName: suggestion.diagnosis
-      }));
+      setChartData(prev => ({ ...prev, chartDiagnosisName: suggestion.diagnosis }));
     }
+  };
+
+  // AI 진단 클릭 시 → 차팅 자동입력 (applyAiSuggestionToChart 위임)
+  const handleAiDiagnosisClick = async (suggestion) => {
+    await applyAiSuggestionToChart(suggestion);
   };
 
   const handleSaveNotes = async (status) => {
@@ -272,21 +280,40 @@ function DiagnosisDetail() {
       const response = await api.put(`/admin/diagnoses/${id}/symptoms`, updatedPayload);
       const updatedDiagnosis = response.data.diagnosis;
       setDiagnosis(updatedDiagnosis);
-      setSymptomSuccess('증상이 수정되었습니다. AI 분석 중...');
       setEditingSymptoms(false);
 
-      // 유사 패턴 증례 즉시 갱신 (업데이트된 증상으로)
-      fetchAiSuggestions({
+      // 수정된 증상으로 AI 3개 진단 재추청 (유사 패턴 증례 갱신)
+      setSymptomSuccess('증상 수정 완료 - AI 전체 재분석 중...');
+      const newSuggestions = await fetchAiSuggestions({
         symptoms: symptomData.symptoms,
         bodyParts: symptomData.bodyParts.join(', '),
         skinSymptoms: symptomData.skinSymptoms.join(', '),
         images: updatedDiagnosis.images
       });
 
-      // AI 진단 결과 + 관련 의학 정보 재분석
+      // 1위 AI 제안을 차팅에 자동 적용
+      if (newSuggestions && newSuggestions.length > 0) {
+        await applyAiSuggestionToChart(newSuggestions[0]);
+      } else {
+        // 제안 없으면 차팅 초기화
+        setChartData({
+          chartDiagnosisName: '',
+          chartIcdCode: '',
+          chartInsuranceCode: '',
+          chartTreatmentGuideline: '',
+          chartSoapS: '',
+          chartSoapO: '',
+          chartSoapA: '',
+          chartSoapP: ''
+        });
+        setSelectedAiDiagnosis(null);
+      }
+
+      // AI 진단 결과 + 관련 의학 정보 재분석 (백그라운드)
       reanalyzeAfterSymptomsUpdate();
 
-      setTimeout(() => setSymptomSuccess(''), 3000);
+      setSymptomSuccess('증상 수정 완료 - 차팅이 자동 업데이트되었습니다.');
+      setTimeout(() => setSymptomSuccess(''), 4000);
     } catch (err) {
       setError(err.response?.data?.message || '증상 수정에 실패했습니다.');
     } finally {
