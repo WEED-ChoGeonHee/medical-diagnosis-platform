@@ -1,6 +1,6 @@
-# 📱 Android App - SkinIQ 환자용 앱
+# 📱 Android App Admin - SkinIQ Doctor 의사용 앱
 
-SkinIQ 환자 포털을 Android 앱으로 패키징한 WebView 앱입니다.
+SkinIQ Doctor 대시보드를 Android 앱으로 패키징한 WebView 앱입니다.
 
 ---
 
@@ -17,8 +17,8 @@ SkinIQ 환자 포털을 Android 앱으로 패키징한 WebView 앱입니다.
 
 | 항목 | 값 |
 |------|-----|
-| 앱 이름 | SkinIQ |
-| 패키지명 | `com.skiniq.patient` |
+| 앱 이름 | SkinIQ Doctor |
+| 패키지명 | `com.skiniq.doctor` |
 | 버전 | 1.0 |
 
 ---
@@ -26,12 +26,12 @@ SkinIQ 환자 포털을 Android 앱으로 패키징한 WebView 앱입니다.
 ## 폴더 구조
 
 ```
-android-app/
+android-app-admin/
 ├── app/
 │   ├── build.gradle         # 앱 빌드 설정
 │   └── src/main/
 │       ├── AndroidManifest.xml  # 앱 권한 및 설정
-│       ├── java/com/skiniq/patient/
+│       ├── java/com/skiniq/doctor/
 │       │   └── MainActivity.java  # WebView Activity
 │       └── res/
 │           ├── layout/activity_main.xml  # 레이아웃
@@ -53,18 +53,27 @@ android-app/
 ## 주요 기능
 
 ### 1. WebView
-- SkinIQ 웹사이트(`/patient`)를 앱 내에서 표시
+- SkinIQ Doctor 웹사이트(`/admin`)를 앱 내에서 표시
 - JavaScript 활성화
 
-### 2. 카메라/갤러리 연동
-- 피부 사진 촬영
-- 갤러리에서 이미지 선택
-- 다중 이미지 업로드 지원
+### 2. 카메라/갤러리 연동 (선택적)
+- 환자 사진 추가 촬영 시 사용
 
 ### 3. 권한
 - `CAMERA`: 사진 촬영
 - `READ_MEDIA_IMAGES`: 갤러리 접근 (Android 13+)
 - `READ/WRITE_EXTERNAL_STORAGE`: 갤러리 접근 (Android 12 이하)
+
+---
+
+## 환자 앱과의 차이점
+
+| 항목 | 환자 앱 | 의사 앱 |
+|------|---------|---------|
+| 패키지명 | `com.skiniq.patient` | `com.skiniq.doctor` |
+| 접속 URL | `/patient` | `/admin` |
+| 아이콘 색상 | 블루 (#4f8cff) | 퍼플 (#a855f7) |
+| 아이콘 심볼 | 피부 패턴 | 의료 십자 + AI |
 
 ---
 
@@ -80,28 +89,23 @@ android-app/
 ### 방법 2: Gradle 직접 실행
 
 ```bash
-cd android-app
+cd android-app-admin
 .\gradlew.bat assembleDebug
 ```
 
 ### 빌드 결과
 
 - Debug APK: `app/build/outputs/apk/debug/app-debug.apk`
-- 복사 위치: `apk-builds/SkinIQ-Patient.apk`
+- 복사 위치: `apk-builds/SkinIQ-Doctor.apk`
 
 ---
 
 ## 앱 아이콘
 
 아이콘 디자인 컨셉:
-- 🔬 피부 세포 패턴 + AI 네트워크
+- 🔬 의료 십자 + AI 네트워크 (의사 전용 구분)
 - 배경색: `#0a0e27` (앱 테마)
-- 메인 컬러: `#4f8cff` (블루), `#00d4ff` (시안)
-
-아이콘 파일 위치:
-- `res/drawable/ic_launcher_foreground.xml`
-- `res/drawable/ic_launcher_background.xml`
-- `res/mipmap-anydpi-v26/ic_launcher.xml`
+- 메인 컬러: `#a855f7` (퍼플), `#00d4ff` (시안)
 
 ---
 
@@ -113,8 +117,6 @@ cd android-app
 - Android SDK 34
 
 ### VS Code에서 빌드
-Android Studio 없이도 Gradle로 빌드 가능합니다.
-
 ```bash
 .\gradlew.bat assembleDebug
 ```
@@ -123,10 +125,4 @@ Android Studio 없이도 Gradle로 빌드 가능합니다.
 
 ## 배포
 
-### APK 배포
-빌드된 APK를 직접 배포하거나 사이드로딩합니다.
-
-### Play Store 배포 (선택)
-1. Release 빌드 (서명 필요)
-2. App Bundle (AAB) 생성
-3. Google Play Console 업로드
+의사 전용 앱으로, 병원 내부 배포 또는 MDM을 통해 배포합니다.
