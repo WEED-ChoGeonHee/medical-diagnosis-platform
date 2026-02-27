@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- 배경색 -->
+    <path
+        android:pathData="M0,0 L108,0 L108,108 L0,108 Z"
+        android:fillColor="#0a0e27"/>
+    
+    <!-- 미세한 그라데이션 효과를 위한 패턴 -->
+    <path
+        android:pathData="M0,0 L108,0 L108,54 L0,54 Z"
+        android:fillColor="#0d1130"
+        android:fillAlpha="0.5"/>
+    
+    <!-- 은은한 회로 패턴 배경 -->
+    <path
+        android:pathData="M10,20 L30,20 M30,20 L30,40 M50,10 L50,30 M70,20 L90,20 M90,20 L90,40"
+        android:strokeColor="#4f8cff"
+        android:strokeWidth="0.5"
+        android:strokeAlpha="0.15"/>
+    
+    <path
+        android:pathData="M10,70 L30,70 M30,70 L30,90 M50,80 L50,100 M70,70 L90,70 M90,70 L90,90"
+        android:strokeColor="#00d4ff"
+        android:strokeWidth="0.5"
+        android:strokeAlpha="0.15"/>
+</vector>

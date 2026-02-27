@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.medical.doctor'
+    namespace 'com.skiniq.doctor'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.medical.doctor"
+        applicationId "com.skiniq.doctor"
         minSdk 24
         targetSdk 34
         versionCode 1

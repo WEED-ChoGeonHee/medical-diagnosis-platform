@@ -11,8 +11,8 @@ function Header({ user, onLogout }) {
     <header className="header">
       <div className="header-content">
         <div className="header-brand">
-          <div className="header-logo">🏥</div>
-          <h1>MediDash Pro</h1>
+          <div className="header-logo">🔬</div>
+          <h1>SkinIQ Doctor</h1>
         </div>
         <nav>
           <Link to="/dashboard" className={isActive('/dashboard') ? 'active' : ''}>

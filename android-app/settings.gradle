@@ -1,2 +1,2 @@
-rootProject.name = "MedicalDiagnosis"
+rootProject.name = "SkinIQ"
 include ':app'

@@ -1,4 +1,4 @@
-package com.medical.patient;
+package com.skiniq.doctor;
 
 import android.Manifest;
 import android.app.Activity;
@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILE_CHOOSER_REQUEST_CODE = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
     
-    // 배포된 웹사이트 URL (Render.com)
-    private static final String APP_URL = "https://medical-diagnosis-platform.onrender.com/patient";
+    // SkinIQ Doctor 대시보드 URL
+    private static final String APP_URL = "https://medical-diagnosis-platform.onrender.com/admin";
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- 외부 글로우 링 -->
+    <path
+        android:pathData="M100,20 A80,80 0 1,1 100,180 A80,80 0 1,1 100,20"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="1"
+        android:strokeAlpha="0.2"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- 중간 링 -->
+    <path
+        android:pathData="M100,35 A65,65 0 1,1 100,165 A65,65 0 1,1 100,35"
+        android:strokeColor="#00d4ff"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.3"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- 육각형 네트워크 패턴 -->
+    <path
+        android:pathData="M55,100 L77,60 L123,60 L145,100 L123,140 L77,140 Z"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.4"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- 메인 원형 영역 -->
+    <path
+        android:pathData="M100,55 A45,45 0 1,1 100,145 A45,45 0 1,1 100,55"
+        android:fillColor="#111638"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="3"/>
+    
+    <!-- 의료 십자 심볼 (의사용) -->
+    <path
+        android:pathData="M92,82 L108,82 L108,92 L118,92 L118,108 L108,108 L108,118 L92,118 L92,108 L82,108 L82,92 L92,92 Z"
+        android:fillColor="#00d4ff"/>
+    
+    <!-- AI 스캔 라인 (수평) -->
+    <path
+        android:pathData="M60,100 L140,100"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.3"/>
+    
+    <!-- AI 노드 포인트 -->
+    <path
+        android:pathData="M52,100 A6,6 0 1,1 64,100 A6,6 0 1,1 52,100"
+        android:fillColor="#a855f7"/>
+    
+    <path
+        android:pathData="M136,100 A6,6 0 1,1 148,100 A6,6 0 1,1 136,100"
+        android:fillColor="#a855f7"/>
+    
+    <path
+        android:pathData="M94,50 A6,6 0 1,1 106,50 A6,6 0 1,1 94,50"
+        android:fillColor="#00d4ff"/>
+    
+    <path
+        android:pathData="M94,144 A6,6 0 1,1 106,144 A6,6 0 1,1 94,144"
+        android:fillColor="#00d4ff"/>
+    
+    <!-- 대각선 연결 - AI 네트워크 -->
+    <path
+        android:pathData="M64,100 L82,82"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.4"/>
+    
+    <path
+        android:pathData="M136,100 L118,82"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.4"/>
+    
+    <path
+        android:pathData="M100,50 L100,82"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.4"/>
+    
+    <path
+        android:pathData="M100,144 L100,118"
+        android:strokeColor="#a855f7"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.4"/>
+</vector>

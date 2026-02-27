@@ -46,9 +46,9 @@ function Login({ onLogin }) {
     <div className="login-container">
       <div className="login-card">
         <div className="login-brand">
-          <div className="login-brand-icon">🏥</div>
-          <h2>MediDash Pro</h2>
-          <p className="subtitle">의사 전용 관리 플랫폼</p>
+          <div className="login-brand-icon">🔬</div>
+          <h2>SkinIQ Doctor</h2>
+          <p className="subtitle">AI 피부 진단 의사 플랫폼</p>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -79,7 +79,7 @@ function Login({ onLogin }) {
           </button>
         </form>
         <div className="login-footer">
-          © 2026 MediDash Pro · 의료 진단 AI 플랫폼
+          © 2026 SkinIQ Doctor · AI 피부 진단 플랫폼
         </div>
       </div>
     </div>
