@@ -31,10 +31,10 @@ const startServer = async () => {
   try {
     await initDatabase();
 
-    // 헬스체크
-    app.get('/api/health', (req, res) => {
-      res.json({ status: 'ok', message: '서버 정상 작동 중', timestamp: new Date().toISOString() });
-    });
+    // 헬스체크 (비활성화됨 - 너무 많은 메일 발생)
+    // app.get('/api/health', (req, res) => {
+    //   res.json({ status: 'ok', message: '서버 정상 작동 중', timestamp: new Date().toISOString() });
+    // });
 
     // API Routes
     app.use('/api/auth', require('./routes/auth'));
