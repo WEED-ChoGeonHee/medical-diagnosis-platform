@@ -31,11 +31,6 @@ const startServer = async () => {
   try {
     await initDatabase();
 
-    // 헬스체크 (로깅 없이 단순 응답만)
-    app.get('/api/health', (req, res) => {
-      res.status(200).json({ status: 'ok' });
-    });
-
     // API Routes
     app.use('/api/auth', require('./routes/auth'));
     app.use('/api/patients', require('./routes/patients'));
