@@ -26,15 +26,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
+// 🔥 헬스체크 엔드포인트 (DB 초기화 전에 먼저 등록 - 즉시 응답)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Database 초기화 후 서버 시작
 const startServer = async () => {
   try {
     await initDatabase();
-
-    // 헬스체크 엔드포인트 (Render 알림 방지)
-    app.get('/api/health', (req, res) => {
-      res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-    });
 
     // API Routes
     app.use('/api/auth', require('./routes/auth'));
