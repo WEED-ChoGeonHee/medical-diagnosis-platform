@@ -6,6 +6,7 @@ services:
     env: node
     region: singapore
     plan: free
+    healthCheckPath: /api/health
     buildCommand: |
       echo "=== Backend 의존성 설치 ==="
       cd backend && npm ci --production=false && cd ..

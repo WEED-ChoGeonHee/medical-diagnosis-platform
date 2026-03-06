@@ -31,6 +31,11 @@ const startServer = async () => {
   try {
     await initDatabase();
 
+    // 헬스체크 엔드포인트 (Render 알림 방지)
+    app.get('/api/health', (req, res) => {
+      res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+    });
+
     // API Routes
     app.use('/api/auth', require('./routes/auth'));
     app.use('/api/patients', require('./routes/patients'));
